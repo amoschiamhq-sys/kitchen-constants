@@ -1,0 +1,8 @@
+{
+  "name": "kitchen-constants",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
