@@ -44,11 +44,11 @@ test('parseWeight rejects non-string values as invalid format', () => {
   assert.deepEqual(parseWeight(1500), { status: 'invalid-format' });
 });
 
-test('calculateDryBrine returns 16.5, 13.5, and 19.5 grams for 1500 grams', () => {
+test('calculateDryBrine returns the reviewed whole-chicken ratio for 1500 grams', () => {
   assert.deepEqual(calculateDryBrine(1500, WHOLE_CHICKEN_DRY_BRINE.ratios), {
     recommended: 16.5,
-    min: 13.5,
-    max: 19.5,
+    min: 16.5,
+    max: 16.5,
   });
 });
 
@@ -100,5 +100,5 @@ test('canonical dry-brine ratios remain ordered and use chicken weight as their 
   assert.equal(WHOLE_CHICKEN_DRY_BRINE.outputUnit, 'g');
   assert.ok(ratios.min <= ratios.recommended);
   assert.ok(ratios.recommended <= ratios.max);
-  assert.deepEqual(ratios, { min: 0.9, recommended: 1.1, max: 1.3 });
+  assert.deepEqual(ratios, { min: 1.1, recommended: 1.1, max: 1.1 });
 });

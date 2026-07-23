@@ -2,71 +2,94 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  getBreadcrumbs,
-  getPreparationViewModel,
+  canonicalSelectionHash,
   getSinglePageViewModel,
   getRouteChoices,
   getRouteTitle,
-  parentRoute,
   parseRoute,
+  resolveSelection,
   routeToHash,
   selectionKey,
 } from '../src/navigation.js';
+import { MEAT_CATALOG } from '../src/constants.js';
 
-test('parseRoute maps the multi-meat paths to their route states', () => {
+test('approved catalogue exposes the compact five-meat matrix', () => {
+  assert.deepEqual(MEAT_CATALOG.map((meat) => meat.label), [
+    'Chicken', 'Beef', 'Pork', 'Lamb', 'Seafood',
+  ]);
+  assert.deepEqual(MEAT_CATALOG.map((meat) => meat.types.map((type) => type.label)), [
+    ['Whole chicken', 'Breast', 'Thigh', 'Ground poultry'],
+    ['Steak', 'Ribeye', 'Beef ribs', 'Ground 80/20'],
+    ['Chop', 'Tenderloin', 'Ribs', 'Ground pork'],
+    ['Chops', 'Leg', 'Rack', 'Shoulder'],
+    ['Scallops', 'Shrimp', 'Fish'],
+  ]);
+});
+
+test('every active cut has a non-empty detail and doneness choice', () => {
+  for (const meat of MEAT_CATALOG) {
+    for (const type of meat.types) {
+      assert.ok(type.details.length > 0, `${meat.label} ${type.label} has no details`);
+      assert.ok(type.doneness.length > 0, `${meat.label} ${type.label} has no doneness`);
+    }
+  }
+});
+
+test('resolved selection defaults every downstream choice', () => {
+  const resolved = resolveSelection(parseRoute('#/beef'));
+
+  assert.equal(resolved.meat.label, 'Beef');
+  assert.equal(resolved.type.label, 'Steak');
+  assert.equal(resolved.detail.label, 'Bone-in');
+  assert.equal(resolved.doneness.label, 'Medium-rare');
+  assert.equal(resolved.selectionComplete, true);
+});
+
+test('canonical selection hash includes the resolved detail and doneness', () => {
+  const resolved = resolveSelection(parseRoute('#/lamb/shoulder'));
+
+  assert.equal(
+    canonicalSelectionHash(resolved),
+    '#/lamb/shoulder/bone-in/tender',
+  );
+});
+
+test('parseRoute maps supported selection paths to route states', () => {
   assert.equal(parseRoute('#/').kind, 'home');
   assert.equal(parseRoute('#/chicken').kind, 'meat');
   assert.equal(parseRoute('#/chicken/whole').kind, 'cut');
-  assert.equal(parseRoute('#/chicken/breast/bone-in').kind, 'variant');
-  assert.equal(parseRoute('#/beef/roast/medium-rare').kind, 'doneness');
+  assert.equal(parseRoute('#/chicken/breast/bone-in').kind, 'detail');
   assert.equal(parseRoute('#/beef/steak/bone-in/medium-rare').kind, 'doneness');
-  assert.equal(parseRoute('#/chicken/whole/dry-brine').kind, 'preparation');
-  assert.equal(parseRoute('#/chicken/breast/boneless/dry-brine').kind, 'preparation');
-  assert.equal(parseRoute('#/beef/steak/bone-in/medium/ dry-brine').kind, 'not-found');
-  assert.equal(parseRoute('#/beef/steak/bone-in/medium/dry-brine').kind, 'preparation');
 });
 
 test('parseRoute maps unknown and malformed hashes to not-found', () => {
-  for (const hash of ['#/fish', '#/chicken/wing', '#/chicken/whole/bone-in', '#/beef/steak/medium']) {
+  for (const hash of ['#/fish', '#/chicken/wing', '#/chicken/whole/bone-in', '#/beef/steak/bone-in/rare']) {
     assert.equal(parseRoute(hash).kind, 'not-found', hash);
   }
 });
 
-test('route parent mapping returns the correct selection step', () => {
-  const steakResult = parseRoute('#/beef/steak/bone-in/medium-rare/dry-brine');
-  const breastResult = parseRoute('#/chicken/breast/boneless/dry-brine');
-  const roastDoneness = parseRoute('#/beef/roast/medium');
-
-  assert.equal(parentRoute(steakResult).hash, '#/beef/steak/bone-in/medium-rare');
-  assert.equal(parentRoute(breastResult).hash, '#/chicken/breast/boneless');
-  assert.equal(parentRoute(roastDoneness).hash, '#/beef/roast');
-});
-
-test('route parsing and hash generation are idempotent', () => {
-  const original = parseRoute('#/chicken/thigh/bone-in/dry-brine');
+test('route parsing and hash generation are idempotent for selection paths', () => {
+  const original = parseRoute('#/chicken/thigh/bone-in');
   const reparsed = parseRoute(routeToHash(original));
 
-  assert.equal(routeToHash(reparsed), '#/chicken/thigh/bone-in/dry-brine');
+  assert.equal(routeToHash(reparsed), '#/chicken/thigh/bone-in');
   assert.equal(selectionKey(original), selectionKey(reparsed));
 });
 
-test('route choices expose the three working meats and their types', () => {
+test('route choices expose the compact active catalogue', () => {
   const homeChoices = getRouteChoices(parseRoute('#/'));
   const beefChoices = getRouteChoices(parseRoute('#/beef'));
 
-  assert.deepEqual(homeChoices.slice(0, 3).map((choice) => choice.label), ['Chicken', 'Beef', 'Pork']);
-  assert.deepEqual(beefChoices.map((choice) => choice.label), ['Steak', 'Roast']);
-  assert.ok(homeChoices.slice(3).every((choice) => choice.kind === 'inert'));
+  assert.deepEqual(homeChoices.slice(0, 5).map((choice) => choice.label), [
+    'Chicken', 'Beef', 'Pork', 'Lamb', 'Seafood',
+  ]);
+  assert.deepEqual(beefChoices.map((choice) => choice.label), [
+    'Steak', 'Ribeye', 'Beef ribs', 'Ground 80/20',
+  ]);
+  assert.equal(homeChoices.length, 5);
 });
 
-test('whole chicken does not offer a bone-in or boneless step', () => {
-  const choices = getRouteChoices(parseRoute('#/chicken/whole'));
-
-  assert.deepEqual(choices.map((choice) => choice.label), ['Dry brine', 'Internal temperature']);
-  assert.ok(choices.every((choice) => !choice.label.includes('Bone')));
-});
-
-test('conditional variant and doneness choices appear only where applicable', () => {
+test('detail and doneness choices are exposed for every applicable step', () => {
   assert.deepEqual(
     getRouteChoices(parseRoute('#/chicken/breast')).map((choice) => choice.label),
     ['Bone-in', 'Boneless'],
@@ -77,75 +100,148 @@ test('conditional variant and doneness choices appear only where applicable', ()
   );
   assert.deepEqual(
     getRouteChoices(parseRoute('#/pork/tenderloin')).map((choice) => choice.label),
-    ['Dry brine', 'Internal temperature'],
+    ['Boneless'],
+  );
+  assert.deepEqual(
+    getRouteChoices(parseRoute('#/chicken/whole')).map((choice) => choice.label),
+    ['Whole'],
   );
 });
 
-test('dry-brine view model exposes confirmed constants before weight input', () => {
-  const viewModel = getPreparationViewModel(parseRoute('#/chicken/whole/dry-brine'));
+test('single-page model resolves whole-chicken defaults before weight input', () => {
+  const model = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/whole')));
 
-  assert.equal(viewModel.contentStatus, 'needs-review');
-  assert.deepEqual(viewModel.content.ratios, { min: 0.9, recommended: 1.1, max: 1.3 });
-  assert.deepEqual(viewModel.weight, { status: 'empty' });
-  assert.equal(viewModel.result, null);
+  assert.equal(model.selectionComplete, true);
+  assert.deepEqual(model.weight, { status: 'empty' });
+  assert.equal(model.dryBrine.contentStatus, 'reviewed');
+  assert.deepEqual(model.dryBrine.ratios, { min: 1.1, recommended: 1.1, max: 1.1 });
+  assert.equal(model.result, null);
 });
 
-test('whole-chicken dry-brine view model calculates without stale output', () => {
-  const route = parseRoute('#/chicken/whole/dry-brine');
-  const valid = getPreparationViewModel(route, '1500');
-  const invalid = getPreparationViewModel(route, '12kg');
+test('single-page whole-chicken model calculates without stale output', () => {
+  const selection = resolveSelection(parseRoute('#/chicken/whole'));
+  const valid = getSinglePageViewModel(selection, '1500');
+  const invalid = getSinglePageViewModel(selection, '12kg');
 
-  assert.deepEqual(valid.result, { recommended: 16.5, min: 13.5, max: 19.5 });
+  assert.deepEqual(valid.result, { recommended: 16.5, min: 16.5, max: 16.5 });
   assert.equal(invalid.result, null);
   assert.equal(invalid.weight.status, 'invalid-format');
 });
 
-test('single-page whole-chicken selection keeps salt and temperature together', () => {
-  const route = parseRoute('#/chicken/whole');
-  const model = getSinglePageViewModel(route, '1500');
+test('single-page model exposes grams without salt-volume fields', () => {
+  const model = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/whole')), '1500');
 
-  assert.equal(model.selectionComplete, true);
-  assert.equal(model.dryBrine.preparation, 'Dry brine');
-  assert.equal(model.internalTemperature.preparation, 'internal-temperature');
-  assert.equal(model.internalTemperature.contentStatus, 'reviewed');
-  assert.equal(model.internalTemperature.targetInternalTemperature, '165°F / 74°C');
-  assert.deepEqual(model.result, { recommended: 16.5, min: 13.5, max: 19.5 });
+  assert.deepEqual(model.result, { recommended: 16.5, min: 16.5, max: 16.5 });
+  assert.equal('saltType' in model, false);
+  assert.equal('spoonResult' in model, false);
 });
 
-test('single-page chef temperatures follow the selected beef doneness', () => {
-  const mediumRare = getSinglePageViewModel(parseRoute('#/beef/steak/bone-in/medium-rare'));
-  const medium = getSinglePageViewModel(parseRoute('#/beef/steak/bone-in/medium'));
+test('reviewed dry-brine timing remains tailored for ground meat and seafood', () => {
+  const ground = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ground-80-20')), '1000');
+  const seafood = getSinglePageViewModel(resolveSelection(parseRoute('#/seafood/shrimp')), '1000');
+
+  assert.match(ground.dryBrine.timing, /refrigerator for 30 minutes/);
+  assert.match(seafood.dryBrine.timing, /Keep chilled for 30 minutes to 1 hour/);
+});
+
+test('single-page chef temperatures follow selected beef doneness', () => {
+  const mediumRare = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/steak/bone-in/medium-rare')));
+  const medium = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/steak/bone-in/medium')));
 
   assert.equal(mediumRare.internalTemperature.targetInternalTemperature, '130–135°F / 54–57°C');
   assert.equal(medium.internalTemperature.targetInternalTemperature, '135–145°F / 57–63°C');
   assert.match(mediumRare.internalTemperature.safety, /145°F/);
 });
 
-test('single-page selections wait for required detail before showing results', () => {
-  const route = parseRoute('#/chicken/thigh');
-  const model = getSinglePageViewModel(route, '1500');
+test('reviewed lamb temperatures cover each roast and chop doneness choice', () => {
+  const expected = {
+    'medium-rare': '130–135°F / 54–57°C',
+    medium: '135–145°F / 57–63°C',
+  };
 
-  assert.equal(model.selectionComplete, false);
-  assert.equal(model.result, null);
+  for (const cut of ['chops', 'leg', 'rack']) {
+    for (const [doneness, target] of Object.entries(expected)) {
+      const model = getSinglePageViewModel(
+        resolveSelection(parseRoute(`#/lamb/${cut}/bone-in/${doneness}`)),
+      );
+      const temperature = model.internalTemperature;
+
+      assert.equal(temperature.contentStatus, 'reviewed', `${cut} ${doneness}`);
+      assert.equal(temperature.targetInternalTemperature, target, `${cut} ${doneness}`);
+      assert.match(temperature.guidance, /5°F \/ 2°C early for chops/);
+      assert.match(temperature.guidance, /10–12°F \/ 5–6°C early for larger roasts/);
+      assert.match(temperature.safety, /145°F \/ 63°C with at least 3 minutes of rest/);
+      assert.equal(
+        temperature.source,
+        'https://blog.thermoworks.com/chef-recommended-tw-approved/',
+      );
+      assert.equal(
+        temperature.safetySource,
+        'https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/safe-temperature-chart',
+      );
+      assert.equal(temperature.reviewedOn, '2026-07-23');
+    }
+  }
+});
+
+test('reviewed ground meat and seafood temperatures use safety baselines', () => {
+  const groundPoultry = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/ground')));
+  const groundBeef = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ground-80-20')));
+  const groundPork = getSinglePageViewModel(resolveSelection(parseRoute('#/pork/ground')));
+  const seafood = getSinglePageViewModel(resolveSelection(parseRoute('#/seafood/fish')));
+
+  assert.equal(groundPoultry.internalTemperature.targetInternalTemperature, '165°F / 74°C');
+  assert.match(groundPoultry.internalTemperature.safety, /ground poultry/);
+  assert.equal(groundBeef.internalTemperature.targetInternalTemperature, '160°F / 71°C');
+  assert.match(groundBeef.internalTemperature.safety, /ground beef and pork/);
+  assert.equal(groundPork.internalTemperature.targetInternalTemperature, '160°F / 71°C');
+  assert.equal(seafood.internalTemperature.targetInternalTemperature, '145°F / 63°C');
+});
+
+test('compact catalogue keeps source ratios for active detail choices', () => {
+  const chickenBoneIn = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/breast/bone-in')), '1000');
+  const chickenBoneless = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/breast/boneless')), '1000');
+  const ribeyeBoneIn = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ribeye/bone-in/medium-rare')), '1000');
+  const ribeyeBoneless = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ribeye/boneless/medium-rare')), '1000');
+
+  assert.equal(chickenBoneIn.dryBrine.ratios.recommended, 1.1);
+  assert.equal(chickenBoneless.dryBrine.ratios.recommended, 1);
+  assert.equal(ribeyeBoneIn.dryBrine.ratios.recommended, 1);
+  assert.equal(ribeyeBoneless.dryBrine.ratios.recommended, 1.1);
+});
+
+test('resolved selections are complete even when the source hash is partial', () => {
+  const model = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/thigh')), '1500');
+
+  assert.equal(model.selectionComplete, true);
   assert.equal(model.weight.status, 'valid');
+  assert.ok(model.result);
+});
+
+test('legacy preparation hashes resolve once to the canonical selection', () => {
+  const parsed = parseRoute('#/chicken/whole/dry-brine');
+  const resolved = resolveSelection(parsed);
+
+  assert.equal(parsed.legacyPreparation, true);
+  assert.equal(resolved.hash, '#/chicken/whole/whole/cook-through');
 });
 
 test('rapid calculator updates keep only the latest derived state', () => {
-  const route = parseRoute('#/chicken/whole/dry-brine');
+  const selection = resolveSelection(parseRoute('#/chicken/whole'));
   const weights = ['1200', '1750', '2200', '950', '750,5'];
-  const models = weights.map((weight) => getPreparationViewModel(route, weight));
+  const models = weights.map((weight) => getSinglePageViewModel(selection, weight));
   const latest = models.at(-1);
 
   assert.equal(latest.weight.status, 'valid');
   assert.deepEqual(latest.result, {
     recommended: 8.2555,
-    min: 6.7545,
-    max: 9.7565,
+    min: 8.2555,
+    max: 8.2555,
   });
   assert.equal(models.at(-2).result.recommended, 10.45);
 });
 
-test('not-found recovery returns a valid home render model', () => {
+test('not-found recovery returns a valid home title', () => {
   const notFound = parseRoute('#/unknown');
   const home = parseRoute('#/');
 
@@ -160,7 +256,6 @@ test('active route choices have accessible labels and destinations', () => {
     parseRoute('#/chicken'),
     parseRoute('#/chicken/breast'),
     parseRoute('#/beef/steak/bone-in'),
-    parseRoute('#/beef/steak/bone-in/medium'),
   ];
 
   for (const route of routes) {
@@ -174,9 +269,9 @@ test('active route choices have accessible labels and destinations', () => {
 });
 
 test('error and result states are mutually exclusive', () => {
-  const route = parseRoute('#/chicken/whole/dry-brine');
-  const invalid = getPreparationViewModel(route, '12kg');
-  const valid = getPreparationViewModel(route, '1200');
+  const selection = resolveSelection(parseRoute('#/chicken/whole'));
+  const invalid = getSinglePageViewModel(selection, '12kg');
+  const valid = getSinglePageViewModel(selection, '1200');
 
   assert.equal(invalid.weight.status, 'invalid-format');
   assert.equal(invalid.result, null);
@@ -184,20 +279,18 @@ test('error and result states are mutually exclusive', () => {
   assert.ok(valid.result);
 });
 
-test('unreviewed paths expose placeholders rather than invented culinary values', () => {
-  const breast = getPreparationViewModel(parseRoute('#/chicken/breast/boneless/dry-brine'), '1500');
+test('unreviewed tender cuts keep a stable pending temperature state', () => {
+  const hashes = [
+    '#/beef/ribs/bone-in/tender',
+    '#/pork/ribs/bone-in/tender',
+    '#/lamb/shoulder/bone-in/tender',
+  ];
 
-  assert.equal(breast.contentStatus, 'needs-review');
-  assert.equal(breast.content.ratios, null);
-  assert.equal(breast.result, null);
-});
+  for (const hash of hashes) {
+    const model = getSinglePageViewModel(resolveSelection(parseRoute(hash)), '1500');
 
-test('breadcrumbs provide direct Change links for each prior decision', () => {
-  const crumbs = getBreadcrumbs(parseRoute('#/beef/steak/bone-in/medium-rare/dry-brine'));
-
-  assert.deepEqual(crumbs.map((crumb) => crumb.label), [
-    'Home', 'Beef', 'Steak', 'Bone-in', 'Medium-rare', 'Dry brine',
-  ]);
-  assert.equal(crumbs[2].href, '#/beef/steak');
-  assert.equal(crumbs[4].href, '#/beef/steak/bone-in/medium-rare');
+    assert.equal(model.selectionComplete, true, hash);
+    assert.equal(model.internalTemperature.contentStatus, 'needs-review', hash);
+    assert.equal(model.internalTemperature.targetInternalTemperature, null, hash);
+  }
 });

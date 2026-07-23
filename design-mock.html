@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchen Constants — Light Cookbook Mock</title>
+  <style>
+    :root {
+      --flour: #f1eee6;
+      --paper: #faf8f2;
+      --ink: #20231f;
+      --pandan: #6f7d68;
+      --pandan-dark: #596652;
+      --sesame: #a97a3c;
+      --stone: #d8d2c5;
+      --stone-light: #e7e2d8;
+      --brick: #965846;
+      --shadow: rgba(55, 48, 37, 0.09);
+      font-family: Aptos, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--flour);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.18)),
+        var(--flour);
+    }
+
+    button,
+    input { font: inherit; }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(169, 122, 60, 0.35);
+      outline-offset: 2px;
+    }
+
+    .app {
+      width: min(100%, 920px);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 0 14px;
+      border-top: 1px solid var(--sesame);
+      border-bottom: 1px solid var(--stone);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--pandan);
+      border-radius: 50%;
+      color: var(--pandan-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    .masthead-note {
+      margin: 0;
+      color: #62675f;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .selector {
+      display: grid;
+      gap: 13px;
+      padding: 17px 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .field-label,
+    .card-title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 400;
+    }
+
+    .field-label {
+      color: #41463f;
+      font-size: 15px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .option {
+      min-height: 42px;
+      padding: 9px 13px;
+      border: 1px solid var(--stone);
+      border-radius: 8px;
+      color: var(--ink);
+      background: rgba(250, 248, 242, 0.6);
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 120ms ease, background 120ms ease, color 120ms ease, transform 120ms ease;
+    }
+
+    .option:hover {
+      border-color: var(--pandan);
+      background: var(--paper);
+    }
+
+    .option:active { transform: translateY(1px); }
+
+    .option[aria-pressed="true"] {
+      border-color: var(--pandan-dark);
+      color: #fffef8;
+      background: var(--pandan-dark);
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1.08fr 1fr;
+      gap: 12px;
+    }
+
+    .result-card {
+      position: relative;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      min-width: 0;
+      padding: 18px;
+      overflow: hidden;
+      border: 1px solid var(--stone);
+      border-radius: 10px;
+      background: var(--paper);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--sesame);
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 21px;
+    }
+
+    .tag {
+      padding: 5px 8px;
+      border: 1px solid var(--stone);
+      border-radius: 999px;
+      color: #5f655c;
+      background: var(--flour);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .ratio-block {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid var(--stone-light);
+    }
+
+    .ratio,
+    .temperature,
+    .salt-output {
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.035em;
+    }
+
+    .ratio {
+      color: var(--sesame);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(40px, 7vw, 58px);
+      font-weight: 400;
+    }
+
+    .ratio-label {
+      color: #61665e;
+      font-size: 13px;
+    }
+
+    .weight-label {
+      display: grid;
+      gap: 6px;
+      color: #41463f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 14px;
+    }
+
+    .weight-input {
+      width: 100%;
+      min-height: 42px;
+      padding: 8px 11px;
+      border: 1px solid var(--stone);
+      border-radius: 8px;
+      color: var(--ink);
+      background: #fffef9;
+      font-family: Aptos, "Segoe UI", Arial, sans-serif;
+      font-size: 16px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .salt-line {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .salt-output,
+    .temperature {
+      color: var(--ink);
+      font-size: clamp(28px, 5vw, 38px);
+      font-weight: 650;
+    }
+
+    .small-note {
+      margin: 0;
+      color: #656a62;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .doneness {
+      display: grid;
+      gap: 7px;
+    }
+
+    .validation {
+      color: var(--brick);
+    }
+
+    @media (max-width: 620px) {
+      .app { padding: 14px; }
+      .button-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .results { grid-template-columns: 1fr; }
+      .masthead-note { display: none; }
+    }
+
+    @media (max-width: 360px) {
+      .app { padding: 11px; }
+      .option { padding-inline: 9px; }
+      .result-card { padding: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .option { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="masthead">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">KC</span>
+        <h1 class="brand-name">Kitchen Constants</h1>
+      </div>
+      <p class="masthead-note">Kitchen reference</p>
+    </header>
+
+    <section class="selector" aria-label="Food selection">
+      <div class="field" role="group" aria-labelledby="meat-label">
+        <p class="field-label" id="meat-label">Meat</p>
+        <div class="button-grid" id="meats">
+          <button class="option" type="button" data-meat="chicken">Chicken</button>
+          <button class="option" type="button" data-meat="beef">Beef</button>
+          <button class="option" type="button" data-meat="pork">Pork</button>
+          <button class="option" type="button" data-meat="lamb">Lamb</button>
+          <button class="option" type="button" data-meat="seafood">Seafood</button>
+        </div>
+      </div>
+
+      <div class="field" role="group" aria-labelledby="cut-label">
+        <p class="field-label" id="cut-label">Cut</p>
+        <div class="button-grid" id="cuts"></div>
+      </div>
+
+      <div class="field" role="group" aria-labelledby="detail-label">
+        <p class="field-label" id="detail-label">Detail</p>
+        <div class="button-row" id="details"></div>
+      </div>
+    </section>
+
+    <section class="results" aria-label="Cooking results">
+      <article class="result-card" aria-labelledby="prepare-title">
+        <div class="card-heading">
+          <h2 class="card-title" id="prepare-title">Prepare</h2>
+          <span class="tag">Dry brine</span>
+        </div>
+
+        <div class="ratio-block">
+          <p class="ratio" id="ratio"></p>
+          <span class="ratio-label">salt by weight</span>
+        </div>
+
+        <label class="weight-label" for="weight">
+          Food weight (g)
+          <input class="weight-input" id="weight" type="text" inputmode="decimal" value="100" aria-describedby="salt-output">
+        </label>
+
+        <div class="salt-line">
+          <p class="salt-output" id="salt-output" aria-live="polite"></p>
+          <span class="ratio-label">salt</span>
+        </div>
+        <p class="small-note" id="timing"></p>
+      </article>
+
+      <article class="result-card" aria-labelledby="finish-title">
+        <div class="card-heading">
+          <h2 class="card-title" id="finish-title">Finish</h2>
+          <span class="tag">Internal temperature</span>
+        </div>
+
+        <div class="doneness" role="group" aria-labelledby="doneness-label">
+          <p class="field-label" id="doneness-label">Doneness</p>
+          <div class="button-row" id="finishes"></div>
+        </div>
+
+        <p class="temperature" id="temperature"></p>
+        <p class="small-note" id="temperature-note"></p>
+        <p class="small-note" id="safety"></p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const medium = [
+        { slug: 'medium-rare', label: 'Medium-rare', temperature: ['130–135°F / 54–57°C', 'Pull a little early for carryover heat.', 'Whole-cut safety baseline: 145°F / 63°C plus 3 minutes rest.'] },
+        { slug: 'medium', label: 'Medium', temperature: ['135–145°F / 57–63°C', 'Rest before serving.', 'Whole-cut safety baseline: 145°F / 63°C plus 3 minutes rest.'] }
+      ];
+
+      const fixed = (label, temperature) => [{ slug: 'recommended', label, temperature }];
+
+      const catalogue = {
+        chicken: [
+          { slug: 'whole', label: 'Whole chicken', details: [['whole', 'Whole', 1.1]], finishes: fixed('Cook through', ['165°F / 74°C', 'Check breast and thigh at the thickest part.', 'Safe minimum for poultry: 165°F / 74°C.']), timing: 'At least 4 hours; overnight is ideal.' },
+          { slug: 'breast', label: 'Breast', details: [['bone-in', 'Bone-in', 1.1], ['boneless', 'Boneless', 1.0]], finishes: fixed('Cook through', ['165°F / 74°C', 'Probe the thickest part.', 'Safe minimum for poultry: 165°F / 74°C.']), timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'thigh', label: 'Thigh', details: [['bone-in', 'Bone-in', 1.1], ['boneless', 'Boneless', 1.0]], finishes: fixed('Tender', ['170–175°F / 77–79°C', 'Dark meat is more tender in this range.', 'Safe minimum for poultry: 165°F / 74°C.']), timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'ground', label: 'Ground poultry', details: [['ground', 'Ground', 0.75]], finishes: fixed('Cook through', ['165°F / 74°C', 'Check the centre of the thickest part.', 'Safe minimum for ground poultry: 165°F / 74°C.']), timing: 'Salt shortly before shaping and cooking.' }
+        ],
+        beef: [
+          { slug: 'steak', label: 'Steak', details: [['bone-in', 'Bone-in', 1.0], ['boneless', 'Boneless', 1.1]], finishes: medium, timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'ribeye', label: 'Ribeye', details: [['bone-in', 'Bone-in', 1.0], ['boneless', 'Boneless', 1.1]], finishes: medium, timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'ribs', label: 'Beef ribs', details: [['bone-in', 'Bone-in', 0.9]], finishes: fixed('Tender', ['195–205°F / 91–96°C', 'Cook until tender rather than by temperature alone.', 'Texture is the main guide for slow-cooked ribs.']), timing: 'At least 4 hours; overnight is ideal.' },
+          { slug: 'ground', label: 'Ground 80/20', details: [['ground', 'Ground', 1.15]], finishes: fixed('Cook through', ['160°F / 71°C', 'Check the centre of the thickest part.', 'Safe minimum for ground beef: 160°F / 71°C.']), timing: 'Salt shortly before shaping and cooking.' }
+        ],
+        pork: [
+          { slug: 'chop', label: 'Chop', details: [['bone-in', 'Bone-in', 1.1], ['boneless', 'Boneless', 1.0]], finishes: fixed('Recommended', ['145°F / 63°C', 'Rest for at least 3 minutes.', 'Safe minimum: 145°F / 63°C plus 3 minutes rest.']), timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'tenderloin', label: 'Tenderloin', details: [['boneless', 'Boneless', 1.0]], finishes: fixed('Recommended', ['145°F / 63°C', 'Rest for at least 3 minutes.', 'Safe minimum: 145°F / 63°C plus 3 minutes rest.']), timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'ribs', label: 'Ribs', details: [['bone-in', 'Bone-in', 1.1]], finishes: fixed('Tender', ['195–205°F / 91–96°C', 'Cook until tender rather than by temperature alone.', 'Texture is the main guide for slow-cooked ribs.']), timing: 'At least 4 hours; overnight is ideal.' },
+          { slug: 'ground', label: 'Ground pork', details: [['ground', 'Ground', 1.25]], finishes: fixed('Cook through', ['160°F / 71°C', 'Check the centre of the thickest part.', 'Safe minimum for ground pork: 160°F / 71°C.']), timing: 'Salt shortly before shaping and cooking.' }
+        ],
+        lamb: [
+          { slug: 'chops', label: 'Chops', details: [['bone-in', 'Bone-in', 0.9], ['boneless', 'Boneless', 1.0]], finishes: medium, timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'leg', label: 'Leg', details: [['bone-in', 'Bone-in', 0.9], ['boneless', 'Boneless', 1.0]], finishes: medium, timing: 'At least 4 hours; overnight is ideal.' },
+          { slug: 'rack', label: 'Rack', details: [['bone-in', 'Bone-in', 0.9]], finishes: medium, timing: 'At least 1 hour; overnight is ideal.' },
+          { slug: 'shoulder', label: 'Shoulder', details: [['bone-in', 'Bone-in', 0.9], ['boneless', 'Boneless', 1.0]], finishes: fixed('Tender', ['195–205°F / 91–96°C', 'Cook until yielding and tender.', 'Texture is the main guide for slow-cooked shoulder.']), timing: 'At least 4 hours; overnight is ideal.' }
+        ],
+        seafood: [
+          { slug: 'scallops', label: 'Scallops', details: [['standard', 'Standard', 0.9]], finishes: fixed('Cook through', ['145°F / 63°C', 'Check the thickest part.', 'Safe minimum for seafood: 145°F / 63°C.']), timing: '30 minutes to 1 hour; cook promptly.' },
+          { slug: 'shrimp', label: 'Shrimp', details: [['peeled', 'Peeled', 0.65], ['shell-on', 'Shell-on', 0.75]], finishes: fixed('Cook through', ['145°F / 63°C', 'Cook until opaque and just firm.', 'Safe minimum for seafood: 145°F / 63°C.']), timing: '30 minutes to 1 hour; cook promptly.' },
+          { slug: 'fish', label: 'Fish', details: [['fillet', 'Fillet', 0.75], ['whole', 'Whole', 0.8]], finishes: fixed('Cook through', ['145°F / 63°C', 'Check the thickest part.', 'Safe minimum for seafood: 145°F / 63°C.']), timing: '30 minutes to 1 hour; cook promptly.' }
+        ]
+      };
+
+      Object.values(catalogue).flat().forEach((cut) => {
+        cut.details = cut.details.map(([slug, label, ratio]) => ({ slug, label, ratio }));
+      });
+
+      const elements = {
+        meatButtons: [...document.querySelectorAll('[data-meat]')],
+        cuts: document.querySelector('#cuts'),
+        details: document.querySelector('#details'),
+        finishes: document.querySelector('#finishes'),
+        ratio: document.querySelector('#ratio'),
+        weight: document.querySelector('#weight'),
+        salt: document.querySelector('#salt-output'),
+        timing: document.querySelector('#timing'),
+        temperature: document.querySelector('#temperature'),
+        temperatureNote: document.querySelector('#temperature-note'),
+        safety: document.querySelector('#safety')
+      };
+
+      const state = { meat: 'chicken', cut: 'whole', detail: 'whole', finish: 'recommended' };
+      const currentCuts = () => catalogue[state.meat];
+      const currentCut = () => currentCuts().find((cut) => cut.slug === state.cut) || currentCuts()[0];
+      const currentDetail = () => currentCut().details.find((detail) => detail.slug === state.detail) || currentCut().details[0];
+      const currentFinish = () => currentCut().finishes.find((finish) => finish.slug === state.finish) || currentCut().finishes[0];
+
+      function chooseMeat(meat) {
+        state.meat = meat;
+        chooseCut(catalogue[meat][0].slug);
+      }
+
+      function chooseCut(cut) {
+        state.cut = cut;
+        state.detail = currentCut().details[0].slug;
+        state.finish = currentCut().finishes[0].slug;
+      }
+
+      function option(label, type, value, selected) {
+        return `<button class="option" type="button" data-${type}="${value}" aria-pressed="${selected}">${label}</button>`;
+      }
+
+      function renderMeats() {
+        elements.meatButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.meat === state.meat)));
+      }
+
+      function renderCuts() {
+        elements.cuts.innerHTML = currentCuts().map((cut) => option(cut.label, 'cut', cut.slug, cut.slug === state.cut)).join('');
+        elements.cuts.querySelectorAll('[data-cut]').forEach((button) => button.addEventListener('click', () => {
+          chooseCut(button.dataset.cut);
+          renderAll();
+        }));
+      }
+
+      function renderDetails() {
+        elements.details.innerHTML = currentCut().details.map((detail) => option(detail.label, 'detail', detail.slug, detail.slug === state.detail)).join('');
+        elements.details.querySelectorAll('[data-detail]').forEach((button) => button.addEventListener('click', () => {
+          state.detail = button.dataset.detail;
+          renderDetails();
+          renderOutputs();
+        }));
+      }
+
+      function renderFinishes() {
+        elements.finishes.innerHTML = currentCut().finishes.map((finish) => option(finish.label, 'finish', finish.slug, finish.slug === state.finish)).join('');
+        elements.finishes.querySelectorAll('[data-finish]').forEach((button) => button.addEventListener('click', () => {
+          state.finish = button.dataset.finish;
+          renderFinishes();
+          renderOutputs();
+        }));
+      }
+
+      function parseWeight(value) {
+        const normal = String(value).trim().replace(',', '.');
+        if (!/^\d+(?:\.\d+)?$/.test(normal)) return null;
+        const number = Number(normal);
+        return Number.isFinite(number) && number > 0 ? number : null;
+      }
+
+      function renderOutputs() {
+        const detail = currentDetail();
+        const finish = currentFinish();
+        const weight = parseWeight(elements.weight.value);
+        elements.ratio.textContent = `${detail.ratio}%`;
+        elements.salt.textContent = weight === null ? 'Enter a weight' : `${(weight * detail.ratio / 100).toFixed(1)} g`;
+        elements.salt.classList.toggle('validation', weight === null);
+        elements.timing.textContent = `Timing: ${currentCut().timing}`;
+        elements.temperature.textContent = finish.temperature[0];
+        elements.temperatureNote.textContent = finish.temperature[1];
+        elements.safety.textContent = finish.temperature[2];
+      }
+
+      function renderAll() {
+        renderMeats();
+        renderCuts();
+        renderDetails();
+        renderFinishes();
+        renderOutputs();
+      }
+
+      elements.meatButtons.forEach((button) => button.addEventListener('click', () => {
+        chooseMeat(button.dataset.meat);
+        renderAll();
+      }));
+      elements.weight.addEventListener('input', renderOutputs);
+      renderAll();
+    })();
+  </script>
+</body>
+</html>

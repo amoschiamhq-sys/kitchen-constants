@@ -1,530 +1,646 @@
-# Kitchen Constants — Initial Prototype Implementation Contract
+# Kitchen Constants — Approved Redesign Implementation Contract
 
-## Purpose
+## Objective
 
+Bring the existing single-page calculator into line with the approved interaction and visual direction without adding unrelated features.
 
-Build the first mobile-first, testable Kitchen Constants prototype around a small interaction matrix:
+The page’s single job is to let a home cook choose a meat, cut, detail, and doneness; immediately see the dry-brine percentage and internal-temperature guidance; and optionally change a default `100 g` weight to calculate salt in grams.
 
-`Home → Meat → Type → (variant or doneness when relevant) → Preparation → Result`
+The approved masthead copy is:
 
-The working paths are:
+> Measure twice. Season once.
 
-- Chicken → Whole chicken
-- Chicken → Breast → Bone-in / Boneless
-- Chicken → Thigh → Bone-in / Boneless
-- Beef → Steak → Bone-in / Boneless → Medium-rare / Medium
-- Beef → Roast → Medium-rare / Medium
-- Pork → Chop → Bone-in / Boneless
-- Pork → Tenderloin
+This contract is for implementation by another coding model. It does not authorize implementation during the planning pass.
 
-The whole-chicken dry-brine screen must expose the confirmed constant before input and calculate salt. Other paths must exercise the same switching model but show an explicit content-review placeholder until their culinary values are approved.
+## Approved product decisions
 
-This contract intentionally stops at a representative interaction matrix. It does not implement the broader launch catalogue.
+These decisions supersede conflicting statements in the older plan and implementation notes:
 
-## Current repository diagnosis
+1. The interface is one compact page. Meat, Cut, Detail, Doneness, Prepare, and Finish remain visible together.
+2. All choice controls are buttons or native links styled as buttons. Selection dropdowns are not used.
+3. Selecting a meat automatically selects that meat’s first cut, first detail, and first doneness.
+4. Selecting a cut automatically selects that cut’s first detail and first doneness.
+5. Detail is always visible and always has at least one choice, even where only one meaningful detail exists.
+6. Doneness is always visible and always has at least one choice, even where only one finish applies.
+7. Results appear immediately; the user never has to complete a second screen or explicitly open a preparation.
+8. Weight defaults to `100 g`, remains editable, and is preserved while switching selections in the same browser session.
+9. The dry-brine percentage is the dominant result. Salt remains authoritative in grams.
+10. Salt type, teaspoon estimates, tablespoon estimates, and volume conversions are removed.
+11. Breadcrumbs, Back controls, separate preparation screens, and the large introductory hero are removed from the primary flow.
+12. Lamb uses proper cuts—Chops, Leg, Rack, and Shoulder. Bone-in and Boneless are details, not cuts.
+13. The active version-one catalogue is the compact catalogue shown in the approved mock. Previously added extra beef and pork choices are deferred.
+14. Meat buttons have consistent dimensions. No item grows because its copy is longer.
+15. The layout is mobile-first and compressed. The controls must not force excessive scrolling before results begin.
+16. The final direction is a light, lightly rustic cookbook—not dark, clinical, overtly Chinese or Singaporean, faux-vintage, handwritten, or “nerdy.” Singaporean and actuarial influence appears only as quiet food awareness, precision, and disciplined hierarchy.
+17. Finish cards present the Chef target as the primary temperature guidance and the Food-safety baseline as secondary context. Safety remains visible where relevant but does not lead the cooking decision.
 
-The repository currently contains product-planning material only:
+## Approved active catalogue
 
-- `handover.md`: product requirements and design direction.
-- `Frontend-design/SKILL.md`, `Luna Executor/SKILL.md`, and `Sol Planner/SKILL.md`: workflow material, not application source.
+The ordering in this table defines every default.
 
-There is no existing application entry point, package manifest, route, function, JavaScript handler, stylesheet, database, backend, or automated test suite. There is consequently no legacy behavior to preserve, replace, redirect, or delete, and no duplicate implementation that can conflict.
+| Meat | Cuts in order | Detail choices in order | Doneness choices in order |
+|---|---|---|---|
+| Chicken | Whole chicken; Breast; Thigh; Ground poultry | Whole chicken: Whole. Breast: Bone-in, Boneless. Thigh: Bone-in, Boneless. Ground poultry: Ground. | Whole chicken: Cook through. Breast: Cook through. Thigh: Tender. Ground poultry: Cook through. |
+| Beef | Steak; Ribeye; Beef ribs; Ground 80/20 | Steak: Bone-in, Boneless. Ribeye: Bone-in, Boneless. Beef ribs: Bone-in. Ground 80/20: Ground. | Steak and Ribeye: Medium-rare, Medium. Beef ribs: Tender. Ground 80/20: Cook through. |
+| Pork | Chop; Tenderloin; Ribs; Ground pork | Chop: Bone-in, Boneless. Tenderloin: Boneless. Ribs: Bone-in. Ground pork: Ground. | Chop and Tenderloin: Recommended. Ribs: Tender. Ground pork: Cook through. |
+| Lamb | Chops; Leg; Rack; Shoulder | Chops: Bone-in, Boneless. Leg: Bone-in, Boneless. Rack: Bone-in. Shoulder: Bone-in, Boneless. | Chops, Leg, and Rack: Medium-rare, Medium. Shoulder: Tender. |
+| Seafood | Scallops; Shrimp; Fish | Scallops: Shucked. Shrimp: Peeled. Fish: Fillet. | Each: Cook through. |
 
-The repository is not currently initialized as a Git worktree. Diff review during milestone gates must therefore use direct file inspection unless Git is initialized separately with user approval.
+For an unreviewed culinary value, render the selected Detail and Doneness normally and keep the result card in a stable “Awaiting content review” state. Do not invent a percentage or temperature merely to fill the card.
 
-## Recommended technical shape
+## Approved visual system
 
-Use a small dependency-free web application:
+Use the fixed palette from `design-mock.html` as the visual reference, not the host application theme:
 
-- Semantic `index.html`.
-- ES modules under `src/`.
-- One responsive stylesheet under `styles/`.
-- Node's built-in `node:test` runner for pure state and calculation tests.
-- Hash routes for refreshable, back-button-compatible screens without a server router.
-- No build step for the first prototype.
+| Token | Value | Use |
+|---|---:|---|
+| Flour paper | `#F1EEE6` | Page background |
+| Recipe paper | `#FAF8F2` | Result cards and inputs |
+| Soft ink | `#20231F` | Primary copy and temperature values |
+| Pandan leaf | `#6F7D68` | Selected controls |
+| Deep pandan | `#596652` | Selected-control fill and high-contrast accents |
+| Toasted sesame | `#A97A3C` | Dry-brine percentage and the result-card spine |
+| Warm stone | `#D8D2C5` | Borders and inactive structure |
+| Brick spice | `#965846` | Validation and error states only |
 
-This is the simplest suitable approach for four screens and one calculation. The domain data, state reducer, calculations, and rendering must remain separate so later categories can be added without rewriting the prototype.
+Typography:
 
-## Files expected across the full prototype
+- Brand, field labels, and card headings: `Georgia, "Times New Roman", serif`.
+- Body and controls: `Aptos, "Segoe UI", Arial, sans-serif`.
+- Numbers: body face with `font-variant-numeric: tabular-nums`; no monospace utility face.
 
-The complete prototype should require no more than these nine application/test files:
+Signature element:
 
-1. `index.html`
-2. `package.json`
-3. `src/constants.js`
-4. `src/calculator.js`
-5. `src/navigation.js`
-6. `src/app.js`
-7. `styles/main.css`
-8. `tests/calculator.test.js`
-9. `tests/navigation.test.js`
+- Result cards use one narrow toasted-sesame vertical “recipe margin” rule. This is the only overt rustic flourish.
+- Remove the repeating ruled-paper background, rotated badge treatment, heavy notebook styling, and blocky monospace captions.
 
-No generated files, framework scaffolding, asset pipeline, database, or server is permitted in this prototype.
+The exact working reference is `design-mock.html`. Production code must not import it or depend on it.
 
-## Product values fixed by the handover
+## Current-code diagnosis
 
-- Recommended dry-brine salt ratio: `1.1%` of chicken weight.
-- Practical minimum ratio: `0.9%`.
-- Practical maximum ratio: `1.3%`.
-- Input base: chicken weight in grams.
-- Output: salt in grams.
-- Display precision: one decimal place.
-- Temperature value: unresolved and must remain an explicit content-review placeholder until separately approved.
+The current implementation is functional and its complete test suite passes: `38` tests, `0` failures when run with `node --test`. Passing tests are not sufficient because several tests encode behavior the user has rejected.
 
-The three salt ratios must have one canonical definition in `src/constants.js`. They must never be duplicated as independent numeric literals in rendering or test code.
+The working tree already contains user and prior-session changes. The executor must preserve unrelated edits and inspect the diff before each milestone.
+
+### `src/constants.js`
+
+- `SALT_TYPES` and `DEFAULT_SALT_TYPE` support the rejected salt-type dropdown and must be deleted.
+- `SOURCE_RATIOS` contains the approved percentages, but also includes deferred catalogue entries.
+- `MEAT_CATALOG` currently models optional `variants` and optional `doneness`. That permits incomplete selections and causes result movement. Replace this with non-empty `details` and non-empty `doneness` arrays for every active cut.
+- Lamb is currently modelled as `Boneless lamb` and `Bone-in lamb` cuts. Replace these with Chops, Leg, Rack, and Shoulder, with bone state represented as Detail.
+- Beef currently exposes ten cuts and Pork five. Reduce the active catalogue to the approved compact matrix above; remove or explicitly quarantine orphaned active records so they cannot appear in navigation.
+- `typeRecord()` currently derives preparation records and optional variant/doneness maps. Refactor it so every cut exposes one dry-brine record, optional dry-brine overrides by Detail, and temperature guidance by Doneness.
+- Keep existing reviewed source URLs and review metadata. Do not rewrite historical review dates merely because records move.
+
+### `src/calculator.js`
+
+- `parseWeight()`, `calculateDryBrine()`, and `formatGrams()` remain relevant.
+- `calculateSpoonMeasures()` exists only for the rejected tsp/tbsp feature and must be deleted.
+- Preserve one-decimal gram formatting and pure calculation behavior.
+
+### `src/navigation.js`
+
+- Imports of `SALT_TYPES`, `DEFAULT_SALT_TYPE`, and `calculateSpoonMeasures()` must be removed.
+- `parseRoute()` currently supports route kinds `home`, `meat`, `cut`, `variant`, `doneness`, and `preparation`, including `/dry-brine` and `/internal-temperature` suffixes. The redesigned page does not navigate to preparation screens.
+- `getRouteChoices()`, `parentRoute()`, `getPreparationViewModel()`, `getContentForRoute()`, and `isKnownPreparationSlug()` belong to the retired multi-screen flow and must be removed unless a remaining test proves a separate need.
+- `getBreadcrumbs()` is legacy and must be deleted with its tests and CSS.
+- `getSinglePageViewModel()` currently accepts `saltTypeSlug`, returns `saltType` and `spoonResult`, and treats missing variant/doneness as incomplete. Replace it with a resolved-selection model that always supplies valid defaults for known partial routes.
+- `routeToHash()` should produce canonical selection hashes only; it must not include preparation segments.
+
+### `src/app.js`
+
+- Imports of salt types and state field `saltTypeSlug` must be removed.
+- `renderWeightInput()` currently creates a separate full-width input card and salt-type `<select>`. Move the weight field into the Prepare result card and remove the select and its help copy.
+- `renderSaltCard()` currently renders tsp/tbsp output and a salt-type explanation. Delete both.
+- `renderSelectionControls()` conditionally omits Detail and Doneness. It must render Meat, Cut, Detail, and Doneness in a stable order every time.
+- Labels `Choose a meat`, `Choose a cut`, `Choose the detail`, and `Choose the finish` become the compact labels `Meat`, `Cut`, `Detail`, and `Doneness`.
+- `getPageSelection()` defaults only Meat and Cut. It must delegate to a pure resolver that also defaults Detail and Doneness.
+- `renderRoute()` currently adds a large eyebrow, H1, lede, selection block, separate input card, and a selection-summary H2. Replace this with the compact masthead, controls, and two result cards.
+- `renderHeader()` must include the visible tagline `Measure twice. Season once.` and no top-right breadcrumbs.
+- The salt-type change listener and focus-restoration branch must be deleted.
+- Keep one delegated weight listener and one `hashchange` listener. Weight edits should update stable output nodes or restore focus and caret without keyboard flicker.
+
+### `styles/main.css`
+
+- Existing palette is close but not exact; it also uses blue/green theme inheritance in the inline mock and a repeating ruled-paper background in production.
+- Remove `.breadcrumbs`, `.back-link`, salt-select styles, `.volume-estimate`, retired preparation-screen styles, and any other selectors left without markup.
+- Remove the oversized hero scale, `Courier New` utility face, rotated mark, heavy notebook shadows, and large vertical gaps.
+- Implement the approved fixed palette and cookbook typography.
+- Keep visible keyboard focus, reduced-motion support, 320 px support, and no page-level horizontal overflow.
+
+### Existing tests that encode rejected behavior
+
+Replace or delete these expectations:
+
+- `calculateSpoonMeasures converts grams using the selected salt density`.
+- `calculateSpoonMeasures rejects invalid salt densities`.
+- `single-page dry-brine model exposes salt density and timing guidance` insofar as it tests salt type and spoon output; retain timing coverage separately.
+- `route choices expose the reviewed meats and expanded beef cuts` because the active catalogue is now compact.
+- `single-page selections wait for required detail before showing results` because defaults must make every known selection complete.
+- `breadcrumbs provide direct Change links for each prior decision`.
+- Preparation-route and Back-parent expectations that exist only for the retired multi-screen flow.
+
+Keep and adapt tests for calculation purity, malformed input, reviewed ratios, reviewed temperatures, source metadata, route idempotency, invalid routes, and stale-result prevention.
 
 ## State model
 
-### Permitted route states
+### Permitted application states
 
-| State ID | Hash | Visible result |
-|---|---|---|
-| `home` | `#/` | Brand, tagline, and active Meat choices. Chicken, Beef, and Pork are active; other launch categories are inert. |
-| `meat` | `#/<meat>` | Types for the selected meat. |
-| `cut` | `#/<meat>/<type>` | Variant choices when the type requires them, otherwise preparation choices. |
-| `variant` | `#/<meat>/<type>/<variant>` | Doneness choices when the selected type requires them, otherwise preparation choices. |
-| `doneness` | `#/<meat>/<type>/<variant>/<doneness>` | Preparation choices for steak and roast. |
-| `dry-brine` | `#/<meat>/<type>/.../dry-brine` | Selected path, ratio or review placeholder, optional weight input, and result. |
-| `not-found` | any unknown hash | Short recovery message and a Home action. |
+1. `resolved`: known Meat, Cut, Detail, and Doneness; results are visible.
+2. `resolved-valid-weight`: resolved selection plus a valid weight; calculated grams are visible.
+3. `resolved-invalid-format`: resolved selection plus malformed weight; inline error is visible and no stale grams remain.
+4. `resolved-out-of-range`: resolved selection plus a weight outside `0.1–1,000,000 g`; inline error is visible and no stale grams remain.
+5. `review-pending`: resolved selection whose culinary percentage or temperature is not reviewed; the relevant result card remains in place and says `Awaiting content review`.
+6. `not-found`: the hash contains an unknown Meat, Cut, Detail, or Doneness; show a compact recovery action.
 
-### Permitted calculator states
+There is no incomplete known-selection state. Known partial hashes are resolved to the first permitted downstream choices.
 
-| State ID | Raw input | Derived output |
-|---|---|---|
-| `empty` | empty string or whitespace | No amount; neutral helper text. |
-| `valid` | a finite positive decimal from `0.1` through `1,000,000` grams | Recommended, minimum, and maximum salt values. |
-| `invalid-format` | letters, multiple separators, scientific notation, negative sign, or non-finite input | Inline format error; no calculated values. |
-| `out-of-range` | zero, less than `0.1`, or more than `1,000,000` grams | Inline range error; no calculated values. |
+### Default state
 
-Both `.` and `,` are accepted as a single decimal separator. Input is not reformatted while focused. A valid result is calculated from the normalized numeric value, not from a rounded input.
+`Chicken → Whole chicken → Whole → Cook through`, weight `100`.
 
-### Route transition table
+Expected first render:
+
+- Dry-brine percentage: `1.1%`.
+- Calculated salt: `1.1 g`.
+- Internal temperature: reviewed whole-chicken guidance.
+
+### Transition table
 
 There are no database changes in any transition.
 
 | Starting state | User action | Database change | Resulting state | UI result |
 |---|---|---|---|---|
-| `home` | Activate a meat | None | `meat` | Types for that meat replace the home choices. |
-| `meat` | Activate a type | None | `cut` | Variant choices or preparation choices appear. |
-| `cut` | Activate a variant when offered | None | `variant` | Doneness choices or preparation choices appear. |
-| `variant` | Activate a doneness when offered | None | `doneness` | Preparation choices appear. |
-| Any selection state | Activate Dry brine | None | `dry-brine` | Constant-first result or content-review placeholder appears. |
-| Any non-home route | Activate visible Back | None | Previous parent route | Parent choice screen appears at its prior scroll position where possible. |
-| Any valid route | Browser Back/Forward | None | Route represented by the new hash | Exactly one render occurs. |
-| Any valid route | Refresh | None | Same route | Same route renders; calculator input resets because persistence is deferred. |
-| `not-found` | Activate Home | None | `home` | Home screen appears. |
-| Any route | Double-click or rapid repeated activation of the same navigation control | None | Intended destination once | No duplicate listeners, history churn, or duplicate view. |
+| Any resolved state | Select a Meat | None | First Cut, first Detail, and first Doneness for that Meat | All four groups remain visible; both result cards update immediately; weight is preserved. |
+| Any resolved state | Select a Cut | None | Same Meat plus first Detail and first Doneness for that Cut | Detail and Doneness buttons are replaced in place; results update immediately. |
+| Any resolved state | Select a Detail | None | Same Meat/Cut/Doneness plus selected Detail | Salt ratio and calculated grams update; temperature remains appropriate to selected Doneness. |
+| Any resolved state | Select a Doneness | None | Same Meat/Cut/Detail plus selected Doneness | Temperature guidance updates; salt calculation remains unchanged unless data explicitly says otherwise. |
+| Any resolved state | Enter a valid weight | None | `resolved-valid-weight` | Salt grams update on input; no submit action. |
+| Valid weight | Replace with malformed text | None | `resolved-invalid-format` | Old grams disappear; specific inline correction message appears. |
+| Invalid weight | Correct to a valid value | None | `resolved-valid-weight` | Error clears and grams return immediately. |
+| Any resolved state | Clear weight | None | Resolved selection with empty weight | Percentage stays visible; calculated grams show a neutral prompt, never stale output. |
+| Any state | Browser Back/Forward | None | Selection represented by history entry | One render; weight remains current for the session; focus is not trapped. |
+| Direct known partial hash | Load or refresh | None | Resolved first downstream choices | Page renders useful results immediately; URL is canonically replaced without adding history. |
+| Legacy preparation hash | Load or refresh | None | Equivalent canonical single-page selection | Old `/dry-brine` or `/internal-temperature` suffix is removed with `replaceState`; one render. |
+| Unknown hash | Load or navigate | None | `not-found` | Compact recovery message and `Use defaults` action. |
+| Any selection | Double-click or rapid repeated activation | None | Same intended selection | No duplicate listeners, duplicate history entries, or cumulative calculation. |
 
-### Calculator transition table
+### Undo, retry, stale-page, and failed-request behavior
 
-| Starting state | User action | Database change | Resulting state | UI result |
-|---|---|---|---|---|
-| `empty` | Enter `1500` | None | `valid` | `16.5 g`, range `13.5–19.5 g`. |
-| `valid` | Replace with `750.5` | None | `valid` | All values update immediately from the new weight. |
-| `valid` | Clear input | None | `empty` | Result values disappear and neutral guidance returns. |
-| Any | Enter malformed text | None | `invalid-format` | Inline error appears; prior result is removed. |
-| Any | Enter `0` or a value beyond limits | None | `out-of-range` | Inline range error appears; prior result is removed. |
-| `invalid-format` or `out-of-range` | Correct to valid input | None | `valid` | Error clears and correct output appears without reload. |
-| `valid` | Re-enter the same value repeatedly | None | `valid` | Output remains identical; no cumulative calculation. |
-| Any calculator state | Navigate away and return | None | `empty` | Input is empty; local persistence is deferred. |
+- Undo selection: use browser Back. Undo weight editing: edit or clear the field.
+- Retry: no network request exists. Correcting input is the only retry flow.
+- Double-click: native hash links target a desired state, not a toggle; repeated activation is idempotent.
+- Stale page: known old preparation hashes redirect once to canonical selection hashes. Unknown values do not silently coerce to another meat.
+- Failed request: not applicable because calculations and catalogue reads are local. Source links are ordinary outbound links and do not affect app state.
+- Refresh: resets weight to `100` because persistence is deferred, while preserving the canonical selection encoded in the hash.
 
-### Failure, retry, stale-page, and undo behavior
+## Data and database invariants
 
-- There are no requests, so network failure and request retry are not applicable.
-- A stale cached HTML page must still recover unknown hashes through `not-found`; cache versioning/service workers are deferred.
-- Undo is not a product action in this flow. Users undo input by editing or clearing it, and undo navigation with the browser Back button.
-- Rapid input and repeated events must recompute from the current raw value only. No result may depend on the prior result.
-- Event listeners must be registered once at application startup. View renders must not add accumulating global listeners.
+No database, API, local storage, session storage, cookie, or service worker is part of this scope. Transaction boundaries, row repair, historical event rewriting, and database rollback are not applicable.
 
-## Database invariants
+Equivalent in-memory invariants:
 
-No database or persistent store exists in this milestone sequence. Therefore transactions, data repair, historical-row preservation, and database idempotency are not applicable.
-
-The equivalent in-memory invariants are:
-
-1. The displayed salt values are pure functions of normalized chicken weight and the three canonical ratios.
-2. Recommended salt is always between the displayed minimum and maximum.
-3. Invalid or empty input never leaves a stale calculated result visible.
-4. Route state is derived from the current hash; it is not maintained as a second conflicting route variable.
-5. Rendering the same state multiple times produces the same visible structure.
-6. No user history is created or rewritten because persistence and favourites are deferred.
-
-If malformed local data is discovered during implementation, it indicates accidental persistence outside this contract and must be removed from the prototype rather than migrated. No historical data exists to rewrite.
+1. Every active Meat has at least one Cut.
+2. Every active Cut has at least one Detail and at least one Doneness.
+3. The first Cut, Detail, and Doneness are always valid defaults.
+4. Every resolved selection belongs to the active catalogue; no cross-meat object may survive a Meat change.
+5. A reviewed dry-brine percentage is a finite, non-negative number with one canonical definition.
+6. Calculated salt is always `weight × percentage / 100`, with no volume-density conversion.
+7. Invalid or empty weight never leaves stale calculated grams visible.
+8. Doneness changes cannot alter dry-brine output unless the content record explicitly defines a different percentage.
+9. Rendering the same selection and weight repeatedly produces identical visible values.
+10. Existing source URLs and review dates are preserved when content records are reorganized.
+11. No migration is needed. If obsolete salt-type or spoon state is discovered in code, remove it rather than persisting or translating it.
 
 ## Backend contracts
 
-No backend route, API request, server validation, or database operation is permitted. All calculations run locally.
+No backend route, request body, database operation, or server response is permitted.
 
-No legacy endpoints exist. The executor must not create a fake API, local server endpoint, form submission, analytics call, or external content request.
+- Validation occurs in `parseWeight()`.
+- Selection validation occurs in pure navigation/catalogue functions.
+- Calculations run locally through `calculateDryBrine()`.
+- Do not add fetch calls, fake endpoints, analytics, or persistence.
+- Legacy hash routes are client-side redirects, not server redirects.
 
 ## Frontend interaction contract
 
 ### Clickable surfaces
 
-- Brand mark/name: returns to Home except when already on Home.
-- Active category card: Chicken.
-- Active cut card: Whole chicken.
-- Active preparation card: Dry brine.
-- Back control on the three child screens.
-- Home recovery control on the not-found screen.
-- Chicken weight input on the dry-brine screen.
-
-Each navigation surface must be a native `<a>` with an `href` matching the destination hash, not a clickable `<div>`. The input must have a visible `<label>`, `inputmode="decimal"`, and a persistent `g` unit.
+- Brand: resets to the default selection at `#/`.
+- Every Meat, Cut, Detail, and Doneness choice: native `<a>` or `<button>` with a visible label and pressed/current state.
+- Food weight: native text input with `inputmode="decimal"` and default value `100`.
+- Source links: ordinary links opening in a new tab with accessible warning text.
+- Not-found recovery: native link/button labelled `Use defaults`.
 
 ### Inert surfaces
 
-The future launch categories and unimplemented chicken cuts/preparations may be shown to communicate scope, but they must be visibly marked `Coming later`, use disabled/inert semantics, and must not change the hash. They must not look identical to active controls.
-
-The displayed ratio, output, target-temperature placeholder, thermometer note, decorative ruled lines, and `Kc` mark are not clickable.
-
-### Drag-and-drop
-
-No element is draggable and no drop target exists. Drag start, target highlighting, drop, drag cancellation, occupied-date behavior, and drag failure recovery are explicitly outside the cooking prototype. Native text selection must not be disabled globally.
-
-### Input and rendering
-
-- Use the `input` event so calculations update without a submit button.
-- Validation messaging must use a stable inline region associated with the input.
-- Derived results must use a polite live region so assistive technology receives changes without excessive interruption.
-- The renderer must replace the contents of one main application region or update stable nodes; it must not append duplicate screens.
-- Hash changes render the destination at the top on forward navigation. Browser Back should use the browser's scroll restoration where supported; application code must not force a second scroll after `popstate`/`hashchange`.
-- Focus moves to the page heading after app-initiated navigation. Browser Back/Forward must not trap focus.
-- A failed render must show a recoverable error panel with a Home link and log one diagnostic; it must not leave the previous screen appearing current under the new hash.
-
-## Calculation contract
-
-`src/calculator.js` must export pure functions with no DOM access:
-
-### `parseWeight(rawValue)`
-
-- Input: string.
-- Normalize: trim surrounding whitespace and replace one comma with a period.
-- Reject: empty as `empty`; more than one separator; signs; exponent notation; non-digits other than the one separator; non-finite values.
-- Range: `0.1 ≤ weight ≤ 1,000,000` grams.
-- Return a discriminated result: `{ status: 'empty' }`, `{ status: 'invalid-format' }`, `{ status: 'out-of-range' }`, or `{ status: 'valid', grams: number }`.
-
-### `calculateDryBrine(weightGrams, ratios)`
-
-- Preconditions: finite positive weight and a ratio object satisfying `min ≤ recommended ≤ max`.
-- Calculate each salt value as `weightGrams × ratio / 100`.
-- Return unformatted numeric values.
-- Do not round intermediate values.
-- Throw a typed error for broken programmer preconditions; user input must be filtered through `parseWeight` first.
-
-### `formatGrams(value)`
-
-- Return one decimal place using the document locale's decimal separator.
-- Do not add the `g` suffix; rendering owns the unit.
-- Values below `0.05 g` cannot occur because the valid weight floor is `0.1 g`; if future constants make this possible, still display `0.0` rather than silently replacing it with a threshold label.
-
-## Accessibility and responsive contract
-
-- One `<h1>` per screen.
-- Tap targets at least `44 × 44 CSS px`.
-- Keyboard focus indicator with at least 3:1 contrast against adjacent colours.
-- Text contrast at least WCAG AA.
-- Layout must remain usable at 320 px CSS width and 200% browser zoom.
-- No horizontal scrolling at 320 px.
-- Numeric result and unit remain together on the same line.
-- The recommended ratio, input, calculated amount, and range must fit within a short phone scroll.
-- No hover-only information or interaction.
-- Respect `prefers-reduced-motion`; navigation does not require animation.
-
-## Milestones
-
-### Milestone 1 — Domain constants and calculator behavior
-
-#### Scope boundary
-
-Included:
-
-- Create the minimal package manifest and Node test command.
-- Define the one canonical dry-brine record.
-- Implement input parsing, pure calculation, and formatting.
-- Add exhaustive calculator unit tests.
-
-Deferred:
-
-- HTML, navigation, DOM rendering, CSS, temperature research, other categories, persistence, and browser testing.
-
-Maximum change: four files — `package.json`, `src/constants.js`, `src/calculator.js`, `tests/calculator.test.js`.
-
-Dependencies that must be stable:
-
-- Ratios `1.1%`, `0.9%`, and `1.3%` from the handover.
-- Grams as input and output unit.
-- One-decimal display precision.
-
-#### Current-code diagnosis
-
-No functions or tests exist. Nothing is replaced or deleted. The executor must not modify `handover.md` or the planning/skill folders.
-
-#### Automated tests
-
-Module: `tests/calculator.test.js`.
-
-- `parseWeight returns empty for blank input`.
-- `parseWeight accepts integer grams`.
-- `parseWeight accepts one dot decimal separator`.
-- `parseWeight accepts one comma decimal separator`.
-- `parseWeight rejects letters, signs, exponent notation, and repeated separators`.
-- `parseWeight rejects zero and values outside the supported range`.
-- `calculateDryBrine returns 16.5, 13.5, and 19.5 grams for 1500 grams`.
-- `calculateDryBrine does not accumulate rounding across repeated calls`.
-- `calculateDryBrine rejects invalid programmer preconditions`.
-- `formatGrams always emits one decimal place`.
-- `canonical dry-brine ratios remain ordered and use chicken weight as their basis`.
-
-#### Gate
-
-The executor must stop after:
-
-1. Focused calculator tests pass.
-2. The complete available suite passes (identical to focused tests at this stage).
-3. `node --check` passes for every JavaScript file.
-4. All four changed files are reviewed directly for accidental UI or unrelated scope.
-5. Browser verification is reported as not applicable because no UI exists yet.
-
-### Milestone 2 — Multi-meat route state and semantic screens
-
-#### Scope boundary
-
-Included:
-
-- Add the HTML shell.
-- Implement hash parsing for home, meat, type, variant, doneness, preparation, and not-found states.
-- Render the Home screen and working Chicken, Beef, and Pork interaction paths.
-- Support the conditional variant and doneness steps without exposing irrelevant choices.
-- Preserve the selected path in the result screen and provide direct Change links to each prior decision.
-- Connect the tested calculator functions to the whole-chicken dry-brine weight input.
-- Show explicit content-review placeholders for unreviewed meat/type combinations; do not invent ratios or temperatures.
-
-Deferred:
-
-- Final visual styling, decorative notebook details, favourites, persistence, temperature value research, and other functional categories.
-
-Maximum change: four new/changed runtime/test files — `index.html`, `src/navigation.js`, `src/app.js`, `tests/navigation.test.js` — plus the necessary data additions to `src/constants.js` and import adjustments to Milestone 1 files.
-
-Dependencies that must already be stable:
-
-- Milestone 1 calculator API and tests.
-- Hash route table in this contract.
-
-#### Current-code diagnosis
-
-Milestone 1 has no DOM handlers. This milestone adds one application initializer, one hash listener, and one delegated input listener. No handler may be registered on each render. No existing behavior should be removed.
-
-#### Automated tests
-
-Module: `tests/navigation.test.js`.
-
-- `parseRoute maps every supported multi-meat hash to one route state`.
-- `parseRoute maps unknown and malformed hashes to not-found`.
-- `route parent mapping returns the correct Back destination for meat, type, variant, and doneness states`.
-- `repeated parsing is idempotent`.
-- `route render model exposes Chicken, Beef, and Pork types`.
-- `whole chicken does not offer a bone-in/boneless step`.
-- `breast, thigh, chop, and steak expose bone-in/boneless only where applicable`.
-- `steak and roast expose only medium-rare and medium doneness`.
-- `changing meat or type clears the non-persisted weight`.
-- `changing a compatible variant preserves weight but changes the selected path`.
-- `dry-brine render model exposes constants before weight input`.
-- `unreviewed paths expose placeholders rather than invented culinary values`.
-- `empty and invalid calculator states cannot expose stale output`.
-- `same input dispatched repeatedly produces the same render model`.
-
-Calculator edge cases remain in `tests/calculator.test.js` and must continue passing.
-
-#### Gate
-
-Stop after focused navigation tests, complete suite, JavaScript syntax checks, direct diff/file review, and a basic browser walkthrough of every route, refresh, Back, Forward, invalid hash, valid input, correction from invalid input, and repeated navigation.
-
-### Milestone 3 — Behavioral hardening and accessibility
-
-#### Scope boundary
-
-Included:
-
-- Correct focus movement, live-region behavior, validation association, and scroll behavior.
-- Verify rapid input, double activation, repeated navigation, refresh, and recovery.
-- Fix behavioral defects only.
-
-Deferred:
-
-- Visual polish, typography tuning, decorative styling, temperature research, and expanded content.
-
-Maximum change: three subsystems — `index.html`, `src/app.js`, and the existing tests. No new runtime subsystem.
-
-Dependencies that must already be stable:
-
-- Milestone 2 route and calculator rendering behavior.
-
-#### Automated tests
-
-Extend the existing two test modules; do not add a third unless the executor can do so without a DOM dependency.
-
-- `rapid calculator updates keep only the latest derived state`.
-- `double navigation activation resolves to one destination state`.
-- `navigating away and returning resets non-persisted calculator state`.
-- `not-found recovery returns a valid home render model`.
-- `route models provide one heading and accessible names for active controls`.
-- `error and result regions are mutually exclusive`.
-
-#### Gate
-
-Stop after focused tests, complete suite, syntax checks, direct diff/file review, and the full manual browser script below. No styling work may begin until the behavioral gate passes.
-
-### Milestone 4 — Mobile-first visual system
-
-#### Scope boundary
-
-Included:
-
-- Add `styles/main.css`.
-- Implement the warm off-white, charcoal, and one muted food-accent palette.
-- Create the restrained notebook-inspired card and ruled-line treatment.
-- Style the `Kc` text mark, navigation choices, constants, input, results, placeholder, focus, error, disabled, and not-found states.
-- Verify phone, tablet, and desktop layouts.
-
-Deferred:
-
-- Custom raster illustrations, web-font downloads, dark mode, animation, final logo assets, favourites, search, metric/imperial toggle, and additional calculator flows.
-
-Maximum change: `styles/main.css`, plus no more than minor semantic class additions to `index.html` and `src/app.js`.
-
-Dependencies that must already be stable:
-
-- All Milestone 3 behavior and browser checks.
-
-#### Automated tests
-
-All existing behavior tests must remain unchanged and pass. Styling must not require rewriting behavioral assertions. Add no snapshot tests for pixel values.
-
-#### Gate
-
-Stop after focused and complete tests, JavaScript syntax checks, direct diff/file review, and browser verification at 320×568, 390×844, 768×1024, and a desktop viewport. Check 200% zoom, keyboard-only use, visible focus, no horizontal overflow, and reduced-motion mode.
-
-### Milestone 5 — Reviewed temperature content (separate approval)
-
-#### Scope boundary
-
-Included only after explicit product approval:
-
-- Research authoritative sources for professional whole-chicken target temperature guidance, including the role of hold time.
-- Record source notes and review date in the canonical content record.
-- Replace the placeholder with approved wording and value.
-- Add content tests that prevent an unreviewed value from appearing.
-
-Deferred:
-
-- Advanced pasteurization charts, medical-risk modes, government/professional comparison UI, cooking time, oven settings, and other foods.
-
-Maximum change: canonical content data, the dry-brine render content, and the relevant tests; no new subsystem.
-
-Dependencies that must already be stable:
-
-- A product decision on whether the app shows a single conservative endpoint, a professional endpoint plus hold-time note, or a more detailed time-and-temperature model.
-- Approved authoritative sources.
-
-This milestone must not silently choose a temperature. The placeholder remains correct until this decision is made.
+- Brand mark, tagline, card titles, badges, percentages, temperatures, timing, safety text, and decorative sesame rules are not clickable.
+- No hidden choice row, breadcrumb, chevron, dropdown, copy button, or share button is introduced.
+
+### Drag and drop
+
+No element is draggable and no drop target exists. Drag start, target highlighting, occupied targets, drop, cancellation, drag failure, and drag scroll restoration are outside this product. Native page scrolling and text selection remain enabled.
+
+### Listener and rendering behavior
+
+- Register global listeners once at application start.
+- Do not attach accumulating listeners after `innerHTML` replacement.
+- Use desired-state URLs rather than toggles.
+- Selection changes may re-render the page once.
+- Weight input should update stable result/error nodes without replacing the focused input. If implementation retains full rerendering, caret position and mobile keyboard continuity are mandatory.
+- Preserve the raw weight across selection changes in memory.
+- Do not force the page to the top on every selection. Keep the current viewport stable unless the user follows a not-found recovery link.
+
+## Responsive and accessibility contract
+
+- One compact masthead; no oversized hero.
+- Meat choices form one equal-height row when space allows and a balanced wrapped grid on small screens.
+- Cut buttons use a compact wrapping grid; Detail and Doneness use wrapping button rows.
+- Desktop: Prepare and Finish cards are two columns.
+- Mobile: result cards stack in one column.
+- At `390 × 844`, the first result card must begin within one viewport or no more than one short swipe from the top for the longest active choice set.
+- At `320 × 568`, all controls remain operable with no page-level horizontal overflow; a short vertical scroll is acceptable.
+- Minimum interactive target: `42 px`, with `44 px` preferred where it does not materially increase scrolling.
+- Selected controls use both fill and `aria-pressed="true"` or `aria-current`, not colour alone.
+- Focus indicators have at least 3:1 contrast against adjacent colours.
+- Text and controls meet WCAG AA contrast.
+- The ratio, weight, salt grams, and temperature use tabular numerals where supported.
+- No essential information is hover-only.
+- Respect `prefers-reduced-motion`.
 
 ## Scenario matrix
 
-### Kitchen Constants scenarios
+### Product scenarios
 
-| Scenario | Given | When | Then | Automated coverage |
-|---|---|---|---|---|
-| First use | Home loads with no stored state | User follows Chicken → Whole chicken → Dry brine | Ratio and range are visible before input; calculator is empty | Navigation render-model tests plus browser script |
-| Repeated use | Calculator has already accepted several values | User replaces the weight five times | Each result is calculated only from the newest value | Calculator idempotency tests plus browser script |
-| Integer input | Dry-brine screen is open | User enters `1500` | Recommended `16.5 g`; range `13.5–19.5 g` | Exact calculator test |
-| Decimal input | Dry-brine screen is open | User enters `750,5` | Input is accepted and output uses the normalized value | Parser tests |
-| Invalid then retry | A valid result is visible | User enters `12kg`, then corrects to `1200` | Stale result disappears during error; corrected output is `13.2 g`, range `10.8–15.6 g` | State/render-model tests |
-| Clear/undo input | A result is visible | User clears the field | Neutral empty state returns, with no old values | Render-model tests |
-| Move away and use again | A valid weight is entered | User navigates Home and returns through the flow | Input returns empty because persistence is deferred | Navigation test and browser script |
-| Double-click | User is on a choice screen | User rapidly activates the same link | One destination renders with no duplicated content/listeners | Navigation idempotency test and browser script |
-| Refresh | Dry-brine route is visible | User refreshes | Same route and constants render; input resets | Browser script |
-| Stale/unknown route | Browser opens an unknown hash | Page initializes | Recoverable not-found screen appears with Home link | Route parser test |
-| Boundary minimum | Dry-brine screen is open | User enters `0.1` | Valid one-decimal result is shown | Parser/calculator tests |
-| Boundary maximum | Dry-brine screen is open | User enters `1000000` | Valid result is shown without overflow | Parser/calculator tests |
-| Out of range | Dry-brine screen is open | User enters `0` or `1000000.1` | Range error appears and no amount is shown | Parser tests |
-| Phone boundary | App is viewed at 320 px width | User traverses every route and enters a weight | No horizontal scrolling; controls remain operable | Browser gate |
-| Long session | App remains open without reload | User completes five route cycles and several input/edit/clear cycles | Controls continue working, viewport does not jump, and no duplicate content appears | Manual browser script |
+| Scenario | Given | When | Then |
+|---|---|---|---|
+| First use | The app opens at `#/` | No action is taken | Chicken, Whole chicken, Whole, and Cook through are selected; `100 g`, `1.1%`, `1.1 g`, and temperature guidance are visible. |
+| Repeated use | A user has changed selections several times | The same selection is chosen again | Route, controls, and results are identical; no duplicate event occurs. |
+| Meat defaulting | Beef is not selected | Beef is selected | Steak, Bone-in, and Medium-rare become selected immediately and results appear. |
+| Cut defaulting | Lamb is selected | Shoulder is selected | Bone-in and Tender become selected immediately; result-card positions do not move. |
+| Singleton Detail | Pork Tenderloin is selected | The page renders | Detail remains visible with one selected Boneless button. |
+| Singleton Doneness | Chicken Breast is selected | The page renders | Doneness remains visible with one selected Cook through button. |
+| Valid weight | Whole chicken and `100` are selected | Weight becomes `1500` | Salt changes from `1.1 g` to `16.5 g`; `1.1%` stays visible. |
+| Invalid then retry | A valid result is visible | Weight becomes `12kg`, then `750.5` | Stale grams disappear with the error; correction shows the new grams without reload. |
+| Double-click | A Meat or Cut control is available | It is rapidly activated twice | Only the intended desired state is represented; listeners and history do not duplicate. |
+| Browser history | Five selection changes have been made | Back and Forward are used | Each historical selection is restored once without viewport jump. |
+| Legacy deep link | An old `/dry-brine` hash is opened | The page loads | It is replaced by the equivalent canonical selection hash and renders one page. |
+| Unknown deep link | A hash contains an unknown cut | The page loads | Not-found recovery appears; no unrelated default is silently substituted. |
+| Pending content | A selected cut lacks a reviewed value | The page renders | Selection remains complete; the relevant result card says `Awaiting content review` without collapsing. |
+| Mobile boundary | The app is `320 px` wide | Every meat is selected in turn | No horizontal page scrolling or clipped controls occurs. |
 
-### Skill-prescribed scheduling scenarios that are not applicable
+### Sol Planner template scenarios that do not belong to this product
 
-The planning skill names plant scheduling, occupied dates, watering recurrences, forecasts, month boundaries, and a six-month horizon. Kitchen Constants has no plants, groups, dates, watering records, recurrence, forecast, drag-and-drop, or database. These scenarios must not be implemented by analogy:
+The named planning skill contains calendar/plant scenarios. They are explicitly closed as follows so an executor does not invent those subsystems:
 
-- Same-date events: not applicable.
-- Dragging a plant to an occupied date: not applicable.
-- Dragging a group to an occupied date: not applicable.
-- Watering today, in the past, or in the future: not applicable.
-- Undoing, moving, and recording again: covered only by editing/clearing calculator input and navigating away/back; no history mutation exists.
-- Forecast coverage ending before the next recurrence: not applicable.
-- Existing malformed or duplicated occurrence state: not applicable; no persisted occurrences exist.
-- Month boundaries and six-month horizon: not applicable.
+| Required template scenario | Given / When / Then disposition |
+|---|---|
+| Same-date events | Given this app has no event or date state, when multiple interactions occur on one date, then date is irrelevant and no event record is created. |
+| Dragging a plant to an occupied date | Given there are no plants, dates, or draggable surfaces, when a drag gesture is attempted, then only native scrolling/text selection may occur and app state is unchanged. |
+| Dragging a group to an occupied date | Given there are no plant groups or occupied targets, when a group drag is attempted, then no drag state or target highlighting exists. |
+| Watering today, in the past, and in the future | Given there is no watering or date model, when the user uses the calculator on any date, then calculations depend only on current selection and weight. |
+| Undoing, moving, and recording again | Given there are no records, when the user goes Back, chooses another selection, and re-enters a weight, then only current in-memory UI state changes. |
+| Forecast coverage ending before the next recurrence | Given there is no forecast or recurrence, when the app is used beyond any date horizon, then behavior is unchanged. |
+| Existing malformed or duplicated occurrence state | Given there is no persistent occurrence data, when the app loads, then only the hash is validated; unknown hashes produce not-found. |
+| Month boundaries and the six-month horizon | Given no date calculations exist, when a month boundary passes, then no behavior changes. |
+
+## Automated test contract
+
+### `tests/calculator.test.js`
+
+Keep or adapt:
+
+- `parseWeight returns empty for blank input`.
+- `parseWeight accepts integer grams`.
+- `parseWeight accepts one dot or comma decimal separator`.
+- `parseWeight rejects malformed and out-of-range input`.
+- `calculateDryBrine returns 1.1 grams for 100 grams at 1.1 percent`.
+- `calculateDryBrine returns 16.5 grams for 1500 grams at 1.1 percent`.
+- `calculateDryBrine is idempotent across repeated calls`.
+- `calculateDryBrine rejects invalid programmer preconditions`.
+- `formatGrams emits one decimal place`.
+
+Delete all `calculateSpoonMeasures` tests. Add a static import-level check that the removed export is not referenced anywhere in `src/` or tests, or enforce this through diff review and syntax checks if a source-scan test would be brittle.
+
+### `tests/navigation.test.js`
+
+Add or replace with:
+
+- `catalogue exposes exactly the approved five meats in order`.
+- `catalogue exposes the approved compact cuts in order`.
+- `lamb uses proper cuts and bone state only as detail`.
+- `every active cut has at least one detail and one doneness`.
+- `default selection is chicken whole whole cook-through`.
+- `selecting each meat resolves its first cut detail and doneness`.
+- `selecting each cut resolves its first detail and doneness`.
+- `known partial hashes resolve to valid canonical selections`.
+- `canonical selection hashes round-trip idempotently`.
+- `legacy preparation hashes map to canonical single-page selections`.
+- `unknown meat cut detail and doneness hashes remain not-found`.
+- `single-choice detail and doneness groups remain present`.
+- `weight defaults to 100 and remains valid on first render`.
+- `selection changes preserve raw weight`.
+- `dry-brine percentage is visible before and after weight edits`.
+- `invalid weight removes stale calculated grams`.
+- `doneness changes temperature without changing salt calculation`.
+- `unreviewed content returns a stable pending result model`.
+- `view model contains no saltType or spoonResult fields`.
+- `breadcrumb and preparation-screen APIs are no longer exported`.
+
+Do not treat a green `38/38` legacy suite as completion. Rejected tests must be removed and the new behavior must be tested.
 
 ## Manual browser script
 
-Use realistic whole-chicken weights. Perform the script in one browser session without manually reloading except where the script explicitly requires a refresh.
+Run this without manually reloading except at the explicit refresh step. The skill’s required five drags are replaced by five consecutive selection changes because this product intentionally has no drag surface.
 
-1. Open `#/` at a desktop viewport. Confirm the `Kc` brand, tagline, active Chicken choice, and visibly inert future categories.
-2. Use only the keyboard to activate Chicken, Whole chicken, and Dry brine. Confirm the heading receives focus after each navigation and the viewport starts at the expected position.
-3. Confirm `1.1%` and `0.9–1.3%` are visible before entering any weight. Confirm the target-temperature area says content review is required and does not invent a number.
-4. Enter `1500`. Confirm `16.5 g` and `13.5–19.5 g`.
-5. Without leaving the screen, replace the value consecutively with `1200`, `1750`, `2200`, `950`, and `750,5`. Confirm every result changes once and remains based on the current value only. This is the required sequence of at least five consecutive calculation interactions; drag-and-drop is not part of this product.
-6. Perform three edit/clear cycles without reload: clear → `1400`; clear → `2000`; clear → `1100`. After each clear confirm no stale amount remains; after each entry confirm a new result appears.
-7. Enter `12kg`. Confirm the valid result disappears and an inline error appears. Correct it to `1200` and confirm the error clears and `13.2 g`, `10.8–15.6 g` appear.
-8. Enter `0`, `0.1`, `1000000`, and `1000000.1` in turn. Confirm the two boundary values are valid and the two outside values are errors.
-9. Activate Back to Whole chicken, Back to Chicken, and Back to Home. Then repeat the complete forward path five consecutive times using a mix of visible Back links and browser Back/Forward. Confirm there are no duplicate screens or dead controls.
-10. On the dry-brine route, refresh once. Confirm the same route returns, the input is empty, and the constant remains visible.
-11. Change the hash to `#/unknown`. Confirm the recovery screen appears. Activate Home and confirm recovery.
-12. Scroll partway down on a choice screen if the viewport permits, navigate forward, and use browser Back. Confirm the application does not cause an unexpected second viewport jump.
-13. Repeat steps 2–8 at 320×568 and 390×844. Confirm no horizontal overflow, truncation, or unit wrapping. At desktop size, set browser zoom to 200% and repeat the forward path.
-14. Throughout the session, inspect the console. Confirm no uncaught exceptions and no repeated diagnostic messages from duplicate listeners.
-15. Since there is no database, assert in developer tools that no Local Storage, Session Storage, IndexedDB, cookie, or network write was created by these actions.
+1. Open `#/` at a desktop width around `900 px`.
+2. Confirm the exact tagline `Measure twice. Season once.` and no breadcrumb, Back link, salt-type dropdown, tsp, or tbsp copy.
+3. Confirm Chicken → Whole chicken → Whole → Cook through is selected and the weight is `100`.
+4. Confirm `1.1%` is visually dominant in toasted sesame and `1.1 g` is visible.
+5. Make at least five consecutive selection changes without reload: Beef → Ribeye → Boneless → Medium → Lamb → Shoulder → Boneless.
+6. After every change, confirm all four control groups remain present, a valid default is selected, card positions do not collapse, and the viewport does not jump unexpectedly.
+7. Confirm Lamb presents Chops, Leg, Rack, and Shoulder as cuts—not Boneless lamb/Bone-in lamb.
+8. Run several weight cycles without reload: `100 → 1500 → 12kg → 750.5 → 0 → 100`.
+9. Confirm valid grams, invalid-format error, correction, out-of-range error, and final recovery. No stale value may remain behind an error.
+10. Rapidly activate the same Cut twice and confirm one selected state and no duplicate reaction.
+11. Use Back five times and Forward five times. Confirm one state change per history entry, retained in-session weight, and no viewport jump.
+12. Open a legacy preparation hash and confirm one canonical replacement with useful results.
+13. Refresh once. Confirm the selection remains represented by the canonical hash and weight returns to `100`.
+14. Open an unknown hash and confirm the compact recovery action.
+15. Resize to `390 × 844`. Confirm equal meat-button dimensions, no horizontal overflow, visible tagline, readable selected controls, and results within one viewport or one short swipe.
+16. Resize to `320 × 568`. Confirm no clipping or page-level horizontal scrolling and all controls remain operable.
+17. Check keyboard-only navigation, visible focus, and screen-reader names for every control group.
+18. Check browser console: no errors.
+19. Database assertion: not applicable by design. Confirm the implementation contains no database, fetch, local-storage, session-storage, cookie, or service-worker writes.
 
-## Rejected behavior and tests that must not be introduced
+## Milestones
 
-- Do not hide the constant until a weight is entered.
-- Do not calculate salt from the previously rounded salt result.
-- Do not accept units embedded in the numeric field.
-- Do not make future options appear active.
-- Do not add a submit button when direct input feedback is sufficient.
-- Do not persist weight input in this prototype.
-- Do not silently redirect unknown hashes to Home; show recoverable not-found state.
-- Do not add click handlers during every render.
-- Do not encode the currently unreviewed chicken temperature as fact.
-- Do not use screenshots or visual snapshots as the sole evidence of behavior.
+### Milestone 1 — Catalogue and resolved-selection model
 
-No existing tests encode rejected behavior because no suite exists.
+#### Scope boundary
 
-## Milestone evidence report template
+Included:
 
-After every milestone, the executor must stop and report:
+- Replace optional variants/doneness with non-empty Detail and Doneness records.
+- Install the approved compact catalogue and proper lamb cuts.
+- Add pure default-selection, partial-route resolution, and canonical-hash helpers.
+- Replace navigation tests that expect incomplete selections or the expanded catalogue.
 
-1. Files added or changed.
-2. Exact focused test command and observed result.
-3. Exact complete-suite command and observed result.
-4. Exact syntax-check command and observed result.
-5. Direct diff/file review findings.
-6. Browser checks performed and observed result, or why browser verification is not yet applicable.
-7. Known issues or deviations.
-8. Confirmation that the next milestone has not started.
+Deferred:
 
-## Ambiguities requiring product decisions
+- Salt-type and spoon removal, DOM rendering, layout copy, CSS, browser styling checks, and handover updates.
+- Keep the existing salt-volume APIs temporarily so the current application remains runnable until Milestone 2 removes the entire feature atomically.
 
-1. **Chicken target temperature.** Recommended default: retain an explicit content-review placeholder through Milestone 4, then run Milestone 5 only after approving the safety/content model and sources.
-2. **Static stack.** Recommended default: dependency-free HTML/CSS/ES modules with Node built-in tests, as specified. A framework would add setup and interpretation without helping the first four screens.
-3. **URL behavior.** Recommended default: hash routes so refresh and browser navigation work on static hosting without server configuration.
-4. **Unimplemented choices.** Recommended default: show the other launch choices as visibly inert `Coming later` items to test information architecture without implying they work.
-5. **Decimal locale.** Recommended default: accept both comma and dot, while formatting output using the browser locale.
-6. **Weight upper bound.** Recommended default: use a generous technical ceiling of `1,000,000 g` to reject overflow and obvious mistakes without imposing a narrow product assumption.
-7. **Input persistence.** Recommended default: none for this prototype. Favourites and saved inputs are later features.
-8. **Git setup.** Recommended default: do not initialize or configure version control as part of implementation; use direct file review unless the user separately asks for Git.
+Maximum change: three files—`src/constants.js`, `src/navigation.js`, and `tests/navigation.test.js`.
 
-## Execution prompt — Milestone 2 only
+Dependencies that must already be stable:
 
-Implement only Milestone 2 from `IMPLEMENTATION_PLAN.md`: build the semantic, hash-routed multi-meat interaction matrix for Chicken, Beef, and Pork, including conditional bone-in/boneless and doneness choices, direct Change links, the whole-chicken dry-brine calculator connection, and explicit placeholders for unreviewed content. Do not add final visual styling, persistence, temperature values, or additional launch categories. Preserve `handover.md`, the Sol Planner contract, and all skill folders. Run focused navigation tests, the complete suite, JavaScript syntax checks, direct file review, and the required browser walkthrough; then stop and report evidence using the milestone evidence template. Do not begin Milestone 3.
-## Product-direction amendment (supersedes the earlier step-by-step prompt)
+- Approved catalogue table.
+- Existing reviewed salt percentages, temperatures, source URLs, and review dates.
+- Current application imports must continue resolving at the end of the milestone.
 
-The interface is now intentionally single-page. Meat, cut, variant, and doneness choices stay on one screen and update the same result area in place. Salt guidance and internal-temperature guidance are sibling result cards on that page; breadcrumbs, Back links, and separate preparation screens are retired. Hashes remain only as optional deep-link state for a selected choice.
+#### Current-code replacement
+
+- Replace optional/incomplete selection semantics with a resolver that always returns valid downstream defaults for known states.
+- Retire expanded Beef/Pork choices from the active catalogue.
+- Keep legacy preparation and salt-volume APIs only as temporary compatibility code; do not extend them or add new tests for them.
+
+#### Gate
+
+Stop and report evidence after:
+
+1. Focused navigation/catalogue tests pass.
+2. Complete test suite passes.
+3. `node --check` passes for every JavaScript file.
+4. Importing `src/app.js` in the browser produces no missing-export error.
+5. Diff review confirms no new culinary values were invented and source metadata is preserved.
+6. A basic browser smoke check confirms the existing page still loads; redesigned interaction is explicitly deferred.
+
+### Milestone 2 — Remove salt-volume behavior atomically
+
+#### Scope boundary
+
+Included:
+
+- Delete `SALT_TYPES`, `DEFAULT_SALT_TYPE`, and `calculateSpoonMeasures()`.
+- Remove `saltTypeSlug`, salt-type view-model fields, the dropdown, tsp/tbsp output, its help copy, focus branch, and change listener.
+- Replace calculator and navigation tests that encode salt density or spoon output.
+- Keep timing guidance and authoritative grams output.
+
+Deferred:
+
+- Compact control structure, default-weight placement, route cleanup, final visual styling, and documentation updates.
+
+Maximum change: six files—`src/constants.js`, `src/calculator.js`, `src/navigation.js`, `src/app.js`, `tests/calculator.test.js`, and `tests/navigation.test.js`.
+
+Dependencies that must already be stable:
+
+- Milestone 1 catalogue and resolved-selection model.
+- Grams remain the only authoritative salt output.
+
+#### Gate
+
+Stop and report evidence after:
+
+1. Focused calculator and view-model tests pass.
+2. Complete suite passes.
+3. JavaScript syntax and import checks pass.
+4. Repository search finds no runtime reference to salt type, teaspoon, tablespoon, salt density, or spoon output.
+5. Browser smoke check confirms calculation in grams still works and the rejected dropdown/output are absent.
+6. Diff review confirms timing and source metadata remain intact.
+
+### Milestone 3 — Stable compact single-page interaction
+
+#### Scope boundary
+
+Included:
+
+- Render Meat, Cut, Detail, and Doneness on every known state.
+- Default all downstream choices immediately.
+- Set raw weight to `100` on initialization and move the field into Prepare.
+- Show Prepare and Finish results immediately.
+- Remove breadcrumbs, preparation screens, Back controls, hero copy, and selection-summary heading.
+- Implement canonical hash replacement for partial and legacy routes.
+- Preserve weight and viewport across selection changes.
+
+Deferred:
+
+- Final palette, typography, cookbook styling, micro-spacing polish, and documentation updates.
+
+Maximum change: three files—`src/app.js`, `src/navigation.js`, and `tests/navigation.test.js`.
+
+Dependencies that must already be stable:
+
+- Milestone 1 resolver APIs.
+- Milestone 2 gram-only view model.
+
+#### Gate
+
+Stop and report evidence after:
+
+1. Focused interaction-model tests pass.
+2. Complete test suite passes.
+3. JavaScript syntax checks pass.
+4. Diff review confirms all retired route UI and listeners are removed.
+5. Browser verification covers defaults, five selection changes, weight validation/recovery, Back/Forward, refresh, legacy redirect, and no console errors.
+6. Styling does not begin until this behavioral gate passes.
+
+### Milestone 4 — Light cookbook visual system and compression
+
+#### Scope boundary
+
+Included:
+
+- Apply the exact fixed palette, typography, sesame result-card spine, compact masthead, and approved tagline.
+- Use consistent button dimensions and stable wrapping grids.
+- Remove clinical/notebook visual remnants and dead selectors.
+- Tune desktop, `390 × 844`, and `320 × 568` layouts.
+- Preserve accessibility and reduced-motion behavior.
+
+Deferred:
+
+- New illustrations, photography, custom web fonts, dark mode, overt cultural motifs, animation, favourites, copy/share, search, imperial units, and new culinary categories.
+
+Maximum change: three files—`styles/main.css`, `src/app.js`, and `index.html` only if metadata cleanup is required.
+
+Dependencies that must already be stable:
+
+- Milestone 3 behavior and markup roles.
+- `design-mock.html` as a visual reference only.
+
+#### Gate
+
+Stop and report evidence after:
+
+1. Focused and complete tests pass unchanged.
+2. JavaScript syntax checks pass.
+3. CSS and markup diff review finds no dead breadcrumb, select, spoon, or preparation-screen styles.
+4. Desktop and both mobile viewport checks pass.
+5. Screenshot comparison confirms no blue text/accent inheritance, no dark background, and no excessive rustic decoration.
+6. Keyboard focus and contrast checks pass.
+
+### Milestone 5 — Final hardening and documentation reconciliation
+
+#### Scope boundary
+
+Included:
+
+- Execute the complete manual browser script.
+- Fix only defects discovered by that script.
+- Update `handover.md` to remove superseded salt-type/spoon/breadcrumb claims and record the final approved behavior and aesthetic.
+- Decide whether `design-mock.html` remains as a clearly labelled design reference or is removed after production matches it.
+
+Deferred:
+
+- All new product features and catalogue expansion.
+
+Maximum change: affected defect files plus `handover.md`; no speculative refactor.
+
+Dependencies that must already be stable:
+
+- Milestones 1–4 have passed their gates.
+
+#### Gate
+
+Stop and report final evidence after:
+
+1. Focused tests for any defect pass.
+2. Complete suite passes.
+3. Syntax checks pass.
+4. Final diff review preserves unrelated working-tree changes.
+5. Full browser script passes with no console errors or viewport jumps.
+6. Documentation matches the shipped behavior and contains no rejected salt-volume or multi-screen guidance.
+
+## Ambiguities and recommended defaults
+
+1. **Unreviewed slow-cook temperatures.** Recommended default: keep `Awaiting content review` for any ribs, lamb shoulder, or similar endpoint not already supported by reviewed source data. A Doneness button may exist without inventing a temperature.
+2. **Seafood Detail wording.** Recommended default: use Shucked, Peeled, and Fillet as the single visible details. If the weight basis later covers shell-on or whole fish, add those only with reviewed percentages.
+3. **Preparation route compatibility duration.** Recommended default: keep client-side legacy hash redirects for this release, remove them only after confirming no saved links depend on them.
+4. **Weight persistence after refresh.** Recommended default: reset to `100`; retain only in memory during the current page session. Do not add storage without a separate decision.
+5. **Pending-content visibility.** Recommended default: keep the full card height and show an explicit pending message so layout does not move.
+6. **Extra former catalogue entries.** Recommended default: defer them outside the active catalogue. Do not expose Sirloin, T-bone / Porterhouse, Strip steak, Filet / Tenderloin, Ground 90/10, Roast, or Pork belly until compactness and content are separately reconsidered.
+
+## Continuation milestone 6 — Reviewed lamb doneness temperatures
+
+### Planning decision
+
+This is the only approved continuation milestone. It resolves the pending temperature cards for lamb Chops, Leg, and Rack where the active Doneness choices map directly to reviewed chef targets.
+
+The reviewed evidence is:
+
+- ThermoWorks' chef-recommended table groups beef, veal, and lamb roasts, steaks, and chops at `130–135°F / 54–57°C` for Medium-rare and `135–145°F / 57–63°C` for Medium. It also distinguishes carryover guidance for individual chops and larger roasts: <https://blog.thermoworks.com/chef-recommended-tw-approved/>
+- USDA FSIS gives lamb chops and roasts a safe minimum of `145°F / 63°C` followed by at least 3 minutes of rest: <https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/lamb-farm-table>
+
+The chef target and the USDA safety baseline must remain visibly distinct. Do not imply that the lower chef target is the USDA minimum.
+
+### Required skills
+
+None. This milestone is a bounded catalogue-content and test change; no specialist UI, document, or deployment workflow is required.
+
+### Scope boundary
+
+Included:
+
+- Add lamb-specific reviewed Medium-rare and Medium temperature guidance.
+- Apply both choices to active Lamb Chops, Leg, and Rack.
+- Preserve the existing source URL, safety-source URL, and a review date of `2026-07-23`.
+- Add focused data/view-model tests for all three cuts and both doneness choices.
+- Confirm the rendered Finish card shows reviewed guidance for representative Lamb routes.
+
+Deferred:
+
+- Beef ribs, Pork ribs, and Lamb shoulder remain `needs-review`. Their active `Tender` endpoint is method- and cut-dependent; recipe-specific smoking or braising targets are not approved as universal constants.
+- No catalogue, route, layout, styling, dry-brine ratio, timing, or copy redesign.
+- No database, storage, API, deployment, or new dependency.
+
+Maximum product change: two files — `src/constants.js` and `tests/navigation.test.js`. Mandatory coordination updates to `HANDOFF.md` and `SESSION_UPDATE.md` do not count toward this maximum.
+
+### Exact implementation contract
+
+1. Add dedicated lamb Medium-rare and Medium records to `CHEF_TEMPERATURES`. Do not alias or silently reuse the beef records even though the reviewed numeric ranges match.
+2. Use these exact peak targets:
+   - Medium-rare: `130–135°F / 54–57°C`
+   - Medium: `135–145°F / 57–63°C`
+3. Guidance must explain carryover without pretending every lamb cut has the same pull offset: approximately `5°F / 2°C` early for chops and `10–12°F / 5–6°C` early for larger roasts, followed by resting to the target.
+4. Safety copy must state: `USDA whole-cut baseline: 145°F / 63°C with at least 3 minutes of rest.`
+5. Allow reviewed temperature records to supply their own `reviewedOn`; retain `2026-07-20` as the fallback for all existing records and set only the new lamb records to `2026-07-23`.
+6. Wire both lamb records through `temperaturesByDoneness` for Chops, Leg, and Rack in the active `MEAT_CATALOG` only.
+7. Do not populate the legacy catalogue or any `Tender` cut.
+
+### State transition table
+
+| Selection | Before | After |
+|---|---|---|
+| Lamb Chops / Medium-rare or Medium | `needs-review`, no target | `reviewed`, selected lamb target |
+| Lamb Leg / Medium-rare or Medium | `needs-review`, no target | `reviewed`, selected lamb target |
+| Lamb Rack / Medium-rare or Medium | `needs-review`, no target | `reviewed`, selected lamb target |
+| Beef ribs / Tender | `needs-review`, no target | unchanged |
+| Pork ribs / Tender | `needs-review`, no target | unchanged |
+| Lamb shoulder / Tender | `needs-review`, no target | unchanged |
+
+### Focused test cases
+
+1. Resolve canonical routes for Chops, Leg, and Rack at each of Medium-rare and Medium.
+2. Assert the target changes from `130–135°F / 54–57°C` to `135–145°F / 57–63°C` with doneness.
+3. Assert each reviewed lamb result includes the USDA `145°F` / 3-minute safety baseline, the chef source, the USDA safety source, and `reviewedOn: 2026-07-23`.
+4. Assert Beef ribs, Pork ribs, and Lamb shoulder remain stable pending records with a null target.
+5. Preserve every existing test.
+
+### Gate
+
+Stop and report evidence after:
+
+1. The new focused lamb and pending-content tests pass.
+2. The complete `node --test` suite passes.
+3. `node --check` passes for every JavaScript file under `src` and `tests`.
+4. Diff review confirms only approved lamb guidance was added and all dry-brine values, existing reviewed temperatures, routes, and presentation remain unchanged.
+5. Browser verification confirms representative Lamb Chops, Leg, and Rack selections show the correct reviewed Finish card, both Doneness buttons update it, Lamb shoulder remains pending, and the console has no errors.
+6. `HANDOFF.md` and `SESSION_UPDATE.md` record the result and remaining pending cuts.
+
+## Current Luna execution prompt
+
+Implement only Continuation milestone 6 from `IMPLEMENTATION_PLAN.md`. Add dedicated, source-backed lamb Medium-rare and Medium guidance and wire it only to active Lamb Chops, Leg, and Rack. Preserve distinct chef-target and USDA-safety language, source metadata, and a `2026-07-23` review date. Keep Beef ribs, Pork ribs, and Lamb shoulder pending; do not generalize recipe-specific tender temperatures. Add the specified focused tests, run the full gate including browser checks, update `HANDOFF.md` and `SESSION_UPDATE.md`, then stop.
+
+## Historical first-milestone execution prompt (completed)
+
+Implement only Milestone 1 from `IMPLEMENTATION_PLAN.md`. Replace the optional variant/doneness catalogue with the approved compact Meat → Cut → Detail → Doneness matrix, including proper lamb cuts and non-empty defaults for every cut. Add pure selection-defaulting, partial-route resolution, and canonical-hash behavior with focused navigation tests. Preserve all reviewed percentages, temperatures, source URLs, review dates, and the temporary salt-volume compatibility APIs required by the current app; do not invent missing culinary values. Do not redesign the DOM or CSS and do not begin salt-volume removal. Run focused tests, the complete suite, JavaScript syntax/import checks, a basic browser smoke check, and a careful diff review, then stop and report evidence before Milestone 2.

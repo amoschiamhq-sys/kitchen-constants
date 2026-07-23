@@ -2,17 +2,17 @@ import { MEAT_CATALOG } from './constants.js';
 import {
   getSinglePageViewModel,
   parseRoute,
-  routeToHash,
-  selectionKey,
+  resolveSelection,
 } from './navigation.js';
 import { formatGrams } from './calculator.js';
 
 const appRoot = document.querySelector('#app');
 const state = {
-  rawWeight: '',
-  route: null,
+  rawWeight: '100',
+  selection: null,
+  pendingFocusKey: null,
+  pendingScrollY: null,
 };
-let focusHeadingOnHashChange = false;
 
 function escapeHtml(value) {
   return String(value)
@@ -23,66 +23,59 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-function getPageSelection(currentRoute) {
-  if (currentRoute.kind === 'not-found') return null;
-  const meat = currentRoute.meat ?? MEAT_CATALOG[0];
-  const type = currentRoute.type ?? meat.types[0];
-
-  return {
-    meat,
-    type,
-    variant: currentRoute.variant ?? null,
-    doneness: currentRoute.doneness ?? null,
-  };
+function resolvedHash(fields) {
+  return resolveSelection(fields).hash;
 }
 
-function choiceClass(isSelected) {
-  return isSelected ? 'choice choice--selected' : 'choice';
+function selectionLink({ href, label, isSelected, key }) {
+  return `<li><a class="choice${isSelected ? ' choice--selected' : ''}" href="${escapeHtml(href)}" data-choice-key="${escapeHtml(key)}"${isSelected ? ' aria-current="true"' : ''}>${escapeHtml(label)}</a></li>`;
 }
 
-function selectionLink({ href, label, isSelected }) {
-  return `<li><a class="${choiceClass(isSelected)}" href="${escapeHtml(href)}"${isSelected ? ' aria-current="true"' : ''}><span>${escapeHtml(label)}</span><span aria-hidden="true">→</span></a></li>`;
-}
-
-function renderChoiceGroup({ id, label, choices }) {
+function renderChoiceGroup({ id, label, kind, choices }) {
   return `
-    <section class="selection-group" aria-labelledby="${id}">
+    <section class="selection-group selection-group--${kind}" aria-labelledby="${id}">
       <h2 id="${id}">${escapeHtml(label)}</h2>
-      <ul class="choice-list choice-list--selector">
+      <ul class="choice-list choice-list--${kind}">
         ${choices.join('')}
       </ul>
     </section>`;
 }
 
 function renderSelectionControls(selection) {
-  const { meat, type, variant, doneness } = selection;
+  const { meat, type, detail, doneness } = selection;
   const meatChoices = MEAT_CATALOG.map((option) => selectionLink({
-    href: routeToHash({ kind: 'meat', meat: option }),
+    href: resolvedHash({ kind: 'meat', meat: option }),
     label: option.label,
     isSelected: option.slug === meat.slug,
+    key: `meat:${option.slug}`,
   }));
   const typeChoices = meat.types.map((option) => selectionLink({
-    href: routeToHash({ kind: 'cut', meat, type: option }),
+    href: resolvedHash({ kind: 'cut', meat, type: option }),
     label: option.label,
     isSelected: option.slug === type.slug,
+    key: `cut:${option.slug}`,
   }));
-  const variantChoices = type.variants.map((option) => selectionLink({
-    href: routeToHash({ kind: 'variant', meat, type, variant: option }),
+  const detailChoices = type.details.map((option) => selectionLink({
+    href: resolvedHash({ kind: 'doneness', meat, type, detail: option, doneness }),
     label: option.label,
-    isSelected: option.slug === variant?.slug,
+    isSelected: option.slug === detail.slug,
+    key: `detail:${option.slug}`,
   }));
   const donenessChoices = type.doneness.map((option) => selectionLink({
-    href: routeToHash({ kind: 'doneness', meat, type, variant, doneness: option }),
+    href: resolvedHash({ kind: 'doneness', meat, type, detail, doneness: option }),
     label: option.label,
-    isSelected: option.slug === doneness?.slug,
+    isSelected: option.slug === doneness.slug,
+    key: `doneness:${option.slug}`,
   }));
 
   return `
-    <div class="selection-controls">
-      ${renderChoiceGroup({ id: 'meat-heading', label: 'Choose a meat', choices: meatChoices })}
-      ${renderChoiceGroup({ id: 'type-heading', label: 'Choose a cut', choices: typeChoices })}
-      ${variantChoices.length ? renderChoiceGroup({ id: 'variant-heading', label: 'Choose the detail', choices: variantChoices }) : ''}
-      ${donenessChoices.length ? renderChoiceGroup({ id: 'doneness-heading', label: 'Choose the finish', choices: donenessChoices }) : ''}
+    <div class="selection-controls" aria-label="Cooking choices">
+      ${renderChoiceGroup({ id: 'meat-heading', label: 'Meat', kind: 'meat', choices: meatChoices })}
+      ${renderChoiceGroup({ id: 'cut-heading', label: 'Cut', kind: 'cut', choices: typeChoices })}
+      <div class="selection-pair">
+        ${renderChoiceGroup({ id: 'detail-heading', label: 'Detail', kind: 'detail', choices: detailChoices })}
+        ${renderChoiceGroup({ id: 'doneness-heading', label: 'Doneness', kind: 'doneness', choices: donenessChoices })}
+      </div>
     </div>`;
 }
 
@@ -92,178 +85,231 @@ function weightError(status) {
   return '';
 }
 
-function renderWeightInput(model) {
+function renderSourceLink(href, label) {
+  if (!href) return '';
+  return `<a class="source-link" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}<span class="visually-hidden"> (opens in a new tab)</span></a>`;
+}
+
+function renderSourceLinks(links) {
+  const uniqueLinks = links.filter((link, index, allLinks) => (
+    link.href && allLinks.findIndex((candidate) => candidate.href === link.href) === index
+  ));
+  if (!uniqueLinks.length) return '';
+  return `<p class="source-links" aria-label="Sources">${uniqueLinks.map((link) => renderSourceLink(link.href, link.label)).join(' &middot; ')}</p>`;
+}
+
+function renderSaltCalculation(model) {
+  if (model.weight.status === 'valid' && model.result) {
+    return `<p class="result-value">${formatGrams(model.result.recommended)} <span>g</span></p>`;
+  }
+  if (model.weight.status === 'empty') {
+    return '<p class="result-placeholder">Enter a weight to calculate salt.</p>';
+  }
+  return '<p class="result-placeholder">Correct the weight to calculate salt.</p>';
+}
+
+function renderPrepareCard(model) {
+  if (!model.dryBrine?.ratios) {
+    return `
+      <article class="result-card result-card--pending" aria-labelledby="prepare-heading">
+        <p class="card-kicker">Prepare</p>
+        <h2 id="prepare-heading">Awaiting content review</h2>
+        <p>The controls are ready. The culinary constant will appear after review.</p>
+      </article>`;
+  }
+
   const error = weightError(model.weight.status);
   const validationAttributes = error
     ? 'aria-invalid="true" aria-errormessage="weight-error"'
     : 'aria-invalid="false"';
 
   return `
-    <section class="calculator-form input-card" aria-labelledby="weight-heading">
-      <p class="eyebrow">Input</p>
-      <h2 id="weight-heading">Weight in grams</h2>
-      <label for="food-weight">Food weight</label>
-      <div class="unit-input">
-        <input id="food-weight" data-weight-input type="text" inputmode="decimal" autocomplete="off" value="${escapeHtml(state.rawWeight)}" aria-describedby="weight-help weight-error" ${validationAttributes}>
-        <span aria-hidden="true">g</span>
+    <article class="result-card result-card--prepare" aria-labelledby="prepare-heading">
+      <p class="card-kicker">Prepare</p>
+      <div class="result-heading-row">
+        <h2 id="prepare-heading">Dry brine</h2>
+        <p class="constant-value" aria-label="${model.dryBrine.ratios.recommended} percent salt">${model.dryBrine.ratios.recommended}<span>%</span></p>
       </div>
-      <p id="weight-help" class="field-help">Use the weight of the selected cut.</p>
-      <p id="weight-error" class="field-error" role="alert">${escapeHtml(error)}</p>
-    </section>`;
-}
-
-function renderSaltCard(model) {
-  if (!model.selectionComplete) {
-    return `
-      <article class="result-card result-card--pending">
-        <p class="eyebrow">Dry brine salt</p>
-        <h3>Choose the remaining options</h3>
-        <p>Select the detail above to show the salt guidance for this cut.</p>
-      </article>`;
-  }
-
-  if (!model.dryBrine?.ratios) {
-    return `
-      <article class="result-card result-card--pending">
-        <p class="eyebrow">Dry brine salt</p>
-        <h3>Awaiting content review</h3>
-        <p>The interaction is ready. The culinary constant will appear after review.</p>
-      </article>`;
-  }
-
-  const hasResult = model.weight.status === 'valid' && model.result;
-  return `
-    <article class="result-card result-card--salt" aria-live="polite" aria-atomic="true" aria-labelledby="salt-heading">
-      <p class="eyebrow">Dry brine salt</p>
-      <h3 id="salt-heading">Recommended salt</h3>
-      <p class="constant-value">${model.dryBrine.ratios.recommended}<span>%</span></p>
-      ${hasResult
-        ? `<p class="result-value">${formatGrams(model.result.recommended)} <span>g</span></p><p class="range">Range: ${formatGrams(model.result.min)}–${formatGrams(model.result.max)} g</p>`
-        : '<p class="result-placeholder">Enter a weight to calculate the salt.</p>'}
+      <div class="calculation-row">
+        <div class="weight-control">
+          <label for="food-weight">Food weight</label>
+          <div class="unit-input">
+            <input id="food-weight" data-weight-input type="text" inputmode="decimal" autocomplete="off" value="${escapeHtml(state.rawWeight)}" aria-describedby="weight-help weight-error" ${validationAttributes}>
+            <span aria-hidden="true">g</span>
+          </div>
+          <p id="weight-help" class="field-help">Weight of the selected cut.</p>
+          <p id="weight-error" class="field-error" role="alert">${escapeHtml(error)}</p>
+        </div>
+        <div class="salt-calculation">
+          <p class="result-label">Salt</p>
+          <div data-salt-output aria-live="polite" aria-atomic="true">${renderSaltCalculation(model)}</div>
+        </div>
+      </div>
+      ${model.dryBrine.timing ? `<p class="timing-note"><strong>Timing</strong> ${escapeHtml(model.dryBrine.timing)}</p>` : ''}
+      ${renderSourceLinks([{ href: model.dryBrine.source, label: 'Salt ratio source' }])}
     </article>`;
 }
 
-function renderTemperatureCard(model) {
+function renderFinishCard(model) {
   const guidance = model.internalTemperature?.targetInternalTemperature;
-
-  if (!model.selectionComplete) {
+  if (!guidance) {
     return `
-      <article class="result-card result-card--pending" aria-labelledby="temperature-heading">
-        <p class="eyebrow">Internal temperature</p>
-        <h3 id="temperature-heading">Choose the remaining options</h3>
-        <p>Select the detail above to show the chef target for this cut.</p>
-      </article>`;
-  }
-
-  if (guidance) {
-    return `
-      <article class="result-card result-card--temperature" aria-labelledby="temperature-heading">
-        <p class="eyebrow">Internal temperature</p>
-        <h3 id="temperature-heading">Chef target</h3>
-        <p class="temperature-value">${escapeHtml(guidance)}</p>
-        <p>${escapeHtml(model.internalTemperature.guidance)}</p>
-        <p class="safety-note">${escapeHtml(model.internalTemperature.safety)}</p>
+      <article class="result-card result-card--pending" aria-labelledby="finish-heading">
+        <p class="card-kicker">Finish</p>
+        <h2 id="finish-heading">Awaiting content review</h2>
+        <p>Professional temperature guidance will appear here after review.</p>
       </article>`;
   }
 
   return `
-    <article class="result-card result-card--pending" aria-labelledby="temperature-heading">
-      <p class="eyebrow">Internal temperature</p>
-      <h3 id="temperature-heading">Awaiting content review</h3>
-      <p>Professional guidance will appear here once the endpoint and hold-time wording are approved.</p>
+    <article class="result-card result-card--finish" aria-labelledby="finish-heading">
+      <p class="card-kicker">Finish</p>
+      <h2 id="finish-heading">Internal temperature</h2>
+      <p class="result-label">Chef target</p>
+      <p class="temperature-value">${escapeHtml(guidance)}</p>
+      <p class="guidance">${escapeHtml(model.internalTemperature.guidance)}</p>
+      <p class="result-label safety-label">Food-safety baseline</p>
+      <p class="safety-note">${escapeHtml(model.internalTemperature.safety)}</p>
+      ${renderSourceLinks([
+        { href: model.internalTemperature.source, label: 'Chef target source' },
+        { href: model.internalTemperature.safetySource, label: 'Safety baseline' },
+      ])}
     </article>`;
-}
-
-function renderResults(selection, model) {
-  const selectionLabel = [selection.meat.label, selection.type.label, selection.variant?.label, selection.doneness?.label]
-    .filter(Boolean)
-    .join(' / ');
-  const input = model.selectionComplete && model.dryBrine?.ratios ? renderWeightInput(model) : '';
-
-  return `
-    <section class="results-section" aria-labelledby="results-heading">
-      <p class="eyebrow">Your results</p>
-      <h2 id="results-heading">${escapeHtml(selectionLabel)}</h2>
-      ${input}
-      <div class="results-grid">
-        ${renderSaltCard(model)}
-        ${renderTemperatureCard(model)}
-      </div>
-    </section>`;
 }
 
 function renderHeader() {
   return `
     <header class="site-header">
-      <a class="brand" href="#/" aria-label="Kitchen Constants home">
-        <span class="brand-mark" aria-hidden="true">Kc</span>
-        <span>Kitchen Constants</span>
-      </a>
+      <div class="header-inner">
+        <a class="brand" href="#/" data-choice-key="brand" aria-label="Kitchen Constants home">
+          <span class="brand-mark" aria-hidden="true">Kc</span>
+          <span class="brand-name">Kitchen Constants</span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="./index.html">Calculator</a>
+          <a href="./guides.html">Guides</a>
+          <a href="./about.html">About</a>
+        </nav>
+      </div>
+      <div class="tagline-row">
+        <p class="tagline">Measure twice. Season once.</p>
+      </div>
     </header>`;
+}
+
+function renderFooter() {
+  return `
+    <footer class="site-footer">
+      <p>Kitchen Constants is a practical cooking reference, not a substitute for your own judgement.</p>
+      <nav aria-label="Footer navigation">
+        <a href="./guides.html">Guides</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </footer>`;
+}
+
+function renderSupportNote() {
+  return `
+    <aside class="support-note" aria-label="Support Kitchen Constants">
+      <p class="support-title">Found this useful?</p>
+      <p>Help keep Kitchen Constants free and independent.</p>
+      <p class="support-note__next">Support link coming soon.</p>
+    </aside>`;
 }
 
 function renderNotFound() {
   return `
-    <section class="not-found" aria-labelledby="not-found-heading">
-      <p class="eyebrow">Kitchen Constants</p>
-      <h1 id="not-found-heading" tabindex="-1">That page is not in the pantry</h1>
-      <p class="lede">That selection is not available yet. Return home and choose from the one-page controls.</p>
-      <a class="choice" href="#/"><span>Go home</span><span aria-hidden="true">→</span></a>
-    </section>`;
+    ${renderHeader()}
+    <main id="main-content">
+      <section class="not-found" aria-labelledby="not-found-heading">
+        <p class="card-kicker">Kitchen reference</p>
+        <h1 id="not-found-heading">That page is not in the pantry</h1>
+        <p>That selection is not available. Return to the default cooking reference.</p>
+        <a class="choice recovery-link" href="#/">Use defaults</a>
+      </section>
+    </main>
+    ${renderFooter()}`;
 }
 
-function renderRoute(currentRoute) {
-  if (currentRoute.kind === 'not-found') {
-    return `${renderHeader()}<main id="main-content" tabindex="-1">${renderNotFound()}</main>`;
-  }
-
-  const selection = getPageSelection(currentRoute);
+function renderPage(selection) {
   const model = getSinglePageViewModel(selection, state.rawWeight);
-
   return `
     ${renderHeader()}
-    <main id="main-content" tabindex="-1">
-      <p class="eyebrow">A pocket reference for cooking by weight</p>
-      <h1 tabindex="-1">Kitchen Constants</h1>
-      <p class="lede">Choose a cut, enter the weight, and keep the useful results together.</p>
+    <main id="main-content">
+      <h1 class="visually-hidden">Kitchen Constants cooking reference</h1>
       ${renderSelectionControls(selection)}
-      ${renderResults(selection, model)}
-    </main>`;
+      <section class="results-grid" aria-label="Cooking guidance">
+        ${renderPrepareCard(model)}
+        ${renderFinishCard(model)}
+      </section>
+      ${renderSupportNote()}
+    </main>
+    ${renderFooter()}`;
 }
 
-function renderCurrentRoute({ focusHeading = false, focusInput = false } = {}) {
-  const nextRoute = parseRoute(window.location.hash);
-  if (state.route && selectionKey(state.route) !== selectionKey(nextRoute)) {
-    state.rawWeight = '';
-  }
-  state.route = nextRoute;
-  appRoot.innerHTML = renderRoute(nextRoute);
+function restorePendingFocus() {
+  if (!state.pendingFocusKey) return;
+  const target = [...appRoot.querySelectorAll('[data-choice-key]')]
+    .find((element) => element.dataset.choiceKey === state.pendingFocusKey);
+  target?.focus({ preventScroll: true });
+  state.pendingFocusKey = null;
+}
 
-  if (focusInput) {
-    const input = appRoot.querySelector('[data-weight-input]');
-    input?.focus();
-    input?.setSelectionRange(input.value.length, input.value.length);
-  } else if (focusHeading) {
-    appRoot.querySelector('h1')?.focus({ preventScroll: true });
+function renderCurrentRoute({ preserveViewport = false } = {}) {
+  const previousScrollY = state.pendingScrollY ?? window.scrollY;
+  state.pendingScrollY = null;
+  const parsed = parseRoute(window.location.hash);
+  if (parsed.kind === 'not-found') {
+    state.selection = null;
+    appRoot.innerHTML = renderNotFound();
+    return;
+  }
+
+  const selection = resolveSelection(parsed);
+  if (window.location.hash !== selection.hash) {
+    window.history.replaceState(null, '', selection.hash);
+  }
+  state.selection = selection;
+  appRoot.innerHTML = renderPage(selection);
+  restorePendingFocus();
+  if (preserveViewport) {
+    window.requestAnimationFrame(() => window.scrollTo({ top: previousScrollY, left: 0, behavior: 'auto' }));
   }
 }
+
+function updateWeightResult() {
+  if (!state.selection) return;
+  const model = getSinglePageViewModel(state.selection, state.rawWeight);
+  const input = appRoot.querySelector('[data-weight-input]');
+  const error = weightError(model.weight.status);
+  input?.setAttribute('aria-invalid', error ? 'true' : 'false');
+  if (error) input?.setAttribute('aria-errormessage', 'weight-error');
+  else input?.removeAttribute('aria-errormessage');
+  const errorNode = appRoot.querySelector('#weight-error');
+  if (errorNode) errorNode.textContent = error;
+  const output = appRoot.querySelector('[data-salt-output]');
+  if (output) output.innerHTML = renderSaltCalculation(model);
+}
+
+appRoot.addEventListener('pointerdown', (event) => {
+  const link = event.target.closest?.('[data-choice-key]');
+  if (link) state.pendingScrollY = window.scrollY;
+}, { capture: true });
 
 appRoot.addEventListener('click', (event) => {
-  const link = event.target.closest?.('a[href^="#/"]');
-  if (!link || !appRoot.contains(link) || link.hash === window.location.hash) return;
-  focusHeadingOnHashChange = true;
+  const link = event.target.closest?.('[data-choice-key]');
+  if (link) {
+    state.pendingFocusKey = link.dataset.choiceKey;
+    if (state.pendingScrollY === null) state.pendingScrollY = window.scrollY;
+  }
 });
 
 appRoot.addEventListener('input', (event) => {
   if (!event.target.matches('[data-weight-input]')) return;
   state.rawWeight = event.target.value;
-  renderCurrentRoute({ focusInput: true });
+  updateWeightResult();
 });
 
-window.addEventListener('hashchange', () => {
-  const shouldFocusHeading = focusHeadingOnHashChange;
-  focusHeadingOnHashChange = false;
-  renderCurrentRoute({ focusHeading: shouldFocusHeading });
-});
+window.addEventListener('hashchange', () => renderCurrentRoute({ preserveViewport: true }));
 
 renderCurrentRoute();
