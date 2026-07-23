@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   CalculationInputError,
+  calculateDoughRatio,
   calculateDryBrine,
   formatGrams,
   parseWeight,
@@ -73,6 +74,24 @@ test('calculateDryBrine rejects invalid programmer preconditions', () => {
     () => calculateDryBrine(100, null),
     CalculationInputError,
   );
+});
+
+test('calculateDoughRatio scales liquid from flour weight', () => {
+  assert.deepEqual(calculateDoughRatio(100, 50), {
+    flour: 100,
+    liquid: 50,
+    hydration: 50,
+  });
+  assert.deepEqual(calculateDoughRatio(250, 52), {
+    flour: 250,
+    liquid: 130,
+    hydration: 52,
+  });
+});
+
+test('calculateDoughRatio rejects invalid programmer preconditions', () => {
+  assert.throws(() => calculateDoughRatio(0, 50), CalculationInputError);
+  assert.throws(() => calculateDoughRatio(100, -1), CalculationInputError);
 });
 
 test('formatGrams always emits one decimal place', () => {

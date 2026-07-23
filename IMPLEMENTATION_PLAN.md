@@ -641,6 +641,42 @@ Stop and report evidence after:
 
 Implement only Continuation milestone 6 from `IMPLEMENTATION_PLAN.md`. Add dedicated, source-backed lamb Medium-rare and Medium guidance and wire it only to active Lamb Chops, Leg, and Rack. Preserve distinct chef-target and USDA-safety language, source metadata, and a `2026-07-23` review date. Keep Beef ribs, Pork ribs, and Lamb shoulder pending; do not generalize recipe-specific tender temperatures. Add the specified focused tests, run the full gate including browser checks, update `HANDOFF.md` and `SESSION_UPDATE.md`, then stop.
 
+## Category expansion milestone 7: Pasta & Noodles, Chinese noodles, and dumpling wrappers
+
+Status: implemented locally on `agent/launch-milestone`; verify and publish with the existing draft pull request.
+
+The product is no longer meat-only. Keep Meat as the default top-level category, then allow each category to define its own stable button choices and result cards. The first added category is Pasta & Noodles, with Fresh egg pasta, Chinese hand-cut noodles, and Dumpling wrappers.
+
+### Product decisions
+
+- Keep the existing warm, light cookbook interface and compact single-page flow.
+- Keep the category switcher above the module-specific controls.
+- Use flour weight as the input for dough modules and keep the default at `100 g` so the percentage is easy to understand.
+- Show the calculated liquid or egg amount immediately; do not add pasta cooking-water salt.
+- Keep the explanatory copy short and practical. Explain hydration as liquid weight relative to flour weight.
+- Keep Bread and Pickles as future categories until their inputs, ratios, and evidence model are defined.
+
+### Content and source policy
+
+- Do not cite or depend on Saltyourmeat.com. Current meat percentages are candidate values and need an independent audit plus home testing before they are described as reviewed.
+- Use culinary references, recipe conversions, community experience, and Amos's own tests for taste-oriented ratios, with transparent status and source links.
+- Reserve official sources for safety-sensitive topics such as food safety, fermentation, canning, or curing ingredients.
+- Current dough reference points are: Pasta Evangelists for fresh egg pasta, Omnivore's Cookbook for Chinese fresh noodles, and Red House Spice for dumpling wrappers.
+
+### Implementation contract
+
+1. Add a reusable category catalogue without breaking existing meat routes or defaults.
+2. Add pure dough hydration calculation and validation tests.
+3. Route `#/pasta`, `#/pasta/fresh-egg`, `#/pasta/chinese-hand-cut`, and `#/pasta/dumpling-wrappers` to canonical stable selections.
+4. Render each style with its own ratio, flour input, calculated liquid or egg output, rest guidance, finishing guidance, and source link.
+5. Preserve Meat's Chef target first and Food-safety baseline second presentation.
+6. Update Guides, project brief, handover, executor handoff, and session notes.
+7. Verify desktop and 390 px mobile layouts, no horizontal overflow, default values, all three dough outputs, and no console errors.
+
+### Gate
+
+Stop only after the complete test suite, JavaScript checks, diff checks, browser smoke checks, documentation update, and existing draft PR update all pass. Leave the local calculator open on the Pasta & Noodles module for handoff testing.
+
 ## Historical first-milestone execution prompt (completed)
 
 Implement only Milestone 1 from `IMPLEMENTATION_PLAN.md`. Replace the optional variant/doneness catalogue with the approved compact Meat → Cut → Detail → Doneness matrix, including proper lamb cuts and non-empty defaults for every cut. Add pure selection-defaulting, partial-route resolution, and canonical-hash behavior with focused navigation tests. Preserve all reviewed percentages, temperatures, source URLs, review dates, and the temporary salt-volume compatibility APIs required by the current app; do not invent missing culinary values. Do not redesign the DOM or CSS and do not begin salt-volume removal. Run focused tests, the complete suite, JavaScript syntax/import checks, a basic browser smoke check, and a careful diff review, then stop and report evidence before Milestone 2.

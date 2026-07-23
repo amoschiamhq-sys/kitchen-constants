@@ -11,7 +11,7 @@ import {
   routeToHash,
   selectionKey,
 } from '../src/navigation.js';
-import { MEAT_CATALOG } from '../src/constants.js';
+import { CATEGORY_CATALOG, MEAT_CATALOG, PASTA_CATALOG } from '../src/constants.js';
 
 test('approved catalogue exposes the compact five-meat matrix', () => {
   assert.deepEqual(MEAT_CATALOG.map((meat) => meat.label), [
@@ -113,9 +113,49 @@ test('single-page model resolves whole-chicken defaults before weight input', ()
 
   assert.equal(model.selectionComplete, true);
   assert.deepEqual(model.weight, { status: 'empty' });
-  assert.equal(model.dryBrine.contentStatus, 'reviewed');
+  assert.equal(model.dryBrine.contentStatus, 'candidate');
   assert.deepEqual(model.dryBrine.ratios, { min: 1.1, recommended: 1.1, max: 1.1 });
   assert.equal(model.result, null);
+});
+
+test('category model exposes meat and pasta tools', () => {
+  assert.deepEqual(CATEGORY_CATALOG.map((category) => category.label), [
+    'Meat', 'Pasta & Noodles',
+  ]);
+  assert.deepEqual(PASTA_CATALOG[0].styles.map((style) => style.label), [
+    'Fresh egg pasta', 'Chinese hand-cut noodles', 'Dumpling wrappers',
+  ]);
+});
+
+test('pasta routes resolve the first style by default', () => {
+  const parsed = parseRoute('#/pasta');
+  const resolved = resolveSelection(parsed);
+
+  assert.equal(parsed.kind, 'category');
+  assert.equal(resolved.style.slug, 'fresh-egg');
+  assert.equal(resolved.hash, '#/pasta/fresh-egg');
+  assert.deepEqual(getRouteChoices(parsed).map((choice) => choice.label), [
+    'Fresh egg pasta', 'Chinese hand-cut noodles', 'Dumpling wrappers',
+  ]);
+});
+
+test('pasta dough model scales fresh pasta, Chinese noodles and wrappers', () => {
+  const cases = [
+    ['fresh-egg', 50],
+    ['chinese-hand-cut', 48],
+    ['dumpling-wrappers', 52],
+  ];
+
+  for (const [style, hydration] of cases) {
+    const model = getSinglePageViewModel(
+      resolveSelection(parseRoute(`#/pasta/${style}`)),
+      '100',
+    );
+
+    assert.equal(model.module, 'pasta');
+    assert.equal(model.dough.liquid, hydration, style);
+    assert.equal(model.dough.flour, 100, style);
+  }
 });
 
 test('single-page whole-chicken model calculates without stale output', () => {

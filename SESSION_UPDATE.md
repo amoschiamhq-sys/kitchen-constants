@@ -35,7 +35,7 @@ Date: 2026-07-23
 
 ## Test baseline
 
-`node --test` passes 37 tests with no failures.
+`node --test` passes 42 tests with no failures.
 
 ## Launch milestone
 
@@ -45,3 +45,14 @@ Date: 2026-07-23
 - Added page descriptions, canonical links, robots.txt and sitemap.xml for the future custom domain.
 - Added a quiet support prompt below results. It is waiting for the real Ko-fi URL and does not pretend to accept payments yet.
 - Browser verification passed at the default viewport, 390 x 844 and 320 x 568 with no horizontal overflow or console errors.
+
+## Category expansion milestone
+
+- Added top-level category controls with Meat selected by default.
+- Added Pasta & Noodles as the first non-meat module.
+- Added fresh egg pasta, Chinese hand-cut noodles, and cold-water dumpling wrappers.
+- Added reusable dough-ratio calculation with a 100 g flour default and immediate liquid output.
+- Kept pasta cooking-water salt out of scope at Amos's request.
+- Added short methodology and dough-hydration guidance to Guides.
+- Removed the direct Saltyourmeat.com dependency and attribution from the current code and content. Existing meat ratios are now explicitly candidate values pending independent audit and home testing.
+- Full suite now passes 42 tests; mobile browser verification shows no horizontal overflow at 390 px.

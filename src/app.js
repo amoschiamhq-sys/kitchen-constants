@@ -1,4 +1,4 @@
-import { MEAT_CATALOG } from './constants.js';
+import { CATEGORY_CATALOG, MEAT_CATALOG } from './constants.js';
 import {
   getSinglePageViewModel,
   parseRoute,
@@ -41,7 +41,49 @@ function renderChoiceGroup({ id, label, kind, choices }) {
     </section>`;
 }
 
+function renderCategoryControls(selection) {
+  const activeCategory = selection?.category?.slug ?? 'meat';
+  const categoryChoices = CATEGORY_CATALOG.map((category) => selectionLink({
+    href: category.slug === 'meat'
+      ? resolvedHash({ meat: MEAT_CATALOG[0] })
+      : resolvedHash({ category }),
+    label: category.label,
+    isSelected: category.slug === activeCategory,
+    key: `category:${category.slug}`,
+  }));
+
+  return renderChoiceGroup({
+    id: 'category-heading',
+    label: 'What are you making?',
+    kind: 'category',
+    choices: categoryChoices,
+  });
+}
+
+function renderPastaSelectionControls(selection) {
+  const styleChoices = selection.category.styles.map((style) => selectionLink({
+    href: resolvedHash({ category: selection.category, style }),
+    label: style.label,
+    isSelected: style.slug === selection.style.slug,
+    key: `pasta:${style.slug}`,
+  }));
+
+  return renderChoiceGroup({
+    id: 'pasta-style-heading',
+    label: 'Style',
+    kind: 'style',
+    choices: styleChoices,
+  });
+}
+
 function renderSelectionControls(selection) {
+  if (selection.category?.kind === 'pasta') {
+    return `
+      <div class="selection-controls selection-controls--secondary" aria-label="Pasta and noodle choices">
+        ${renderPastaSelectionControls(selection)}
+      </div>`;
+  }
+
   const { meat, type, detail, doneness } = selection;
   const meatChoices = MEAT_CATALOG.map((option) => selectionLink({
     href: resolvedHash({ kind: 'meat', meat: option }),
@@ -98,6 +140,10 @@ function renderSourceLinks(links) {
   return `<p class="source-links" aria-label="Sources">${uniqueLinks.map((link) => renderSourceLink(link.href, link.label)).join(' &middot; ')}</p>`;
 }
 
+function renderMethodologyLink() {
+  return '<p class="source-links"><a class="source-link" href="./guides.html#methodology">How we choose the numbers</a></p>';
+}
+
 function renderSaltCalculation(model) {
   if (model.weight.status === 'valid' && model.result) {
     return `<p class="result-value">${formatGrams(model.result.recommended)} <span>g</span></p>`;
@@ -146,7 +192,68 @@ function renderPrepareCard(model) {
         </div>
       </div>
       ${model.dryBrine.timing ? `<p class="timing-note"><strong>Timing</strong> ${escapeHtml(model.dryBrine.timing)}</p>` : ''}
-      ${renderSourceLinks([{ href: model.dryBrine.source, label: 'Salt ratio source' }])}
+      <p class="method-note">A practical starting point, refined through culinary references and home testing.</p>
+      ${renderMethodologyLink()}
+    </article>`;
+}
+
+function renderDoughCalculation(model) {
+  if (model.weight.status === 'valid' && model.dough) {
+    return `<p class="result-value">${formatGrams(model.dough.liquid)} <span>g</span></p>`;
+  }
+  if (model.weight.status === 'empty') {
+    return '<p class="result-placeholder">Enter flour weight to calculate.</p>';
+  }
+  return '<p class="result-placeholder">Correct the flour weight to calculate.</p>';
+}
+
+function renderPastaPrepareCard(model) {
+  const { style } = model;
+  const error = weightError(model.weight.status);
+  const validationAttributes = error
+    ? 'aria-invalid="true" aria-errormessage="weight-error"'
+    : 'aria-invalid="false"';
+
+  return `
+    <article class="result-card result-card--prepare" aria-labelledby="prepare-heading">
+      <p class="card-kicker">Make</p>
+      <div class="result-heading-row">
+        <div>
+          <h2 id="prepare-heading">${escapeHtml(style.label)}</h2>
+          <p class="ratio-label">${escapeHtml(style.ratioLabel)}</p>
+        </div>
+        <p class="ratio-display" aria-label="${escapeHtml(style.ratioDisplay)}">${escapeHtml(style.ratioDisplay)}</p>
+      </div>
+      <div class="calculation-row">
+        <div class="weight-control">
+          <label for="food-weight">${escapeHtml(style.inputLabel)}</label>
+          <div class="unit-input">
+            <input id="food-weight" data-weight-input type="text" inputmode="decimal" autocomplete="off" value="${escapeHtml(state.rawWeight)}" aria-describedby="weight-help weight-error" ${validationAttributes}>
+            <span aria-hidden="true">g</span>
+          </div>
+          <p id="weight-help" class="field-help">The flour amount for this batch.</p>
+          <p id="weight-error" class="field-error" role="alert">${escapeHtml(error)}</p>
+        </div>
+        <div class="salt-calculation">
+          <p class="result-label">${escapeHtml(style.liquidLabel)}</p>
+          <div data-dough-output aria-live="polite" aria-atomic="true">${renderDoughCalculation(model)}</div>
+        </div>
+      </div>
+      <p class="timing-note"><strong>Why it works</strong> ${escapeHtml(style.note)}</p>
+      ${renderSourceLinks([{ href: style.source, label: style.sourceLabel }])}
+    </article>`;
+}
+
+function renderPastaFinishCard(model) {
+  return `
+    <article class="result-card result-card--finish" aria-labelledby="finish-heading">
+      <p class="card-kicker">Finish</p>
+      <h2 id="finish-heading">Rest, then shape</h2>
+      <p class="result-label">Rest</p>
+      <p class="guidance">${escapeHtml(model.style.rest)}</p>
+      <p class="result-label safety-label">Cook or use</p>
+      <p class="safety-note">${escapeHtml(model.style.finish)}</p>
+      ${renderSourceLinks([{ href: model.style.source, label: model.style.sourceLabel }])}
     </article>`;
 }
 
@@ -233,14 +340,18 @@ function renderNotFound() {
 
 function renderPage(selection) {
   const model = getSinglePageViewModel(selection, state.rawWeight);
+  const isPasta = selection.category?.kind === 'pasta';
   return `
     ${renderHeader()}
     <main id="main-content">
       <h1 class="visually-hidden">Kitchen Constants cooking reference</h1>
-      ${renderSelectionControls(selection)}
+      <div class="selection-controls">
+        ${renderCategoryControls(selection)}
+        ${renderSelectionControls(selection)}
+      </div>
       <section class="results-grid" aria-label="Cooking guidance">
-        ${renderPrepareCard(model)}
-        ${renderFinishCard(model)}
+        ${isPasta ? renderPastaPrepareCard(model) : renderPrepareCard(model)}
+        ${isPasta ? renderPastaFinishCard(model) : renderFinishCard(model)}
       </section>
       ${renderSupportNote()}
     </main>
@@ -287,8 +398,14 @@ function updateWeightResult() {
   else input?.removeAttribute('aria-errormessage');
   const errorNode = appRoot.querySelector('#weight-error');
   if (errorNode) errorNode.textContent = error;
-  const output = appRoot.querySelector('[data-salt-output]');
-  if (output) output.innerHTML = renderSaltCalculation(model);
+  const output = appRoot.querySelector(state.selection.category?.kind === 'pasta'
+    ? '[data-dough-output]'
+    : '[data-salt-output]');
+  if (output) {
+    output.innerHTML = state.selection.category?.kind === 'pasta'
+      ? renderDoughCalculation(model)
+      : renderSaltCalculation(model);
+  }
 }
 
 appRoot.addEventListener('pointerdown', (event) => {

@@ -50,7 +50,7 @@ The default view is:
 
 ## Verification
 
-- `node --test`: 37 tests passed, 0 failed.
+- `node --test`: 42 tests passed, 0 failed.
 - JavaScript syntax checks passed for all runtime and test modules.
 - `git diff --check` passed apart from existing line-ending notices.
 - Browser walkthrough covered defaults, six consecutive selection changes, weight validation and recovery, Back/Forward, refresh, legacy-route recovery, keyboard focus, and console errors.
@@ -87,6 +87,16 @@ Beef ribs, Pork ribs, and Lamb shoulder deliberately remain at "Awaiting content
 1. Add the real Ko-fi URL after the account is created.
 2. Confirm `kitchenconstants.com` availability and register it if it is still available.
 3. Publish the reviewed local changes through a launch branch and pull request.
-4. Connect the private GitHub repository to Cloudflare Pages and submit the sitemap to Google Search Console.
+4. Connect the private GitHub repository to the chosen low-cost host and submit the sitemap to Google Search Console after the domain is live.
 
 Beef ribs, Pork ribs and Lamb shoulder remain pending. Define preparation-specific `Tender` semantics and review source-backed targets before adding temperatures.
+
+## Category expansion milestone
+
+Pasta & Noodles is now the first additional category, with three stable choices:
+
+- Fresh egg pasta: `1 egg / 100 g` flour starting point.
+- Chinese hand-cut noodles: `48%` hydration starting point.
+- Dumpling wrappers: `52%` hydration starting point.
+
+All three use a default `100 g` flour input and show the calculated liquid amount immediately. Pasta cooking-water salt is intentionally out of scope. Meat dry-brine percentages remain candidate values with no direct dependency or attribution to Saltyourmeat.com; their independent audit and home testing remain ongoing. Bread and Pickles are future categories.

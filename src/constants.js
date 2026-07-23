@@ -1,5 +1,3 @@
-const SALT_YOUR_MEAT_SOURCE = 'https://www.saltyourmeat.com/';
-
 function sourceRatio(recommended) {
   return Object.freeze({
     min: recommended,
@@ -119,8 +117,9 @@ export const WHOLE_CHICKEN_DRY_BRINE = Object.freeze({
   inputUnit: 'g',
   outputUnit: 'g',
   ratios: SOURCE_RATIOS.chickenWhole,
-  contentStatus: 'reviewed',
-  source: SALT_YOUR_MEAT_SOURCE,
+  contentStatus: 'candidate',
+  source: null,
+  methodology: 'culinary-references-and-home-testing',
   reviewedOn: '2026-07-20',
   targetInternalTemperature: null,
   timing: 'Refrigerate uncovered for at least 4 hours; overnight is ideal for crisper skin.',
@@ -147,8 +146,9 @@ function dryBrineContent(id, ratios, timing = 'Refrigerate for at least 1 hour; 
     ...placeholderContent(id, 'Dry brine'),
     percentageBasis: 'protein-weight',
     ratios,
-    contentStatus: 'reviewed',
-    source: SALT_YOUR_MEAT_SOURCE,
+    contentStatus: 'candidate',
+    source: null,
+    methodology: 'culinary-references-and-home-testing',
     reviewedOn: '2026-07-20',
     timing,
   });
@@ -672,5 +672,66 @@ export const MEAT_CATALOG = Object.freeze([
         timing: 'Keep chilled for 30 minutes to 1 hour, then cook promptly.',
       }),
     ]),
+  }),
+]);
+
+export const PASTA_CATALOG = Object.freeze([
+  Object.freeze({
+    slug: 'pasta',
+    label: 'Pasta & Noodles',
+    styles: Object.freeze([
+      Object.freeze({
+        slug: 'fresh-egg',
+        label: 'Fresh egg pasta',
+        inputLabel: 'Flour weight',
+        liquidLabel: 'Beaten egg',
+        hydration: 50,
+        ratioDisplay: '1 egg / 100 g',
+        ratioLabel: 'flour starting point',
+        rest: 'Rest for at least 30 minutes so the dough relaxes before rolling.',
+        finish: 'Start checking after 1–2 minutes in boiling water.',
+        note: 'Weigh the beaten egg when you want the dough to scale cleanly.',
+        source: 'https://pastaevangelists.com/blogs/blog/how-to-make-homemade-pasta',
+        sourceLabel: 'Fresh pasta ratio reference',
+      }),
+      Object.freeze({
+        slug: 'chinese-hand-cut',
+        label: 'Chinese hand-cut noodles',
+        inputLabel: 'Flour weight',
+        liquidLabel: 'Water',
+        hydration: 48,
+        ratioDisplay: '48%',
+        ratioLabel: 'hydration starting point',
+        rest: 'Rest for at least 30 minutes; a longer rest makes the dough easier to roll.',
+        finish: 'Cut to the thickness you want, then cook until tender; thin noodles take only a few minutes.',
+        note: 'A firm dough gives hand-cut noodles their springy bite. Flour and humidity can shift the water slightly.',
+        source: 'https://omnivorescookbook.com/fresh-homemade-noodles/',
+        sourceLabel: 'Chinese noodle ratio reference',
+      }),
+      Object.freeze({
+        slug: 'dumpling-wrappers',
+        label: 'Dumpling wrappers',
+        inputLabel: 'Flour weight',
+        liquidLabel: 'Water',
+        hydration: 52,
+        ratioDisplay: '52%',
+        ratioLabel: 'hydration starting point',
+        rest: 'Rest covered for 30 minutes, knead again, then rest until relaxed before rolling.',
+        finish: 'Roll each piece thin at the edges and slightly thicker in the centre so it seals without tearing.',
+        note: 'This is a cold-water wrapper dough for jiaozi. Flour protein changes how much water the dough needs.',
+        source: 'https://redhousespice.com/homemade-dumpling-wrappers/',
+        sourceLabel: 'Dumpling wrapper ratio reference',
+      }),
+    ]),
+  }),
+]);
+
+export const CATEGORY_CATALOG = Object.freeze([
+  Object.freeze({ slug: 'meat', label: 'Meat', kind: 'meat' }),
+  Object.freeze({
+    slug: 'pasta',
+    label: 'Pasta & Noodles',
+    kind: 'pasta',
+    styles: PASTA_CATALOG[0].styles,
   }),
 ]);

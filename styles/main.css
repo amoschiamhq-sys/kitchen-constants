@@ -306,6 +306,10 @@ h2 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
+.choice-list--category {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .choice-list--cut {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -313,6 +317,14 @@ h2 {
 .choice-list--detail,
 .choice-list--doneness {
   grid-template-columns: repeat(auto-fit, minmax(7.25rem, 1fr));
+}
+
+.choice-list--style {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.selection-controls--secondary {
+  margin-top: -0.15rem;
 }
 
 .choice {
@@ -417,6 +429,24 @@ h2 {
   font-size: 0.42em;
   letter-spacing: 0;
   vertical-align: 0.7em;
+}
+
+.ratio-display {
+  max-width: 10rem;
+  margin: 0;
+  color: var(--sesame);
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  text-align: right;
+}
+
+.ratio-label {
+  margin: 0.25rem 0 0;
+  color: var(--muted-ink);
+  font-size: 0.75rem;
 }
 
 .calculation-row {
@@ -548,6 +578,14 @@ h2 {
   font-weight: 700;
 }
 
+.method-note {
+  margin: 0.65rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--warm-stone);
+  color: var(--muted-ink);
+  font-size: 0.78rem;
+}
+
 .source-links {
   margin: 0.55rem 0 0;
 }
@@ -670,6 +708,11 @@ h2 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .choice-list--category,
+  .choice-list--style {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .choice-list--cut {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -691,6 +734,11 @@ h2 {
 
   .result-card {
     padding: 0.9rem 0.85rem 0.95rem 1.1rem;
+  }
+
+  .ratio-display {
+    max-width: 7rem;
+    font-size: 1.85rem;
   }
 }
 

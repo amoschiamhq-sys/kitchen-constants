@@ -8,7 +8,7 @@ The approved redesign milestones and Continuation Milestone 6 in `IMPLEMENTATION
 
 ## Stable invariants
 
-- Five active meat categories use the approved compact cut matrix.
+- The meat module uses the approved compact cut matrix.
 - Every active cut has non-empty ordered Detail and Doneness choices.
 - Known partial routes resolve to the first downstream choices and are replaced with a canonical hash.
 - The default weight is `100 g`; selection changes preserve it; a reload resets it.
@@ -30,9 +30,18 @@ The approved redesign milestones and Continuation Milestone 6 in `IMPLEMENTATION
 
 - Add the real Ko-fi URL.
 - Confirm and register the preferred domain.
-- Publish via a launch branch and pull request, then connect the private repository to Cloudflare Pages.
+- Publish via the existing launch branch and draft pull request, then connect the private repository to the chosen low-cost host.
 - Submit the sitemap in Google Search Console after the domain is live.
 - A future source-backed review may address Beef ribs, Pork ribs, or Lamb shoulder, but must define preparation-specific `Tender` semantics before publishing a target.
+
+## Category expansion milestone
+
+- Meat remains the default category.
+- Pasta & Noodles now includes fresh egg pasta, Chinese hand-cut noodles, and dumpling wrappers.
+- Dough modules use flour weight, a `100 g` default, and immediate liquid or egg output.
+- Pasta cooking-water salt is deliberately not included.
+- Meat dry-brine values are candidate values without a direct Saltyourmeat.com dependency or attribution, pending independent audit and home testing.
+- The full suite now passes 42 tests.
 
 ## Working-tree note
 
