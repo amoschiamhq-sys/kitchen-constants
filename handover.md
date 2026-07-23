@@ -39,7 +39,7 @@ The tagline remains: **Measure twice. Season once.**
 - No culinary values, source metadata, calculator behavior, or deployment settings changed.
 - Rendered culinary reference links were removed; source URLs and review metadata remain internal. The compact support link is present in the calculator, Guides, and About footers.
 - Automated checks pass: 43 tests, JavaScript syntax, and `git diff --check`.
-- The changes are local and not deployed. Visual verification remains pending because the in-app browser could not reach the local preview server.
+- The changes were merged into `main` and are live on <https://kitchenconstants.com/>. HTTP verification confirmed the updated homepage, Guides, and About titles and copy. In-app browser visual verification remains pending because it could not reach the local preview server.
 
 ## Active catalogue
 
