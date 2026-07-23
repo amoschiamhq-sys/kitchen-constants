@@ -41,7 +41,7 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 - `https://kitchenconstants.com` was verified over HTTPS at the default desktop viewport, `390 x 844`, and `320 x 568`; the live calculator had no horizontal overflow or console errors.
 - The live Pasta & Noodles styles, reviewed Lamb Chops targets, and pending Lamb Shoulder state were confirmed on the custom domain.
 - Google Search Console DNS ownership verification succeeded on 2026-07-23, and `https://kitchenconstants.com/sitemap.xml` now reports `Success` with 3 discovered pages.
-- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. The local automated checks pass; visual verification of these un-deployed changes remains pending because the in-app browser could not reach the local preview server.
+- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. Automated checks pass, and the merged changes are live on the custom domain. In-app browser visual verification remains pending because it could not reach the local preview server.
 - Rendered culinary reference links were removed from calculator results; source URLs and review metadata remain stored internally. A compact `Leave a tip` link is available in the calculator, Guides, and About footers.
 
 ## Launch handoff

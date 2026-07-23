@@ -37,7 +37,7 @@ Date: 2026-07-23
 - The live custom-domain page was checked for all three dough outputs, Lamb Chops at Medium-rare and Medium, and pending Lamb Shoulder guidance.
 - Google Search Console DNS ownership verification succeeded on 2026-07-23. The full sitemap URL was submitted and now reports `Success` with 3 discovered pages.
 - Content polish updated homepage, Guides, and About metadata; refreshed the approved personal About copy; kept visible Guides and calculator language short and warm; and refined the support note. No culinary values or calculator behavior changed.
-- `npm.cmd test` passes 43 tests, `node --check src/app.js` passes, and `git diff --check` passes. Local browser verification of the un-deployed copy changes remains pending because the in-app browser could not reach the local preview server.
+- `npm.cmd test` passes 43 tests, all source and test JavaScript syntax checks pass, and `git diff --check` passes. The merged copy changes are live; in-app browser visual verification remains pending because it could not reach the local preview server.
 - Removed rendered culinary reference links from calculator cards while preserving source URLs and review metadata internally. Added a compact footer support link to Guides and About, and softened the shared footer wording.
 
 ## Remaining launch work
