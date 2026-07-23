@@ -6,6 +6,8 @@ Updated: 2026-07-23
 
 The MVP now includes the independently named meat catalogue, two dry-brine timing bands, dough formulas with separate liquid and salt calculations, labelled ratio displays, and the approved personal support note.
 
+Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-constants.pages.dev/>. Amos confirmed that the live page is the current version. The custom domain `kitchenconstants.com` is active through Cloudflare Registrar and SSL is enabled.
+
 ## Stable invariants
 
 - Meat remains the default category.
@@ -19,7 +21,7 @@ The MVP now includes the independently named meat catalogue, two dry-brine timin
 - Pasta & Noodles uses flour weight, liquid or egg percentage, and salt percentage.
 - Pasta ratio displays use a visual separator with ingredient subtitles, for example `48% | 2%` with `Water` and `Salt` beneath.
 - The support note uses Amos's approved wording and links `Leave a tip` to <https://ko-fi.com/amoschiam> in a new tab.
-- No database, API, storage, analytics, or deployment changes were made.
+- No database, API, storage, or analytics were added. Cloudflare Pages hosting was configured externally; no runtime deployment code was added.
 
 ## Active catalogue
 
@@ -36,9 +38,18 @@ The MVP now includes the independently named meat catalogue, two dry-brine timin
 - `git diff --check` passes; only normal line-ending notices remain.
 - Browser verification passed for the ratio labels, support copy, new category buttons, timing display, dough salt output, and the 899 px desktop preview with no horizontal overflow.
 - A narrow mobile viewport check passed with no horizontal overflow.
+- `https://kitchenconstants.com` was verified over HTTPS at the default desktop viewport, `390 x 844`, and `320 x 568`; the live calculator had no horizontal overflow or console errors.
+- The live Pasta & Noodles styles, reviewed Lamb Chops targets, and pending Lamb Shoulder state were confirmed on the custom domain.
+- Google Search Console DNS ownership verification succeeded on 2026-07-23, and `https://kitchenconstants.com/sitemap.xml` now reports `Success` with 3 discovered pages.
+- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. The local automated checks pass; visual verification of these un-deployed changes remains pending because the in-app browser could not reach the local preview server.
+- Rendered culinary reference links were removed from calculator results; source URLs and review metadata remain stored internally. A compact `Leave a tip` link is available in the calculator, Guides, and About footers.
 
-## Next work
+## Launch handoff
 
-1. Follow `LAUNCH_SETUP.md` to connect the live Ko-fi page and finish Cloudflare Pages setup.
-2. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
-3. Keep Bread, Marinades, and Sauces deferred until a later product decision.
+1. Recheck Search Console around 2026-07-26 or 2026-07-27. The sitemap is accepted; URL indexing may take days or weeks.
+2. Keep `https://kitchen-constants.pages.dev/` as the fallback deployment URL.
+
+## Remaining product work
+
+1. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
+2. Keep Bread, Marinades, and Sauces deferred until a later product decision.

@@ -235,10 +235,16 @@ input {
   background: var(--recipe-paper);
 }
 
-.guide-card h2,
-.about-card h2 {
+.guide-card h2 {
   margin-bottom: 0.55rem;
   font-size: 1.45rem;
+}
+
+.about-byline {
+  margin-bottom: 1.1rem;
+  color: var(--muted-ink);
+  font-family: var(--display);
+  font-style: italic;
 }
 
 .guide-card p,
@@ -571,8 +577,7 @@ h2 {
 .result-placeholder,
 .guidance,
 .safety-note,
-.timing-note,
-.source-links {
+.timing-note {
   color: var(--muted-ink);
   font-size: 0.78rem;
 }
@@ -698,19 +703,6 @@ h2 {
   border-top: 1px solid var(--warm-stone);
   color: var(--muted-ink);
   font-size: 0.78rem;
-}
-
-.source-links {
-  margin: 0.55rem 0 0;
-}
-
-.source-link {
-  color: var(--deep-pandan);
-  text-underline-offset: 0.16em;
-}
-
-.source-link:hover {
-  color: var(--soft-ink);
 }
 
 .result-card--pending p:last-child {

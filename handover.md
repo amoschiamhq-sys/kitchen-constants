@@ -22,6 +22,25 @@ The tagline remains: **Measure twice. Season once.**
 - Pasta ratios now use a clear separator with ingredient subtitles, such as `48% | 2%` with `Water` and `Salt` beneath.
 - The support note uses Amos's approved personal-project wording and links `Leave a tip` to <https://ko-fi.com/amoschiam> in a new tab.
 
+## External launch status
+
+- Cloudflare Pages is live at <https://kitchen-constants.pages.dev/> from the `main` branch.
+- Amos confirmed the live page is the current version.
+- `kitchenconstants.com` was purchased through Cloudflare Registrar, is now Active, and has SSL enabled.
+- `https://kitchenconstants.com` was verified over HTTPS at desktop, `390 x 844`, and `320 x 568` with no horizontal overflow or console errors.
+- Google Search Console DNS ownership verification succeeded on 2026-07-23.
+- The full sitemap URL `https://kitchenconstants.com/sitemap.xml` was submitted and now reports `Success` with 3 discovered pages.
+- Recheck Search Console around 2026-07-26 or 2026-07-27; indexing and URL inspection may still be pending.
+
+## Content polish status
+
+- Updated homepage, Guides, and About metadata for natural dry-brining, meat-temperature, pasta-dough, and cooking-reference searches.
+- Updated the approved personal About copy, Guides introduction and selected headings, calculator helper text, and support note.
+- No culinary values, source metadata, calculator behavior, or deployment settings changed.
+- Rendered culinary reference links were removed; source URLs and review metadata remain internal. The compact support link is present in the calculator, Guides, and About footers.
+- Automated checks pass: 43 tests, JavaScript syntax, and `git diff --check`.
+- The changes are local and not deployed. Visual verification remains pending because the in-app browser could not reach the local preview server.
+
 ## Active catalogue
 
 - Chicken: Whole bird, Breast, Thigh, Ground meat
@@ -51,4 +70,4 @@ Meat salt ratios remain candidate values and should be independently audited and
 
 - `handover.md`: human-facing release summary.
 - `HANDOFF.md`: shorter continuation context for another executor.
-- `LAUNCH_SETUP.md`: exact external account and hosting checklist for Amos to complete before final deployment.
+- `LAUNCH_SETUP.md`: external account, hosting, domain, and launch checklist; use the current launch status above when resuming.

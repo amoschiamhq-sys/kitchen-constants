@@ -132,31 +132,14 @@ function weightError(status) {
   return '';
 }
 
-function renderSourceLink(href, label) {
-  if (!href) return '';
-  return `<a class="source-link" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}<span class="visually-hidden"> (opens in a new tab)</span></a>`;
-}
-
-function renderSourceLinks(links) {
-  const uniqueLinks = links.filter((link, index, allLinks) => (
-    link.href && allLinks.findIndex((candidate) => candidate.href === link.href) === index
-  ));
-  if (!uniqueLinks.length) return '';
-  return `<p class="source-links" aria-label="Sources">${uniqueLinks.map((link) => renderSourceLink(link.href, link.label)).join(' &middot; ')}</p>`;
-}
-
-function renderMethodologyLink() {
-  return '<p class="source-links"><a class="source-link" href="./guides.html#methodology">How we choose the numbers</a></p>';
-}
-
 function renderSaltCalculation(model) {
   if (model.weight.status === 'valid' && model.result) {
     return `<p class="result-value">${formatGrams(model.result.recommended)} <span>g</span></p>`;
   }
   if (model.weight.status === 'empty') {
-    return '<p class="result-placeholder">Enter a weight to calculate salt.</p>';
+    return '<p class="result-placeholder">Enter a weight to calculate the dry-brining salt.</p>';
   }
-  return '<p class="result-placeholder">Correct the weight to calculate salt.</p>';
+  return '<p class="result-placeholder">Correct the weight to calculate the dry-brining salt.</p>';
 }
 
 function renderTimingNote(timing) {
@@ -210,8 +193,7 @@ function renderPrepareCard(model) {
         </div>
       </div>
       ${renderTimingNote(model.dryBrine.timing)}
-      <p class="method-note">A practical starting point, refined through culinary references and home testing.</p>
-      ${renderMethodologyLink()}
+      <p class="method-note">A practical starting point, drawn from culinary references and open to adjustment in your own kitchen.</p>
     </article>`;
 }
 
@@ -230,9 +212,9 @@ function renderDoughCalculation(model) {
       </div>`;
   }
   if (model.weight.status === 'empty') {
-    return '<p class="result-placeholder">Enter flour weight to calculate.</p>';
+    return '<p class="result-placeholder">Enter a flour weight to calculate the dough ingredients.</p>';
   }
-  return '<p class="result-placeholder">Correct the flour weight to calculate.</p>';
+  return '<p class="result-placeholder">Correct the flour weight to calculate the dough ingredients.</p>';
 }
 
 function renderRatioDisplay(style) {
@@ -283,7 +265,6 @@ function renderPastaPrepareCard(model) {
         <div class="dough-calculation" data-dough-output aria-live="polite" aria-atomic="true">${renderDoughCalculation(model)}</div>
       </div>
       <p class="timing-note"><strong>Why it works</strong> ${escapeHtml(style.note)}</p>
-      ${renderSourceLinks([{ href: style.source, label: style.sourceLabel }])}
     </article>`;
 }
 
@@ -296,7 +277,6 @@ function renderPastaFinishCard(model) {
       <p class="guidance">${escapeHtml(model.style.rest)}</p>
       <p class="result-label safety-label">Cook or use</p>
       <p class="safety-note">${escapeHtml(model.style.finish)}</p>
-      ${renderSourceLinks([{ href: model.style.source, label: model.style.sourceLabel }])}
     </article>`;
 }
 
@@ -307,7 +287,7 @@ function renderFinishCard(model) {
       <article class="result-card result-card--pending" aria-labelledby="finish-heading">
         <p class="card-kicker">Finish</p>
         <h2 id="finish-heading">Awaiting content review</h2>
-        <p>Professional temperature guidance will appear here after review.</p>
+        <p>This internal-temperature guidance is still under review.</p>
       </article>`;
   }
 
@@ -320,10 +300,6 @@ function renderFinishCard(model) {
       <p class="guidance">${escapeHtml(model.internalTemperature.guidance)}</p>
       <p class="result-label safety-label">Food-safety baseline</p>
       <p class="safety-note">${escapeHtml(model.internalTemperature.safety)}</p>
-      ${renderSourceLinks([
-        { href: model.internalTemperature.source, label: 'Chef target source' },
-        { href: model.internalTemperature.safetySource, label: 'Safety baseline' },
-      ])}
     </article>`;
 }
 
@@ -350,7 +326,7 @@ function renderHeader() {
 function renderFooter() {
   return `
     <footer class="site-footer">
-      <p>Kitchen Constants is a practical cooking reference, not a substitute for your own judgement.</p>
+      <p>A small cooking reference for home cooks, with room for your own judgement.</p>
       <nav aria-label="Footer navigation">
         <a href="./guides.html">Guides</a>
         <a href="./about.html">About</a>
@@ -362,7 +338,7 @@ function renderSupportNote() {
   return `
     <aside class="support-note" aria-label="Support Kitchen Constants">
       <p class="support-title">Found this useful?</p>
-      <p>Kitchen Constants started as a small personal project to make my own cooking a little more reliable. If it has helped you too, a small tip helps me keep it free and continue improving it.</p>
+      <p>I built Kitchen Constants to make my own cooking a little more reliable. If it has found a place in your kitchen too, a small tip helps me keep it free and continue improving it.</p>
       <a class="support-button" href="https://ko-fi.com/amoschiam" target="_blank" rel="noopener noreferrer">Leave a tip</a>
     </aside>`;
 }
