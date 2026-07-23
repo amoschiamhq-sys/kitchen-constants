@@ -43,14 +43,19 @@ function renderChoiceGroup({ id, label, kind, choices }) {
 
 function renderCategoryControls(selection) {
   const activeCategory = selection?.category?.slug ?? 'meat';
-  const categoryChoices = CATEGORY_CATALOG.map((category) => selectionLink({
-    href: category.slug === 'meat'
-      ? resolvedHash({ meat: MEAT_CATALOG[0] })
-      : resolvedHash({ category }),
-    label: category.label,
-    isSelected: category.slug === activeCategory,
-    key: `category:${category.slug}`,
-  }));
+  const categoryChoices = CATEGORY_CATALOG.map((category) => {
+    if (category.status === 'coming-soon') {
+      return `<li><span class="choice choice--coming-soon" aria-disabled="true"><span>${escapeHtml(category.label)}</span><small>Coming soon</small></span></li>`;
+    }
+    return selectionLink({
+      href: category.slug === 'meat'
+        ? resolvedHash({ meat: MEAT_CATALOG[0] })
+        : resolvedHash({ category }),
+      label: category.label,
+      isSelected: category.slug === activeCategory,
+      key: `category:${category.slug}`,
+    });
+  });
 
   return renderChoiceGroup({
     id: 'category-heading',
@@ -154,6 +159,19 @@ function renderSaltCalculation(model) {
   return '<p class="result-placeholder">Correct the weight to calculate salt.</p>';
 }
 
+function renderTimingNote(timing) {
+  if (!timing) return '';
+  const ranges = typeof timing === 'string'
+    ? { minimum: timing, best: timing }
+    : timing;
+  return `
+    <div class="timing-note">
+      <strong>Timing</strong>
+      <span><b>Minimum:</b> ${escapeHtml(ranges.minimum)}</span>
+      <span><b>Best:</b> ${escapeHtml(ranges.best)}</span>
+    </div>`;
+}
+
 function renderPrepareCard(model) {
   if (!model.dryBrine?.ratios) {
     return `
@@ -191,7 +209,7 @@ function renderPrepareCard(model) {
           <div data-salt-output aria-live="polite" aria-atomic="true">${renderSaltCalculation(model)}</div>
         </div>
       </div>
-      ${model.dryBrine.timing ? `<p class="timing-note"><strong>Timing</strong> ${escapeHtml(model.dryBrine.timing)}</p>` : ''}
+      ${renderTimingNote(model.dryBrine.timing)}
       <p class="method-note">A practical starting point, refined through culinary references and home testing.</p>
       ${renderMethodologyLink()}
     </article>`;
@@ -199,7 +217,17 @@ function renderPrepareCard(model) {
 
 function renderDoughCalculation(model) {
   if (model.weight.status === 'valid' && model.dough) {
-    return `<p class="result-value">${formatGrams(model.dough.liquid)} <span>g</span></p>`;
+    return `
+      <div class="dough-output-grid">
+        <div class="dough-output-item">
+          <p class="dough-output-label">${escapeHtml(model.style.liquidLabel)}</p>
+          <p class="result-value">${formatGrams(model.dough.liquid)} <span>g</span></p>
+        </div>
+        <div class="dough-output-item dough-output-item--salt">
+          <p class="dough-output-label">Salt</p>
+          <p class="result-value">${formatGrams(model.dough.salt)} <span>g</span></p>
+        </div>
+      </div>`;
   }
   if (model.weight.status === 'empty') {
     return '<p class="result-placeholder">Enter flour weight to calculate.</p>';
@@ -234,10 +262,7 @@ function renderPastaPrepareCard(model) {
           <p id="weight-help" class="field-help">The flour amount for this batch.</p>
           <p id="weight-error" class="field-error" role="alert">${escapeHtml(error)}</p>
         </div>
-        <div class="salt-calculation">
-          <p class="result-label">${escapeHtml(style.liquidLabel)}</p>
-          <div data-dough-output aria-live="polite" aria-atomic="true">${renderDoughCalculation(model)}</div>
-        </div>
+        <div class="dough-calculation" data-dough-output aria-live="polite" aria-atomic="true">${renderDoughCalculation(model)}</div>
       </div>
       <p class="timing-note"><strong>Why it works</strong> ${escapeHtml(style.note)}</p>
       ${renderSourceLinks([{ href: style.source, label: style.sourceLabel }])}

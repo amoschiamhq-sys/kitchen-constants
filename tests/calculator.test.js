@@ -76,16 +76,20 @@ test('calculateDryBrine rejects invalid programmer preconditions', () => {
   );
 });
 
-test('calculateDoughRatio scales liquid from flour weight', () => {
-  assert.deepEqual(calculateDoughRatio(100, 50), {
+test('calculateDoughRatio scales liquid and salt from flour weight', () => {
+  assert.deepEqual(calculateDoughRatio(100, { hydration: 50, salt: 1 }), {
     flour: 100,
     liquid: 50,
+    salt: 1,
     hydration: 50,
+    saltPercent: 1,
   });
-  assert.deepEqual(calculateDoughRatio(250, 52), {
+  assert.deepEqual(calculateDoughRatio(250, { hydration: 52, salt: 2 }), {
     flour: 250,
     liquid: 130,
+    salt: 5,
     hydration: 52,
+    saltPercent: 2,
   });
 });
 

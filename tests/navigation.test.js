@@ -15,14 +15,14 @@ import { CATEGORY_CATALOG, MEAT_CATALOG, PASTA_CATALOG } from '../src/constants.
 
 test('approved catalogue exposes the compact five-meat matrix', () => {
   assert.deepEqual(MEAT_CATALOG.map((meat) => meat.label), [
-    'Chicken', 'Beef', 'Pork', 'Lamb', 'Seafood',
+    'Chicken', 'Beef', 'Pork', 'Lamb', 'Fish & shellfish',
   ]);
   assert.deepEqual(MEAT_CATALOG.map((meat) => meat.types.map((type) => type.label)), [
-    ['Whole chicken', 'Breast', 'Thigh', 'Ground poultry'],
-    ['Steak', 'Ribeye', 'Beef ribs', 'Ground 80/20'],
-    ['Chop', 'Tenderloin', 'Ribs', 'Ground pork'],
+    ['Whole bird', 'Breast', 'Thigh', 'Ground meat'],
+    ['Steak', 'Ribeye', 'Beef ribs', 'Ground meat'],
+    ['Chop', 'Tenderloin', 'Ribs', 'Ground meat'],
     ['Chops', 'Leg', 'Rack', 'Shoulder'],
-    ['Scallops', 'Shrimp', 'Fish'],
+    ['Scallops', 'Prawns', 'Fish fillet'],
   ]);
 });
 
@@ -81,10 +81,10 @@ test('route choices expose the compact active catalogue', () => {
   const beefChoices = getRouteChoices(parseRoute('#/beef'));
 
   assert.deepEqual(homeChoices.slice(0, 5).map((choice) => choice.label), [
-    'Chicken', 'Beef', 'Pork', 'Lamb', 'Seafood',
+    'Chicken', 'Beef', 'Pork', 'Lamb', 'Fish & shellfish',
   ]);
   assert.deepEqual(beefChoices.map((choice) => choice.label), [
-    'Steak', 'Ribeye', 'Beef ribs', 'Ground 80/20',
+    'Steak', 'Ribeye', 'Beef ribs', 'Ground meat',
   ]);
   assert.equal(homeChoices.length, 5);
 });
@@ -120,7 +120,10 @@ test('single-page model resolves whole-chicken defaults before weight input', ()
 
 test('category model exposes meat and pasta tools', () => {
   assert.deepEqual(CATEGORY_CATALOG.map((category) => category.label), [
-    'Meat', 'Pasta & Noodles',
+    'Meat', 'Pasta & Noodles', 'Bread', 'Marinades', 'Sauces',
+  ]);
+  assert.deepEqual(CATEGORY_CATALOG.slice(2).map((category) => category.status), [
+    'coming-soon', 'coming-soon', 'coming-soon',
   ]);
   assert.deepEqual(PASTA_CATALOG[0].styles.map((style) => style.label), [
     'Fresh egg pasta', 'Chinese hand-cut noodles', 'Dumpling wrappers',
@@ -155,6 +158,7 @@ test('pasta dough model scales fresh pasta, Chinese noodles and wrappers', () =>
     assert.equal(model.module, 'pasta');
     assert.equal(model.dough.liquid, hydration, style);
     assert.equal(model.dough.flour, 100, style);
+    assert.ok(model.dough.salt > 0, style);
   }
 });
 
@@ -180,8 +184,10 @@ test('reviewed dry-brine timing remains tailored for ground meat and seafood', (
   const ground = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ground-80-20')), '1000');
   const seafood = getSinglePageViewModel(resolveSelection(parseRoute('#/seafood/shrimp')), '1000');
 
-  assert.match(ground.dryBrine.timing, /refrigerator for 30 minutes/);
-  assert.match(seafood.dryBrine.timing, /Keep chilled for 30 minutes to 1 hour/);
+  assert.match(ground.dryBrine.timing.minimum, /Immediately before shaping/);
+  assert.match(ground.dryBrine.timing.best, /30 minutes/);
+  assert.equal(seafood.dryBrine.timing.minimum, '30 minutes');
+  assert.equal(seafood.dryBrine.timing.best, '1 hour');
 });
 
 test('single-page chef temperatures follow selected beef doneness', () => {

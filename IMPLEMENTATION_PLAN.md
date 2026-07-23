@@ -680,3 +680,29 @@ Stop only after the complete test suite, JavaScript checks, diff checks, browser
 ## Historical first-milestone execution prompt (completed)
 
 Implement only Milestone 1 from `IMPLEMENTATION_PLAN.md`. Replace the optional variant/doneness catalogue with the approved compact Meat → Cut → Detail → Doneness matrix, including proper lamb cuts and non-empty defaults for every cut. Add pure selection-defaulting, partial-route resolution, and canonical-hash behavior with focused navigation tests. Preserve all reviewed percentages, temperatures, source URLs, review dates, and the temporary salt-volume compatibility APIs required by the current app; do not invent missing culinary values. Do not redesign the DOM or CSS and do not begin salt-volume removal. Run focused tests, the complete suite, JavaScript syntax/import checks, a basic browser smoke check, and a careful diff review, then stop and report evidence before Milestone 2.
+## MVP refinement milestone 8: independent taxonomy, two timing bands, and dough salt
+
+Status: implemented locally; browser and final static checks remain as the handoff gate.
+
+### Approved decisions
+
+- Replace the inherited visible taxonomy while retaining Ground meat inside its parent meat.
+- Keep the existing meat salt percentages as candidate values pending independent audit and home testing.
+- Show dry-brine Minimum and Best timing together without a timing selector.
+- Keep flour at 100% for dough formulas and show liquid or egg and salt as separate percentages and gram outputs.
+- Keep Bread, Marinades, and Sauces visible as non-interactive Coming soon categories.
+- Do not add marinade or sauce formula content to the MVP.
+
+### Implemented changes
+
+1. Removed the unused legacy meat catalogue from runtime data.
+2. Renamed the visible meat choices to Whole bird, Ground meat, Prawns, and Fish fillet where appropriate.
+3. Added timing objects with `minimum` and `best` values to dry-brine content.
+4. Extended dough calculation to return flour, liquid, salt, hydration, and salt percentage.
+5. Added salt starting points to fresh egg pasta, Chinese hand-cut noodles, and dumpling wrappers.
+6. Added Coming soon category treatments for Bread, Marinades, and Sauces.
+7. Updated the brief, handoff, handover, session notes, and Guides copy.
+
+### Gate
+
+The full unit suite must pass, every changed JavaScript file must pass `node --check`, `git diff --check` must pass, and the browser must verify the default meat route, category buttons, Minimum/Best timing, dough salt output, Coming soon treatment, and 320 px / 390 px layouts without console errors or horizontal overflow.

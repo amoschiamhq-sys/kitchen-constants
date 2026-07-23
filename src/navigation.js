@@ -232,7 +232,10 @@ export function getSinglePageViewModel(selection, rawWeight = '') {
 
   if (resolved?.category?.kind === 'pasta') {
     const dough = resolved.style && weight.status === 'valid'
-      ? calculateDoughRatio(weight.grams, resolved.style.hydration)
+      ? calculateDoughRatio(weight.grams, {
+        hydration: resolved.style.hydration,
+        salt: resolved.style.saltPercent,
+      })
       : null;
     return {
       selectionComplete: Boolean(resolved),

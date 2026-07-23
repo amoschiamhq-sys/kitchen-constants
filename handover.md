@@ -4,99 +4,48 @@ Updated: 2026-07-23
 
 ## Outcome
 
-The approved calculator redesign is implemented locally. It is a compact, single-page cooking reference with a light cookbook aesthetic and the tagline "Measure twice. Season once."
+Kitchen Constants is a compact cooking reference for home cooks who want less guessing. The MVP covers meat dry-brining, chef-oriented temperatures, fresh egg pasta, Chinese hand-cut noodles, and dumpling wrappers.
 
-The launch layer is now included locally: Calculator, Guides and About navigation, an About page credited to Amos Chiam, one concise Guides page covering dry brining, percentages and temperature, search metadata, robots.txt and sitemap.xml. The support prompt is visible beneath results and is intentionally waiting for a real Ko-fi URL before it becomes a live payment link.
-
-The support wording is deliberately brief: "Found this useful? Help keep Kitchen Constants free and independent." The more personal reason for the site belongs in About, where it does not interrupt the calculator flow.
-
-The default view is:
-
-- Chicken / Whole chicken / Whole / Cook through
-- Food weight: `100 g`
-- Dry-brine ratio: `1.1%`
-- Calculated salt: `1.1 g`
-- Internal temperature: `165°F / 74°C`
+The tagline remains: **Measure twice. Season once.**
 
 ## Shipped behavior
 
 - Meat, Cut, Detail, and Doneness are always visible as buttons.
-- Selecting a meat or cut immediately selects its first valid downstream choices.
-- Every cut has at least one Detail and Doneness option.
-- Weight remains unchanged while switching choices and resets to `100 g` after a full refresh.
-- Valid weight edits update salt grams immediately without replacing the focused input.
-- Invalid weight clears stale grams and shows an inline correction.
-- Partial and old preparation hashes are replaced with canonical selection hashes.
-- Browser Back and Forward restore selections.
-- Salt type, teaspoons, tablespoons, breadcrumbs, Back controls, and separate preparation screens are absent.
-- Lamb Chops, Leg, and Rack provide reviewed Medium-rare and Medium temperature guidance with separate chef-target and USDA-safety wording.
-- Finish cards present Chef target as the primary guidance and Food-safety baseline as secondary context.
+- Selecting a parent choice immediately selects valid downstream defaults.
+- Weight defaults to `100 g` and outputs salt in grams only.
+- Dry-brine timing shows Minimum and Best together.
+- Ground meat remains under its parent meat and uses separate short timing guidance.
+- Pasta & Noodles shows flour weight, liquid or egg grams, and salt grams.
+- Bread, Marinades, and Sauces are visible as Coming soon but are not interactive.
+- Salt type, teaspoons, tablespoons, breadcrumbs, and preparation screens remain absent.
+- Chef temperature targets remain primary, with food-safety baselines shown as separate context.
 
 ## Active catalogue
 
-- Chicken: Whole chicken, Breast, Thigh, Ground poultry
-- Beef: Steak, Ribeye, Beef ribs, Ground 80/20
-- Pork: Chop, Tenderloin, Ribs, Ground pork
+- Chicken: Whole bird, Breast, Thigh, Ground meat
+- Beef: Steak, Ribeye, Beef ribs, Ground meat
+- Pork: Chop, Tenderloin, Ribs, Ground meat
 - Lamb: Chops, Leg, Rack, Shoulder
-- Seafood: Scallops, Shrimp, Fish
+- Fish & shellfish: Scallops, Prawns, Fish fillet
 
-## Visual direction
+## Dough formulas
 
-- Light flour-paper background with recipe-paper cards.
-- Soft black ink, pandan selected controls, toasted-sesame result emphasis.
-- Georgia for brand and headings; Aptos/Segoe UI for controls and body copy.
-- The only overt rustic flourish is the narrow sesame recipe-margin rule on result cards.
-- Equal meat-button dimensions and compact mobile wrapping.
+- Fresh egg pasta: 50% beaten egg, 1% salt starting point.
+- Chinese hand-cut noodles: 48% water, 2% salt starting point.
+- Dumpling wrappers: 52% water, 1% salt starting point.
 
-## Verification
-
-- `node --test`: 42 tests passed, 0 failed.
-- JavaScript syntax checks passed for all runtime and test modules.
-- `git diff --check` passed apart from existing line-ending notices.
-- Browser walkthrough covered defaults, six consecutive selection changes, weight validation and recovery, Back/Forward, refresh, legacy-route recovery, keyboard focus, and console errors.
-- Desktop viewport: no horizontal overflow and results begin at 344 px.
-- `390 x 844`: no horizontal overflow; equal meat buttons at about 42 px high; results begin at 419 px.
-- `320 x 568`: no horizontal overflow; equal meat buttons at about 42 px high; results begin at 545 px.
-- Browser console errors: none.
-- Lamb browser walkthrough covered Chops, Leg, and Rack at both doneness choices plus the pending Shoulder state.
+All dough inputs default to `100 g` flour. Pasta cooking-water salt is deliberately excluded.
 
 ## Content status
 
-Existing reviewed ratios, timing, sources, and temperature records were retained. Lamb Chops, Leg, and Rack now use reviewed ThermoWorks chef targets for Medium-rare (`130–135°F / 54–57°C`) and Medium (`135–145°F / 57–63°C`), alongside the separately labelled USDA whole-cut baseline of `145°F / 63°C` with at least 3 minutes of rest.
+Meat salt ratios remain candidate values and should be independently audited and home-tested before being described as reviewed. Beef ribs, Pork ribs, and Lamb shoulder still have pending internal-temperature guidance because their tender endpoint depends on preparation method.
 
-Beef ribs, Pork ribs, and Lamb shoulder deliberately remain at "Awaiting content review". Their `Tender` endpoint depends on the exact cut and cooking method, so recipe-specific smoking or braising targets were not generalized.
+## Verification
 
-## Important files
+- `npm.cmd test`: 42 passing tests.
+- Syntax checks and `git diff --check` pass. The desktop browser preview at 899 px has no horizontal overflow and the new routes render correctly. Explicit 390 x 844 and 320 x 568 viewport checks remain before release sign-off.
 
-- `src/constants.js`: catalogue and reviewed cooking content.
-- `src/navigation.js`: route parsing, default resolution, canonical hashes, and view model.
-- `src/calculator.js`: weight validation and gram calculation.
-- `src/app.js`: single-page rendering and interactions.
-- `styles/main.css`: responsive cookbook visual system.
-- `tests/`: calculation and navigation regression coverage.
-- `design-mock.html`: non-production visual reference only.
+## File roles
 
-## Handover files
-
-- `handover.md` is the human-facing project summary, including what is shipped, how it was checked and what remains before launch.
-- `HANDOFF.md` is the shorter executor context used when another agent or session continues the work.
-- They intentionally overlap on the core invariants, but they serve different readers. Keep `handover.md` as the document to share with a person.
-
-## Suggested next work
-
-1. Add the real Ko-fi URL after the account is created.
-2. Confirm `kitchenconstants.com` availability and register it if it is still available.
-3. Publish the reviewed local changes through a launch branch and pull request.
-4. Connect the private GitHub repository to the chosen low-cost host and submit the sitemap to Google Search Console after the domain is live.
-
-Beef ribs, Pork ribs and Lamb shoulder remain pending. Define preparation-specific `Tender` semantics and review source-backed targets before adding temperatures.
-
-## Category expansion milestone
-
-Pasta & Noodles is now the first additional category, with three stable choices:
-
-- Fresh egg pasta: `1 egg / 100 g` flour starting point.
-- Chinese hand-cut noodles: `48%` hydration starting point.
-- Dumpling wrappers: `52%` hydration starting point.
-
-All three use a default `100 g` flour input and show the calculated liquid amount immediately. Pasta cooking-water salt is intentionally out of scope. Meat dry-brine percentages remain candidate values with no direct dependency or attribution to Saltyourmeat.com; their independent audit and home testing remain ongoing. Bread and Pickles are future categories.
+- `handover.md`: human-facing release summary.
+- `HANDOFF.md`: shorter continuation context for another executor.

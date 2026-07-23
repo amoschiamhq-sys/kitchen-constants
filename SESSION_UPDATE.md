@@ -2,57 +2,25 @@
 
 Date: 2026-07-23
 
-## Continuation completed
+## MVP execution
 
-- Sol approved and Luna executed Continuation Milestone 6 for source-backed lamb doneness temperatures.
-- Lamb Chops, Leg, and Rack now show `130–135°F / 54–57°C` at Medium-rare and `135–145°F / 57–63°C` at Medium.
-- ThermoWorks supplies the chef peak targets and carryover guidance; USDA FSIS supplies the separately labelled whole-cut safety baseline.
-- New lamb records carry their own `2026-07-23` review date without changing existing records.
-- Beef ribs, Pork ribs, and Lamb shoulder remain pending because `Tender` is not a universal temperature endpoint.
-- Finish cards now label Chef target first and Food-safety baseline second without changing the reviewed culinary values.
-- Focused tests, the full 37-test suite, JavaScript syntax checks, diff checks, six reviewed lamb browser states, the pending shoulder state, and the browser console all pass.
+- Replaced the inherited visible meat taxonomy with independently named choices.
+- Kept Ground meat inside Chicken, Beef, and Pork as requested.
+- Retained the current candidate meat salt percentages.
+- Replaced single timing sentences with Minimum and Best timing bands.
+- Added separate salt percentages and calculated salt grams to Pasta & Noodles formulas.
+- Kept pasta cooking-water salt out of scope.
+- Added Bread, Marinades, and Sauces as non-interactive Coming soon categories.
+- Removed the unused legacy meat catalogue from the runtime data file.
+- Corrected temperature strings to render with proper degree and en-dash characters.
 
-## Completed
+## Tests
 
-- Installed the compact Meat / Cut / Detail / Doneness catalogue with proper lamb cuts.
-- Added complete default selection and canonical route resolution.
-- Removed salt type and spoon-volume conversion from data, calculations, tests, and UI.
-- Set weight to `100 g` by default and kept it stable during selection changes.
-- Moved weight and calculated grams into the Prepare card.
-- Kept Detail and Doneness visible for singleton choices.
-- Removed the hero, breadcrumbs, Back controls, preparation screens, and result-summary heading.
-- Applied the approved light cookbook palette, typography, compact spacing, equal meat-button sizing, and sesame card spine.
-- Verified desktop and mobile interaction, validation recovery, navigation history, legacy redirects, focus, overflow, and console state.
-- Reconciled `handover.md` with the final behavior.
+`npm.cmd test` passes 42 tests with no failures.
 
-## Decisions reinforced
+## Remaining verification
 
-- Results must be useful immediately.
-- Grams remain authoritative.
-- The interface should feel warm and lightly rustic, never ornate or clinical.
-- Singaporean and actuarial influence remains implicit through food awareness, precision, and disciplined hierarchy.
-- Pending content is preferable to unsourced culinary guidance.
-
-## Test baseline
-
-`node --test` passes 42 tests with no failures.
-
-## Launch milestone
-
-- Added Calculator, Guides and About navigation without changing the compact calculator flow.
-- Added a concise Guides page covering dry brining, salt percentages and why temperature beats time.
-- Added a sincere About page credited to Amos Chiam, focused on reducing wasted meat, time and guesswork.
-- Added page descriptions, canonical links, robots.txt and sitemap.xml for the future custom domain.
-- Added a quiet support prompt below results. It is waiting for the real Ko-fi URL and does not pretend to accept payments yet.
-- Browser verification passed at the default viewport, 390 x 844 and 320 x 568 with no horizontal overflow or console errors.
-
-## Category expansion milestone
-
-- Added top-level category controls with Meat selected by default.
-- Added Pasta & Noodles as the first non-meat module.
-- Added fresh egg pasta, Chinese hand-cut noodles, and cold-water dumpling wrappers.
-- Added reusable dough-ratio calculation with a 100 g flour default and immediate liquid output.
-- Kept pasta cooking-water salt out of scope at Amos's request.
-- Added short methodology and dough-hydration guidance to Guides.
-- Removed the direct Saltyourmeat.com dependency and attribution from the current code and content. Existing meat ratios are now explicitly candidate values pending independent audit and home testing.
-- Full suite now passes 42 tests; mobile browser verification shows no horizontal overflow at 390 px.
+- JavaScript syntax checks pass for all source and test modules.
+- `git diff --check` passes; only normal line-ending notices remain.
+- The real page was checked at the 899 px desktop preview with no horizontal overflow.
+- Explicit 390 x 844 and 320 x 568 browser viewport checks remain before release sign-off.

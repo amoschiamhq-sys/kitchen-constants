@@ -56,19 +56,26 @@ export function calculateDryBrine(weightGrams, ratios) {
   };
 }
 
-export function calculateDoughRatio(flourWeightGrams, hydrationPercent) {
+export function calculateDoughRatio(flourWeightGrams, formula) {
   if (!Number.isFinite(flourWeightGrams) || flourWeightGrams <= 0) {
     throw new CalculationInputError('Flour weight must be a finite positive number.');
   }
 
+  const hydrationPercent = typeof formula === 'number' ? formula : formula?.hydration;
+  const saltPercent = typeof formula === 'number' ? 0 : formula?.salt ?? 0;
   if (!Number.isFinite(hydrationPercent) || hydrationPercent < 0) {
     throw new CalculationInputError('Hydration must be a finite non-negative number.');
+  }
+  if (!Number.isFinite(saltPercent) || saltPercent < 0) {
+    throw new CalculationInputError('Salt percentage must be a finite non-negative number.');
   }
 
   return {
     flour: normalizeCalculation(flourWeightGrams),
     liquid: normalizeCalculation(flourWeightGrams * hydrationPercent / 100),
+    salt: normalizeCalculation(flourWeightGrams * saltPercent / 100),
     hydration: hydrationPercent,
+    saltPercent,
   };
 }
 
