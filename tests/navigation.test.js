@@ -162,6 +162,23 @@ test('pasta dough model scales fresh pasta, Chinese noodles and wrappers', () =>
   }
 });
 
+test('pasta styles expose labelled ratio parts for the visual ratio display', () => {
+  const cases = [
+    ['fresh-egg', ['50% Egg', '1% Salt']],
+    ['chinese-hand-cut', ['48% Water', '2% Salt']],
+    ['dumpling-wrappers', ['52% Water', '1% Salt']],
+  ];
+
+  for (const [style, expected] of cases) {
+    const selection = resolveSelection(parseRoute(`#/pasta/${style}`));
+    assert.deepEqual(
+      selection.style.ratioParts.map((part) => `${part.value}% ${part.label}`),
+      expected,
+      style,
+    );
+  }
+});
+
 test('single-page whole-chicken model calculates without stale output', () => {
   const selection = resolveSelection(parseRoute('#/chicken/whole'));
   const valid = getSinglePageViewModel(selection, '1500');

@@ -235,6 +235,24 @@ function renderDoughCalculation(model) {
   return '<p class="result-placeholder">Correct the flour weight to calculate.</p>';
 }
 
+function renderRatioDisplay(style) {
+  const parts = style.ratioParts ?? [
+    { value: style.hydration, label: style.liquidLabel },
+    { value: style.saltPercent, label: 'Salt' },
+  ];
+  const ariaLabel = parts.map(({ value, label }) => `${value} percent ${label.toLowerCase()}`).join(', ');
+
+  return `
+    <div class="ratio-display" aria-label="${escapeHtml(ariaLabel)}">
+      ${parts.map(({ value, label }, index) => `
+        ${index > 0 ? '<span class="ratio-separator" aria-hidden="true">|</span>' : ''}
+        <span class="ratio-part">
+          <span class="ratio-value">${escapeHtml(value)}%</span>
+          <span class="ratio-ingredient">${escapeHtml(label)}</span>
+        </span>`).join('')}
+    </div>`;
+}
+
 function renderPastaPrepareCard(model) {
   const { style } = model;
   const error = weightError(model.weight.status);
@@ -250,7 +268,7 @@ function renderPastaPrepareCard(model) {
           <h2 id="prepare-heading">${escapeHtml(style.label)}</h2>
           <p class="ratio-label">${escapeHtml(style.ratioLabel)}</p>
         </div>
-        <p class="ratio-display" aria-label="${escapeHtml(style.ratioDisplay)}">${escapeHtml(style.ratioDisplay)}</p>
+        ${renderRatioDisplay(style)}
       </div>
       <div class="calculation-row">
         <div class="weight-control">
@@ -344,8 +362,8 @@ function renderSupportNote() {
   return `
     <aside class="support-note" aria-label="Support Kitchen Constants">
       <p class="support-title">Found this useful?</p>
-      <p>Help keep Kitchen Constants free and independent.</p>
-      <p class="support-note__next">Support link coming soon.</p>
+      <p>Kitchen Constants started as a small personal project to make my own cooking a little more reliable. If it has helped you too, a small tip helps me keep it free and continue improving it.</p>
+      <span class="support-button support-button--pending" aria-disabled="true">Leave a tip</span>
     </aside>`;
 }
 

@@ -19,6 +19,8 @@ The tagline remains: **Measure twice. Season once.**
 - Bread, Marinades, and Sauces are visible as Coming soon but are not interactive.
 - Salt type, teaspoons, tablespoons, breadcrumbs, and preparation screens remain absent.
 - Chef temperature targets remain primary, with food-safety baselines shown as separate context.
+- Pasta ratios now use a clear separator with ingredient subtitles, such as `48% | 2%` with `Water` and `Salt` beneath.
+- The support note uses Amos's approved personal-project wording and shows a pending `Leave a tip` action.
 
 ## Active catalogue
 
@@ -42,10 +44,11 @@ Meat salt ratios remain candidate values and should be independently audited and
 
 ## Verification
 
-- `npm.cmd test`: 42 passing tests.
-- Syntax checks and `git diff --check` pass. The desktop browser preview at 899 px has no horizontal overflow and the new routes render correctly. Explicit 390 x 844 and 320 x 568 viewport checks remain before release sign-off.
+- `npm.cmd test`: 43 passing tests.
+- Syntax checks and `git diff --check` pass. The desktop browser preview at 899 px has no horizontal overflow and the new routes render correctly. A narrow mobile viewport check also passed without horizontal overflow.
 
 ## File roles
 
 - `handover.md`: human-facing release summary.
 - `HANDOFF.md`: shorter continuation context for another executor.
+- `LAUNCH_SETUP.md`: exact external account and hosting checklist for Amos to complete before final deployment.

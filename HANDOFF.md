@@ -4,7 +4,7 @@ Updated: 2026-07-23
 
 ## Current state
 
-The MVP now includes the independently named meat catalogue, two dry-brine timing bands, and dough formulas with separate liquid and salt calculations.
+The MVP now includes the independently named meat catalogue, two dry-brine timing bands, dough formulas with separate liquid and salt calculations, labelled ratio displays, and the approved personal support note.
 
 ## Stable invariants
 
@@ -17,6 +17,8 @@ The MVP now includes the independently named meat catalogue, two dry-brine timin
 - Chef temperature guidance remains primary, with food-safety context beneath it.
 - Bread, Marinades, and Sauces are visible as non-interactive Coming soon choices.
 - Pasta & Noodles uses flour weight, liquid or egg percentage, and salt percentage.
+- Pasta ratio displays use a visual separator with ingredient subtitles, for example `48% | 2%` with `Water` and `Salt` beneath.
+- The support note uses Amos's approved wording and shows an inactive `Leave a tip` action until the Ko-fi URL is added.
 - No database, API, storage, analytics, or deployment changes were made.
 
 ## Active catalogue
@@ -29,14 +31,15 @@ The MVP now includes the independently named meat catalogue, two dry-brine timin
 
 ## Verification baseline
 
-- `npm.cmd test`: 42 passing tests.
+- `npm.cmd test`: 43 passing tests.
 - JavaScript syntax checks pass for all source and test modules.
 - `git diff --check` passes; only normal line-ending notices remain.
-- Browser verification passed for the new category buttons, timing display, dough salt output, and the 899 px desktop preview with no horizontal overflow.
-- Explicit 390 x 844 and 320 x 568 browser viewport checks remain to be completed in the next visual QA pass.
+- Browser verification passed for the ratio labels, support copy, new category buttons, timing display, dough salt output, and the 899 px desktop preview with no horizontal overflow.
+- A narrow mobile viewport check passed with no horizontal overflow.
 
 ## Next work
 
-1. Complete browser verification at desktop, 390 x 844, and 320 x 568.
-2. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
-3. Keep Bread, Marinades, and Sauces deferred until a later product decision.
+1. Follow `LAUNCH_SETUP.md` to create Ko-fi and Stripe accounts and connect the repository to Cloudflare Pages.
+2. Bring back the Ko-fi URL and Cloudflare Pages URL; then add the real tip link and finalise deployment.
+3. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
+4. Keep Bread, Marinades, and Sauces deferred until a later product decision.
