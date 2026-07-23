@@ -18,7 +18,7 @@ The MVP now includes the independently named meat catalogue, two dry-brine timin
 - Bread, Marinades, and Sauces are visible as non-interactive Coming soon choices.
 - Pasta & Noodles uses flour weight, liquid or egg percentage, and salt percentage.
 - Pasta ratio displays use a visual separator with ingredient subtitles, for example `48% | 2%` with `Water` and `Salt` beneath.
-- The support note uses Amos's approved wording and shows an inactive `Leave a tip` action until the Ko-fi URL is added.
+- The support note uses Amos's approved wording and links `Leave a tip` to <https://ko-fi.com/amoschiam> in a new tab.
 - No database, API, storage, analytics, or deployment changes were made.
 
 ## Active catalogue
@@ -39,7 +39,6 @@ The MVP now includes the independently named meat catalogue, two dry-brine timin
 
 ## Next work
 
-1. Follow `LAUNCH_SETUP.md` to create Ko-fi and Stripe accounts and connect the repository to Cloudflare Pages.
-2. Bring back the Ko-fi URL and Cloudflare Pages URL; then add the real tip link and finalise deployment.
-3. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
-4. Keep Bread, Marinades, and Sauces deferred until a later product decision.
+1. Follow `LAUNCH_SETUP.md` to connect the live Ko-fi page and finish Cloudflare Pages setup.
+2. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
+3. Keep Bread, Marinades, and Sauces deferred until a later product decision.

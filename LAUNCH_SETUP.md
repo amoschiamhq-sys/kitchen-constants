@@ -80,7 +80,7 @@ The domain extension determines the annual price. A custom domain is optional; t
 
 Once the accounts are ready, return with:
 
-- The public Ko-fi page URL, for example `https://ko-fi.com/kitchenconstants`.
+- The public Ko-fi page URL is now `https://ko-fi.com/amoschiam` and is connected to the website button.
 - The Cloudflare Pages URL, for example `https://kitchen-constants.pages.dev`.
 - Whether you bought a custom domain, and the domain name only.
 - Whether you want PayPal added later.

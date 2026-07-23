@@ -20,7 +20,7 @@ The tagline remains: **Measure twice. Season once.**
 - Salt type, teaspoons, tablespoons, breadcrumbs, and preparation screens remain absent.
 - Chef temperature targets remain primary, with food-safety baselines shown as separate context.
 - Pasta ratios now use a clear separator with ingredient subtitles, such as `48% | 2%` with `Water` and `Salt` beneath.
-- The support note uses Amos's approved personal-project wording and shows a pending `Leave a tip` action.
+- The support note uses Amos's approved personal-project wording and links `Leave a tip` to <https://ko-fi.com/amoschiam> in a new tab.
 
 ## Active catalogue
 

@@ -363,7 +363,7 @@ function renderSupportNote() {
     <aside class="support-note" aria-label="Support Kitchen Constants">
       <p class="support-title">Found this useful?</p>
       <p>Kitchen Constants started as a small personal project to make my own cooking a little more reliable. If it has helped you too, a small tip helps me keep it free and continue improving it.</p>
-      <span class="support-button support-button--pending" aria-disabled="true">Leave a tip</span>
+      <a class="support-button" href="https://ko-fi.com/amoschiam" target="_blank" rel="noopener noreferrer">Leave a tip</a>
     </aside>`;
 }
 
