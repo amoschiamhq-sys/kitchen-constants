@@ -53,3 +53,10 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 
 1. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
 2. Keep Bread, Marinades, and Sauces deferred until a later product decision.
+
+## Launch hardening status — 2026-07-23
+
+- Added the favicon, Apple touch icon, social-card asset, complete Open Graph/Twitter metadata, and a pasta-aware homepage title locally.
+- Added a Cloudflare Pages `_headers` rule for an initial HSTS policy of `max-age=2592000` with no subdomain inclusion or preload.
+- Added metadata and asset regression tests; the suite now passes 45 tests.
+- External Cloudflare work remains: add the proxied `www` record, create the permanent path/query-preserving redirect to `https://kitchenconstants.com`, deploy these changes, then verify the live HSTS and metadata responses.

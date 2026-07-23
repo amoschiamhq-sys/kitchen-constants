@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Kitchen Constants — Measure twice. Season once.</title>
+  <desc id="desc">A practical cooking reference for dry brining, meat temperatures, and pasta dough.</desc>
+  <rect width="1200" height="630" fill="#F1EEE6"/>
+  <rect x="70" y="70" width="1060" height="490" fill="#FAF8F2" stroke="#D8D2C5" stroke-width="2"/>
+  <rect x="70" y="70" width="10" height="490" fill="#A97A3C"/>
+  <rect x="118" y="116" width="76" height="76" fill="#FAF8F2" stroke="#596652" stroke-width="2"/>
+  <text x="156" y="167" fill="#596652" font-family="Georgia, Times New Roman, serif" font-size="34" font-weight="700" text-anchor="middle">Kc</text>
+  <text x="224" y="164" fill="#20231F" font-family="Georgia, Times New Roman, serif" font-size="34" font-weight="700">Kitchen Constants</text>
+  <line x1="118" y1="242" x2="1082" y2="242" stroke="#D8D2C5" stroke-width="2"/>
+  <text x="118" y="342" fill="#20231F" font-family="Georgia, Times New Roman, serif" font-size="68" font-weight="700">Measure twice.</text>
+  <text x="118" y="418" fill="#20231F" font-family="Georgia, Times New Roman, serif" font-size="68" font-weight="700">Season once.</text>
+  <text x="118" y="490" fill="#596652" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="600">Dry brining  ·  Meat temperatures  ·  Pasta dough</text>
+</svg>

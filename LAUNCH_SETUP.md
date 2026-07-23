@@ -76,6 +76,19 @@ After the free site is working:
 
 The domain extension determines the annual price. A custom domain is optional; the `pages.dev` address is enough for initial testing.
 
+### www redirect and HSTS hardening
+
+After the apex custom domain is active:
+
+1. In Cloudflare DNS, create a proxied `A` record named `www` with address `192.0.2.1`.
+2. In Bulk Redirects, create a permanent redirect from `www.kitchenconstants.com` to `https://kitchenconstants.com`.
+3. Preserve query strings, match subpaths, and preserve the path suffix.
+4. Verify the apex and `www` HTTPS certificates before enabling HSTS.
+5. Enable HSTS in **SSL/TLS → Edge Certificates** with an initial max age of `2592000` seconds. Leave `includeSubDomains` and preload off initially.
+6. Confirm the `Strict-Transport-Security` header, redirect status, path preservation, query preservation, and absence of redirect loops.
+
+HSTS is deliberately enabled only after HTTPS and the `www` redirect are stable. Do not move the zone to DNS-only, pause Cloudflare, or disable HTTPS while this policy is active.
+
 ## 4. What to bring back to Codex
 
 Once the accounts are ready, return with:

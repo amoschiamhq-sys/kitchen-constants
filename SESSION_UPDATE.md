@@ -48,3 +48,11 @@ Date: 2026-07-23
 
 - Independently audit and home-test candidate meat salt ratios before describing them as reviewed.
 - Beef ribs, Pork ribs, and Lamb shoulder remain pending internal-temperature guidance.
+
+## Launch hardening — 2026-07-23
+
+- Added brand assets under `assets/`: scalable favicon, 32 px favicon fallback, Apple touch icon, and a 1200 × 630 social card.
+- Added complete Open Graph and Twitter card metadata to the homepage, Guides, and About pages, including canonical `og:url` values and the pasta-aware homepage title.
+- Added `_headers` with a conservative initial HSTS policy: `Strict-Transport-Security: max-age=2592000`.
+- Added metadata and asset checks; `npm.cmd test` now passes 45 tests.
+- Remaining external launch steps are the Cloudflare `www` DNS/redirect setup, deployment, and live verification of HSTS, redirects, assets, and metadata.
