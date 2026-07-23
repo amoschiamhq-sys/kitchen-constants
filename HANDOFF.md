@@ -60,3 +60,12 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 - Added a Cloudflare Pages `_headers` rule for an initial HSTS policy of `max-age=2592000` with no subdomain inclusion or preload.
 - Added metadata and asset regression tests; the suite now passes 45 tests.
 - External Cloudflare work remains: add the proxied `www` record, create the permanent path/query-preserving redirect to `https://kitchenconstants.com`, deploy these changes, then verify the live HSTS and metadata responses.
+
+## Tomorrow handover — 2026-07-23
+
+- Launch-hardening work is committed on `agent/launch-hardening` at `8973f7f`.
+- Draft PR: <https://github.com/amoschiamhq-sys/kitchen-constants/pull/5>.
+- Validation is complete: 45 tests pass, all JavaScript files pass `node --check`, `git diff --check` passes, and the desktop browser smoke test passes.
+- The live apex currently returns `200` without `Strict-Transport-Security`; `www.kitchenconstants.com` still does not resolve.
+- Cloudflare access is the only remaining blocker. The connected account showed no Kitchen Constants Pages project or DNS zone.
+- On resume: sign into the Cloudflare account that owns the site, configure the proxied `www` record and permanent path/query-preserving redirect, merge/deploy PR #5, enable HSTS at `max-age=2592000` with subdomains/preload off, then verify live headers, redirects, assets, and metadata.
