@@ -63,3 +63,9 @@ Date: 2026-07-23
 - Local checks are green: 45 tests, JavaScript syntax checks, diff check, and desktop smoke test.
 - Live state is unchanged: apex HTTPS is `200` without HSTS; `www.kitchenconstants.com` is unresolved.
 - Cloudflare account access did not expose the site’s Pages project or DNS zone. Resume by switching to the owning account, then complete the documented `www` redirect, deployment, HSTS, and live verification steps.
+
+## About copy update - 2026-07-24
+
+- Updated the About page footer description to: “A small cooking reference for home cooks, leaving the final touch to you.”
+- Updated the About page closing paragraph to: “If you’re the kind of home cook who keeps looking up the same cooking references, I hope you’ll find it useful too.”
+- `npm.cmd test` passes 45 tests, all JavaScript syntax checks pass, and `git diff --check` passes. The local About HTML response returned HTTP 200 and contained both updated sentences.
