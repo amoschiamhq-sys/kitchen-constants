@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" role="img" aria-labelledby="title">
+  <title id="title">Kitchen Constants</title>
+  <rect width="180" height="180" fill="#FAF8F2"/>
+  <rect x="17" y="17" width="146" height="146" fill="none" stroke="#596652" stroke-width="5"/>
+  <text x="90" y="111" fill="#596652" font-family="Georgia, Times New Roman, serif" font-size="70" font-weight="700" text-anchor="middle">Kc</text>
+</svg>

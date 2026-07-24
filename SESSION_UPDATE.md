@@ -48,3 +48,24 @@ Date: 2026-07-23
 
 - Independently audit and home-test candidate meat salt ratios before describing them as reviewed.
 - Beef ribs, Pork ribs, and Lamb shoulder remain pending internal-temperature guidance.
+
+## Launch hardening — 2026-07-23
+
+- Added brand assets under `assets/`: scalable favicon, 32 px favicon fallback, Apple touch icon, and a 1200 × 630 social card.
+- Added complete Open Graph and Twitter card metadata to the homepage, Guides, and About pages, including canonical `og:url` values and the pasta-aware homepage title.
+- Added `_headers` with a conservative initial HSTS policy: `Strict-Transport-Security: max-age=2592000`.
+- Added metadata and asset checks; `npm.cmd test` now passes 45 tests.
+- Remaining external launch steps are the Cloudflare `www` DNS/redirect setup, deployment, and live verification of HSTS, redirects, assets, and metadata.
+
+## Handover for next session — 2026-07-23
+
+- Draft PR #5 is open from `agent/launch-hardening` (`8973f7f`): <https://github.com/amoschiamhq-sys/kitchen-constants/pull/5>.
+- Local checks are green: 45 tests, JavaScript syntax checks, diff check, and desktop smoke test.
+- Live state is unchanged: apex HTTPS is `200` without HSTS; `www.kitchenconstants.com` is unresolved.
+- Cloudflare account access did not expose the site’s Pages project or DNS zone. Resume by switching to the owning account, then complete the documented `www` redirect, deployment, HSTS, and live verification steps.
+
+## About copy update - 2026-07-24
+
+- Updated the About page footer description to: “A small cooking reference for home cooks, leaving the final touch to you.”
+- Updated the About page closing paragraph to: “If you’re the kind of home cook who keeps looking up the same cooking references, I hope you’ll find it useful too.”
+- `npm.cmd test` passes 45 tests, all JavaScript syntax checks pass, and `git diff --check` passes. The local About HTML response returned HTTP 200 and contained both updated sentences.
