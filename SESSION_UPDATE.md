@@ -69,3 +69,8 @@ Date: 2026-07-23
 - Updated the About page footer description to: “A small cooking reference for home cooks, leaving the final touch to you.”
 - Updated the About page closing paragraph to: “If you’re the kind of home cook who keeps looking up the same cooking references, I hope you’ll find it useful too.”
 - `npm.cmd test` passes 45 tests, all JavaScript syntax checks pass, and `git diff --check` passes. The local About HTML response returned HTTP 200 and contained both updated sentences.
+
+## Shared footer copy update - 2026-07-24
+
+- Replaced the remaining legacy footer wording in Guides and the calculator renderer with: “A small cooking reference for home cooks, leaving the final touch to you.”
+- The old wording no longer appears in the public HTML or calculator source. `npm.cmd test` passes 45 tests, all JavaScript syntax checks pass, and `git diff --check` passes.
