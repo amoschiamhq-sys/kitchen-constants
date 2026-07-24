@@ -326,7 +326,7 @@ function renderHeader() {
 function renderFooter() {
   return `
     <footer class="site-footer">
-      <p>A small cooking reference for home cooks, with room for your own judgement.</p>
+      <p>A small cooking reference for home cooks, leaving the final touch to you.</p>
       <nav aria-label="Footer navigation">
         <a href="./guides.html">Guides</a>
         <a href="./about.html">About</a>
