@@ -25,6 +25,11 @@ The tagline remains: **Measure twice. Season once.**
 
 ## External launch status
 
+- The current production release is PR #8, merged into `main` as `2bb8cf7` on 2026-07-25. The apex domain now serves the approved seven-URL release.
+- All seven clean URLs return `200`; live HTML has matching canonicals, one H1, structured data, and HSTS. `robots.txt` and the seven-URL sitemap are live.
+- `http://www.kitchenconstants.com/` returns a permanent redirect to the apex, but the HTTPS `www` hostname currently fails its TLS handshake and needs Cloudflare certificate/redirect verification.
+- PageSpeed's public API returned `429 Too Many Requests`; no performance score is recorded. Search Console was not changed.
+
 - Cloudflare Pages is live at <https://kitchen-constants.pages.dev/> from the `main` branch.
 - Amos confirmed the live page is the current version.
 - `kitchenconstants.com` was purchased through Cloudflare Registrar, is now Active, and has SSL enabled.
@@ -40,7 +45,7 @@ The tagline remains: **Measure twice. Season once.**
 - No existing culinary values, source metadata, calculator behavior, or deployment settings changed; the new Vinaigrette entry is recorded internally as owner-tested with reference material.
 - Rendered culinary reference links were removed; source URLs and review metadata remain internal. The compact support link is present in the calculator, Guides, and About footers.
 - Automated checks pass: 62 tests, JavaScript syntax, and `git diff --check`.
-- This local milestone sequence was not committed or deployed; the live domain state was not changed by this execution. Local in-app browser verification confirmed the updated homepage, Guides, About, and ratio-heavy calculator states.
+- The M21 release is committed and deployed. The remaining external exceptions are documented above; the current production state is not being presented as fully verified until `www` HTTPS and PageSpeed can be rechecked.
 
 ## Active catalogue
 

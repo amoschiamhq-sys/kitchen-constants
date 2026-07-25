@@ -1786,6 +1786,14 @@ If any external requirement is unavailable, stop with the precise blocker. Do no
 - Focused metadata tests pass: 10. Full suite passes: 65. Changed JavaScript test syntax passes; `git diff --check` passes with existing line-ending notices.
 - Browser verification passed at desktop, `390 x 844`, and `320 x 568` for all four pages; CTAs opened intended canonical hashes, body widths stayed within the viewport, and console logs were clean.
 
+## Milestone 21 release execution record
+
+- Authorized release completed through launch branch `agent/m21-seo-reference-pages`, PR #8, and merge commit `2bb8cf7` on `main`.
+- Local gates pass: 10 focused metadata tests, 65 full tests, JavaScript syntax checks, and `git diff --check`.
+- Production apex checks pass for all seven clean URLs, canonicals, structured data, sitemap, robots, HSTS, calculator links, and responsive browser checks at desktop, `390 x 844`, and `320 x 568`. Desktop ratio number/subtitle rows remain separated.
+- `www` HTTP redirects to the apex, but the HTTPS `www` handshake fails. The public PageSpeed API returned `429 Too Many Requests`. Search Console was not inspected or mutated.
+- M21 is published but not fully closed: recheck Cloudflare `www` certificate/redirect behavior and obtain a repeatable PageSpeed/Lighthouse result before marking the live gate complete.
+
 ## Next-milestone execution prompt
 
-Publishing is now the next step, but it changes external state. Execute **Milestone 21 - Conditional publishing and live SEO verification** from `IMPLEMENTATION_PLAN.md` only after the user explicitly authorizes publishing/deployment. Use the canonical repository and established hosting path, inspect the remote first, preserve unrelated changes, and stop if account, DNS, certificate, or deployment access is unavailable. Do not submit Search Console changes without separate explicit authorization.
+Do not add product scope. M21 is live on the apex domain, but remains open for the documented `www` HTTPS and PageSpeed verification exceptions. Search Console remains unchanged unless separately authorized.
