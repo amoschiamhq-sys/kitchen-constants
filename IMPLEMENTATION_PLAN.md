@@ -706,3 +706,135 @@ Status: implemented locally; browser and final static checks remain as the hando
 ### Gate
 
 The full unit suite must pass, every changed JavaScript file must pass `node --check`, `git diff --check` must pass, and the browser must verify the default meat route, category buttons, Minimum/Best timing, dough salt output, Coming soon treatment, and 320 px / 390 px layouts without console errors or horizontal overflow.
+
+## Sauce section redesign milestone 9
+
+Status: implemented locally; sauce content remains candidate material pending independent review and home testing.
+
+### Approved decisions
+
+- Make Sauces active and organise the section by task first: Stir-fry, Glaze, Dipping, then Dressing. Keep named classics in a separate compact route.
+- Teach flavour roles and reusable ratios instead of long recipes or cooking instructions.
+- Include Balanced, Umami, Bright, Nutty, Sweet Glaze, and Spicy profiles, with Teriyaki, Sesame (Goma), Peanut, and Sweet & Sour as the only named cards.
+- Keep the universal Salty + Umami + Sweet + Acid formula and a permanent adjustment guide visible in the sauce flow.
+
+### Implemented changes
+
+1. Added source-backed sauce catalogue data with review metadata, role substitutions, uses, and canonical profile/classic routes.
+2. Added task-first selection controls and one-screen balance/use cards that reuse the existing Kitchen Constants visual language.
+3. Added mobile wrapping rules and navigation tests for defaulting, canonicalisation, profile choices, and candidate metadata.
+
+### Gate
+
+Run the complete test suite, JavaScript syntax checks, diff checks, and browser smoke checks at desktop, 390 px, and 320 px before handoff. Do not deploy or mark candidate sauce ratios as reviewed in this milestone.
+
+## Sauce visual polish milestone 10
+
+Status: implemented locally; sauce content remains candidate material pending independent review and home testing.
+
+### Approved decisions
+
+- Keep Sauce Builder as a distinct foundational entry point directly under the Sauces category selector and before task choices.
+- Keep the task-first order unchanged: Stir-fry, Glaze, Dipping, Dressing, then named classics.
+- Keep the universal formula in Sauce Builder only; profile and classic cards show their own ratios without repeating the general formula.
+- Treat each ratio separator and value as one visual unit, and use `rough parts` to avoid implying false precision.
+
+### Implemented changes
+
+1. Added the canonical `#/sauces/builder` route and compact builder card with ingredient roles and substitutions.
+2. Removed the repeated universal formula from individual sauce cards and added a small Builder link on detail routes.
+3. Grouped ratio markup and added long-ratio layout rules for Sesame (Goma) and other four- or five-part balances.
+4. Simplified the concentrated-sauce adjustment guidance and tightened the narrowest header layout.
+
+### Gate
+
+Run the complete test suite, JavaScript syntax checks, diff checks, and browser smoke checks at desktop, 390 px, and 320 px. Confirm the Builder formula appears once on its route, never on detail cards, and no ratio separator becomes stranded when a card wraps.
+
+## Sauce simplification milestone 11
+
+Status: implemented locally on 2026-07-25. This milestone supersedes the Sauce Builder decisions in milestone 10; no deployment was performed.
+
+### Approved decisions
+
+- Remove Sauce Builder completely from the selectable product experience.
+- Open Sauces directly to Stir-fry / Balanced, following the existing first-valid-downstream-choice rule.
+- Keep the approved task order, flavour profiles, named classics, candidate ratios, sources, and review metadata unchanged.
+- Follow the existing Kitchen Constants rhythm: category controls, module controls, then two compact result cards.
+- Show the selected sauce parts and practical uses; do not show a universal formula, glossary, or standalone troubleshooting panel.
+
+### Implementation contract
+
+1. Delete the Builder data export, Builder card/link rendering, Builder-specific view model, and Builder CSS.
+2. Restore `#/sauces` canonicalization to `#/sauces/stir-fry/balanced`.
+3. Canonicalize the temporary `#/sauces/builder` path once to the same default profile so existing local links do not break.
+4. Retain task and flavour controls plus the existing Balance and Use cards.
+5. Use the label `parts` with the helper `Use the same spoon or cup for every part.`
+6. Remove visible colon punctuation from ratio layout and use subtle dividers that remain clean when wrapped.
+7. Remove the full-width adjustment guide from profile and classic routes.
+8. Preserve the separate 320 px header-spacing fix and all unrelated Meat/Pasta behavior.
+9. Update focused navigation tests and reconcile all project documentation after implementation.
+
+### Non-goals
+
+- Do not change any sauce ratio, ingredient example, use, substitution, source URL, status, or review date.
+- Do not add recipes, quantities in fixed units, cooking instructions, persistence, analytics, or network requests.
+- Do not redesign Meat, Pasta, the global category control, support note, or footer.
+- Do not commit, open a pull request, publish, or deploy without explicit approval.
+
+### Gate
+
+Run focused sauce tests, the full `node --test` suite, `node --check` for all changed JavaScript, and `git diff --check`. Review the complete diff. In the real browser verify desktop, `390 x 844`, and `320 x 568`: Sauces defaults directly to Stir-fry / Balanced, only two result cards render, Sesame wraps without punctuation artifacts, the task/profile controls remain canonical, there is no horizontal overflow, and the console is clean.
+
+### Tomorrow execution prompt
+
+Implement only Sauce simplification milestone 11 from `IMPLEMENTATION_PLAN.md`. Remove Sauce Builder, its route state, links, data, styles, and the standalone adjustment guide. Restore Sauces to the canonical Stir-fry / Balanced default while redirecting the temporary Builder hash once to that default. Preserve every candidate culinary value, source, review field, task/profile/classic choice, and the 320 px header fix. Keep the existing two-card Balance / Use presentation, label ratios as parts with one same-measure helper, replace visible colon separators with wrap-safe dividers, update tests and project documents, run the full required gate, and stop without committing or deploying.
+
+## Sauce guidance and Vinaigrette milestone 12
+
+Status: implemented locally on 2026-07-25; no deployment performed.
+
+### Approved decisions
+
+- Keep Marinades separate from Sauces and place active Sauces before the deferred categories.
+- Add a static Sauce Builder guide before the dough guides; do not restore an interactive Builder route.
+- Keep the guide short and practical: balance roles, taste-based adjustment, pure salt as a separate pinch, and a concise water/oil/aromatics mixing note.
+- Broaden ingredient-role examples to include Western and global ingredients. Worcestershire belongs under Umami.
+- Show optional heat as `+ Heat`, including the Heat choices in spicy profiles.
+- Add Vinaigrette after the existing named classics with a `3 Fat : 1 Acid` starting balance.
+- Keep culinary references and review metadata internal; render no source links or citations to users.
+
+### Implementation contract
+
+1. Reorder `CATEGORY_CATALOG` to Meat, Pasta & Noodles, Sauces, Bread, Marinades.
+2. Add Vinaigrette at the end of `SAUCE_CATALOG.classics` so Teriyaki remains the default classic.
+3. Preserve the flexible ratio markup; remove narrow-screen dividers and use spacing so wrapped values stay readable and paired.
+4. Update Guide 05 and renumber Dough Hydration and Dough Salt to 06 and 07.
+5. Preserve all existing sauce sources internally and record the new Vinaigrette as owner-tested with reference material.
+6. Update focused tests and reconcile project handoff documents.
+
+### Gate
+
+Run focused sauce and Guides tests, the complete `node --test` suite, `node --check` for every changed JavaScript file, and `git diff --check`. Verify the default sauce route, Spicy, Sesame (Goma), Vinaigrette, Guides, and the category order at desktop, `390 x 844`, and `320 x 568`. Confirm no horizontal overflow, readable ratio groups, visible `+ Heat`, no rendered culinary citations, and no console errors. Do not commit, publish, or deploy.
+
+## Pre-live URL and sauce review milestone 13
+
+Status: implemented locally on 2026-07-25; Cloudflare work remains manual and no deployment was performed.
+
+### Approved decisions
+
+- Use Cloudflare's clean public URLs: `/`, `/guides`, and `/about`.
+- Treat the user's self-testing confirmation as sufficient owner testing for the existing sauce ratios.
+- Keep meat ratios as candidate values without adding a review checklist or making them a launch blocker.
+- Keep Cloudflare certificate, DNS, redirect, push, merge, and deployment actions outside the agent's scope unless separately authorized.
+
+### Implementation contract
+
+1. Update Guides and About canonical and Open Graph URLs to their clean paths.
+2. Update `sitemap.xml` to the same clean paths; keep physical `.html` links for local file/static-preview compatibility.
+3. Change sauce review metadata to `reviewed`, `2026-07-25`, and `owner-tested-with-reference`; preserve all ratios and hidden source URLs.
+4. Update metadata and sauce tests for clean URLs and owner-tested sauce records.
+5. Reconcile current handoff and session notes without changing historical execution records.
+
+### Gate
+
+Run focused metadata and sauce tests, the complete `node --test` suite, `node --check` for all JavaScript files, `git diff --check`, local-reference and asset smoke checks, and browser verification at desktop, `390 x 844`, and `320 x 568`. Confirm clean local routes, no overflow, no console errors, reviewed sauce metadata, unchanged meat candidate values, and no deployment activity.

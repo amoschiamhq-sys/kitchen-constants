@@ -11,7 +11,7 @@ import {
   routeToHash,
   selectionKey,
 } from '../src/navigation.js';
-import { CATEGORY_CATALOG, MEAT_CATALOG, PASTA_CATALOG } from '../src/constants.js';
+import { CATEGORY_CATALOG, MEAT_CATALOG, PASTA_CATALOG, SAUCE_CATALOG } from '../src/constants.js';
 
 test('approved catalogue exposes the compact five-meat matrix', () => {
   assert.deepEqual(MEAT_CATALOG.map((meat) => meat.label), [
@@ -118,16 +118,142 @@ test('single-page model resolves whole-chicken defaults before weight input', ()
   assert.equal(model.result, null);
 });
 
-test('category model exposes meat and pasta tools', () => {
+test('category model exposes the active sauce section before coming-soon tools', () => {
   assert.deepEqual(CATEGORY_CATALOG.map((category) => category.label), [
-    'Meat', 'Pasta & Noodles', 'Bread', 'Marinades', 'Sauces',
+    'Meat', 'Pasta & Noodles', 'Sauces', 'Bread', 'Marinades',
   ]);
-  assert.deepEqual(CATEGORY_CATALOG.slice(2).map((category) => category.status), [
-    'coming-soon', 'coming-soon', 'coming-soon',
+  assert.deepEqual(CATEGORY_CATALOG.slice(3).map((category) => category.status), [
+    'coming-soon', 'coming-soon',
   ]);
   assert.deepEqual(PASTA_CATALOG[0].styles.map((style) => style.label), [
     'Fresh egg pasta', 'Chinese hand-cut noodles', 'Dumpling wrappers',
   ]);
+});
+
+test('sauce catalogue follows the task-first order and relevant profiles', () => {
+  assert.equal(SAUCE_CATALOG.kind, 'sauce');
+  assert.deepEqual(SAUCE_CATALOG.directions.map((direction) => direction.label), [
+    'Stir-fry', 'Glaze', 'Dipping', 'Dressing',
+  ]);
+  assert.deepEqual(
+    SAUCE_CATALOG.directions.map((direction) => direction.profiles.map((profile) => profile.label)),
+    [
+      ['Balanced', 'Umami', 'Spicy'],
+      ['Sweet Glaze', 'Umami', 'Spicy'],
+      ['Balanced', 'Bright', 'Spicy'],
+      ['Bright', 'Nutty', 'Spicy'],
+    ],
+  );
+  assert.deepEqual(SAUCE_CATALOG.classics.map((classic) => classic.label), [
+    'Teriyaki', 'Sesame (Goma)', 'Peanut', 'Sweet & Sour', 'Vinaigrette',
+  ]);
+});
+
+test('sauce roles include global examples and optional heat', () => {
+  assert.deepEqual(SAUCE_CATALOG.directions[0].profiles[0].ingredientsByRole, {
+    salty: ['Soy sauce', 'Fish sauce'],
+    umami: ['Oyster sauce', 'Miso', 'Gochujang', 'Worcestershire'],
+    sweet: ['Sugar', 'Honey', 'Mirin', 'Maple syrup'],
+    acid: ['Rice vinegar', 'Black vinegar', 'Lime juice', 'Wine or cider vinegar', 'Mustard'],
+    fat: ['Sesame oil', 'Chili oil', 'Sesame paste', 'Peanut butter', 'Olive oil', 'Butter'],
+    heat: ['Fresh chili', 'Sambal', 'Gochugaru', 'Black pepper', 'Horseradish'],
+    aromatics: ['Garlic', 'Ginger', 'Scallions', 'Shallot', 'Herbs'],
+  });
+  assert.deepEqual(
+    SAUCE_CATALOG.directions.flatMap((direction) => direction.profiles)
+      .filter((profile) => profile.label === 'Spicy')
+      .map((profile) => profile.ratioParts.at(-1)),
+    [
+      { value: '+', label: 'Heat' },
+      { value: '+', label: 'Heat' },
+      { value: '+', label: 'Heat' },
+      { value: '+', label: 'Heat' },
+    ],
+  );
+});
+
+test('sauce routes default and canonicalize every downstream choice', () => {
+  const category = parseRoute('#/sauces');
+  const defaultSelection = resolveSelection(category);
+
+  assert.equal(category.kind, 'sauce-category');
+  assert.equal(defaultSelection.kind, 'sauce-resolved');
+  assert.equal(defaultSelection.direction.slug, 'stir-fry');
+  assert.equal(defaultSelection.profile.slug, 'balanced');
+  assert.equal(defaultSelection.hash, '#/sauces/stir-fry/balanced');
+  assert.equal(selectionKey(defaultSelection), 'sauces/stir-fry/balanced');
+  assert.equal(routeToHash(defaultSelection), '#/sauces/stir-fry/balanced');
+  assert.deepEqual(getRouteChoices(category).map((choice) => choice.label), [
+    'Stir-fry', 'Glaze', 'Dipping', 'Dressing',
+  ]);
+
+  const builder = parseRoute('#/sauces/builder');
+  assert.equal(builder.kind, 'sauce-legacy');
+  assert.equal(resolveSelection(builder).hash, '#/sauces/stir-fry/balanced');
+  assert.equal(getSinglePageViewModel(resolveSelection(builder)).module, 'sauce');
+
+  const direction = parseRoute('#/sauces/dipping');
+  assert.equal(direction.kind, 'sauce-direction');
+  assert.equal(resolveSelection(direction).hash, '#/sauces/dipping/balanced');
+  assert.deepEqual(getRouteChoices(direction).map((choice) => choice.label), [
+    'Balanced', 'Bright', 'Spicy',
+  ]);
+
+  const classic = resolveSelection(parseRoute('#/sauces/classics/teriyaki'));
+  assert.equal(classic.classic.slug, 'teriyaki');
+  assert.equal(classic.hash, '#/sauces/classics/teriyaki');
+  assert.equal(selectionKey(classic), 'sauces/classics/teriyaki');
+  assert.equal(routeToHash(parseRoute(classic.hash)), classic.hash);
+
+  const classicIndex = resolveSelection(parseRoute('#/sauces/classics'));
+  assert.equal(classicIndex.classic.slug, 'teriyaki');
+  assert.equal(classicIndex.hash, '#/sauces/classics/teriyaki');
+});
+
+test('sauce view models expose reviewed ratios, uses, substitutions, and sources', () => {
+  const profile = getSinglePageViewModel(resolveSelection(parseRoute('#/sauces/stir-fry/balanced')));
+  assert.equal(profile.module, 'sauce');
+  assert.deepEqual(profile.sauce.ratioParts.map((part) => `${part.value} ${part.label}`), [
+    '3 Salty', '1 Umami', '½ Sweet',
+  ]);
+  assert.ok(profile.sauce.uses.length > 0);
+  assert.ok(profile.sauce.substitutions.length > 0);
+  assert.equal(profile.sauce.contentStatus, 'reviewed');
+  assert.equal(profile.sauce.reviewedOn, '2026-07-25');
+  assert.equal(profile.sauce.methodology, 'owner-tested-with-reference');
+  assert.ok(profile.sauce.sources.length > 0);
+
+  const classic = getSinglePageViewModel(resolveSelection(parseRoute('#/sauces/classics/peanut')));
+  assert.equal(classic.classic.label, 'Peanut');
+  assert.equal(classic.sauce.ratioParts.at(-1).label, 'Salty');
+});
+
+test('all sauce ratios carry owner-tested review metadata', () => {
+  const sauces = [
+    ...SAUCE_CATALOG.directions.flatMap((direction) => direction.profiles),
+    ...SAUCE_CATALOG.classics,
+  ];
+
+  assert.ok(sauces.length > 0);
+  for (const sauce of sauces) {
+    assert.equal(sauce.contentStatus, 'reviewed', sauce.slug);
+    assert.equal(sauce.reviewedOn, '2026-07-25', sauce.slug);
+    assert.equal(sauce.methodology, 'owner-tested-with-reference', sauce.slug);
+    assert.ok(sauce.sources.length > 0, sauce.slug);
+  }
+});
+
+test('vinaigrette is a reviewed classic with a chef-style balance', () => {
+  const selection = resolveSelection(parseRoute('#/sauces/classics/vinaigrette'));
+
+  assert.equal(selection.hash, '#/sauces/classics/vinaigrette');
+  assert.deepEqual(selection.classic.ratioParts, [
+    { value: '3', label: 'Fat' },
+    { value: '1', label: 'Acid' },
+  ]);
+  assert.equal(selection.classic.contentStatus, 'reviewed');
+  assert.equal(selection.classic.reviewedOn, '2026-07-25');
+  assert.equal(selection.classic.methodology, 'owner-tested-with-reference');
 });
 
 test('pasta routes resolve the first style by default', () => {

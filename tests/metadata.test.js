@@ -12,11 +12,11 @@ const pages = [
   },
   {
     file: 'guides.html',
-    canonical: 'https://kitchenconstants.com/guides.html',
+    canonical: 'https://kitchenconstants.com/guides',
   },
   {
     file: 'about.html',
-    canonical: 'https://kitchenconstants.com/about.html',
+    canonical: 'https://kitchenconstants.com/about',
   },
 ];
 
@@ -90,4 +90,41 @@ test('brand assets and HSTS configuration are present and correctly sized', () =
   assert.equal(png.readUInt32BE(16), 1200);
   assert.equal(png.readUInt32BE(20), 630);
   assert.match(fs.readFileSync(path.join(root, '_headers'), 'utf8'), /Strict-Transport-Security:\s*max-age=2592000/);
+});
+
+test('Guides keeps sauce guidance short, ordered, and citation-free', () => {
+  const html = readPage('guides.html');
+  const cards = [...html.matchAll(/<article class="guide-card" id="([^"]+)">\s*<p class="card-kicker">(\d+)<\/p>/g)];
+
+  assert.deepEqual(cards.map(([, id, number]) => [id, number]), [
+    ['methodology', '01'],
+    ['dry-brining', '02'],
+    ['salt-percentages', '03'],
+    ['temperature', '04'],
+    ['sauce-builder', '05'],
+    ['dough-ratios', '06'],
+    ['dough-salt', '07'],
+  ]);
+  assert.match(html, /dissolve salt and sugar in the watery ingredients first\./);
+  assert.match(html, /Mix dried spices or chilli into the oil\./);
+  assert.match(html, /Add delicate fresh herbs last/);
+  assert.match(html, /Pure salt sits outside the parts/);
+  assert.doesNotMatch(html, /thewoksoflife|escoffier|justonecookbook|hot-thai-kitchen/i);
+});
+
+test('public navigation and sitemap use clean page URLs', () => {
+  for (const file of ['guides.html', 'about.html']) {
+    const html = readPage(file);
+    assert.match(html, /href="\.\/guides\.html"/);
+    assert.match(html, /href="\.\/about\.html"/);
+  }
+
+  const app = fs.readFileSync(path.join(root, 'src/app.js'), 'utf8');
+  assert.match(app, /href="\.\/guides\.html"/);
+  assert.match(app, /href="\.\/about\.html"/);
+
+  const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
+  assert.match(sitemap, /https:\/\/kitchenconstants\.com\/guides/);
+  assert.match(sitemap, /https:\/\/kitchenconstants\.com\/about/);
+  assert.doesNotMatch(sitemap, /(?:guides|about)\.html/);
 });
