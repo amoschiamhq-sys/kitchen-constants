@@ -1,10 +1,12 @@
 # Executor handoff
 
-Updated: 2026-07-23
+Updated: 2026-07-25
+
+Execution status: Sauce simplification completed locally on 2026-07-25; no deployment performed.
 
 ## Current state
 
-The MVP now includes the independently named meat catalogue, two dry-brine timing bands, dough formulas with separate liquid and salt calculations, labelled ratio displays, and the approved personal support note.
+The MVP now includes the independently named meat catalogue, two dry-brine timing bands, dough formulas with separate liquid and salt calculations, reusable sauce-balance cards, labelled ratio displays, and the approved personal support note.
 
 Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-constants.pages.dev/>. Amos confirmed that the live page is the current version. The custom domain `kitchenconstants.com` is active through Cloudflare Registrar and SSL is enabled.
 
@@ -17,7 +19,8 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 - Salt output is calculated in grams only.
 - Current meat salt ratios remain candidate values and were not changed during this milestone.
 - Chef temperature guidance remains primary, with food-safety context beneath it.
-- Bread, Marinades, and Sauces are visible as non-interactive Coming soon choices.
+- Bread and Marinades remain visible as non-interactive Coming soon choices; Marinades remain separate from Sauces.
+- Sauces remain task-first: Stir-fry, Glaze, Dipping, and Dressing, with Teriyaki, Sesame (Goma), Peanut, Sweet & Sour, and Vinaigrette as the named classics. Sauces open directly to Stir-fry / Balanced; the temporary Builder hash canonicalizes to that same profile and is not selectable.
 - Pasta & Noodles uses flour weight, liquid or egg percentage, and salt percentage.
 - Pasta ratio displays use a visual separator with ingredient subtitles, for example `48% | 2%` with `Water` and `Salt` beneath.
 - The support note uses Amos's approved wording and links `Leave a tip` to <https://ko-fi.com/amoschiam> in a new tab.
@@ -33,16 +36,18 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 
 ## Verification baseline
 
-- `npm.cmd test`: 43 passing tests.
+- `node --test`: 48 passing tests, including sauce navigation and candidate-content coverage.
 - JavaScript syntax checks pass for all source and test modules.
 - `git diff --check` passes; only normal line-ending notices remain.
-- Browser verification passed for the ratio labels, support copy, new category buttons, timing display, dough salt output, and the 899 px desktop preview with no horizontal overflow.
+- Browser verification passed for the ratio labels, support copy, task-first sauce controls, sauce balance cards, timing display, dough salt output, and desktop/mobile previews with no horizontal overflow.
 - A narrow mobile viewport check passed with no horizontal overflow.
 - `https://kitchenconstants.com` was verified over HTTPS at the default desktop viewport, `390 x 844`, and `320 x 568`; the live calculator had no horizontal overflow or console errors.
 - The live Pasta & Noodles styles, reviewed Lamb Chops targets, and pending Lamb Shoulder state were confirmed on the custom domain.
 - Google Search Console DNS ownership verification succeeded on 2026-07-23, and `https://kitchenconstants.com/sitemap.xml` now reports `Success` with 3 discovered pages.
-- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. Automated checks pass, and the merged changes are live on the custom domain. In-app browser visual verification remains pending because it could not reach the local preview server.
+- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. Sauce ratios remain candidate content with source URLs and review metadata retained internally. Automated checks and local in-app browser verification pass; no deployment was performed for this redesign.
+- Sauce simplification removed the Builder route state, universal formula, Builder link, and standalone adjustment guide; ratios now use `parts`, a same-measure helper, and wrap-safe visual dividers. No deployment was performed.
 - Rendered culinary reference links were removed from calculator results; source URLs and review metadata remain stored internally. A compact `Leave a tip` link is available in the calculator, Guides, and About footers.
+- Guide 05 now contains the compact sauce-building and mixing guidance; Guides do not render culinary source links or citations.
 
 ## Launch handoff
 
@@ -51,8 +56,67 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 
 ## Remaining product work
 
-1. Independently audit and home-test candidate meat salt ratios before calling them reviewed.
-2. Keep Bread, Marinades, and Sauces deferred until a later product decision.
+1. Source-audit and home-test candidate meat salt ratios before calling them reviewed. The source audit is recorded in `SESSION_UPDATE.md`; home-test results are still required.
+2. Keep Bread and Marinades deferred until a later product decision.
+
+## Sauce guidance execution — 2026-07-25
+
+- Sauces remain before the deferred Bread and Marinades categories.
+- Added Vinaigrette after the existing classics with a `3 Fat : 1 Acid` balance; it is recorded internally as owner-tested with reference material.
+- Broadened role examples to include Worcestershire, maple syrup, wine or cider vinegar, mustard, olive oil, butter, black pepper, horseradish, shallot, and herbs.
+- Added visible `+ Heat` groups and Heat ingredient choices for spicy profiles.
+- Added Guide 05, “Build a sauce,” before dough hydration and dough salt; the guide includes concise water/oil/aromatics mixing advice and keeps pure salt outside the equal-parts ratio.
+- No culinary references or citations are rendered to users; internal source metadata remains preserved.
+
+## Tomorrow execution handoff — 2026-07-25
+
+### Objective (completed)
+
+Remove Sauce Builder and return Sauces to the same direct, compact interaction used by Meat and Pasta. Users should choose a task and flavour, then immediately see the sauce parts. This is an interaction and presentation cleanup only; do not change candidate culinary ratios, sources, review metadata, profiles, named classics, or task order.
+
+### Current mismatch
+
+- `#/sauces` resolves canonically to `#/sauces/stir-fry/balanced`.
+- `#/sauces/builder` is accepted only as a temporary legacy path and canonicalizes once to the same default profile.
+- Sauce pages render the task/profile controls followed by exactly two result cards.
+- Sesame (Goma) keeps each ratio group intact and uses subtle dividers without leading punctuation when it wraps.
+
+### Implemented changes
+
+1. Remove `SAUCE_BUILDER` data and every Builder card/link renderer and style.
+2. Make `#/sauces` resolve canonically to `#/sauces/stir-fry/balanced`, matching the first-valid-choice behavior used elsewhere.
+3. Treat `#/sauces/builder` as a temporary legacy path that canonicalizes once to `#/sauces/stir-fry/balanced`; do not keep it as a selectable state.
+4. Keep the task-first controls and all existing flavour profiles and named classics unchanged.
+5. Keep exactly two primary result cards:
+   - `Balance`: selected profile/classic, parts, short purpose, and relevant ingredient choices.
+   - `Use`: typical uses, optional additions, and common substitutions.
+6. Remove the standalone universal formula and full-width adjustment guide from the primary sauce flow.
+7. Label the ratio simply `parts` and add one short helper: `Use the same spoon or cup for every part.`
+8. Replace visible colon separators with subtle visual dividers so a wrapped ratio never starts with punctuation.
+9. Preserve the useful 320 px header-spacing fix already present in `styles/main.css`.
+
+### Expected files
+
+- `src/constants.js`: remove Builder data; preserve sauce catalogue values and source/review metadata.
+- `src/navigation.js`: remove Builder selection/model behavior; restore direct defaulting and canonicalization.
+- `src/app.js`: remove Builder and adjustment renderers; keep the two sauce result cards.
+- `styles/main.css`: remove Builder/adjustment rules and refine ratio dividers; preserve unrelated responsive fixes.
+- `tests/navigation.test.js`: restore task/profile defaults and add the legacy Builder canonicalization check.
+- `PROJECT_BRIEF.md`, `HANDOFF.md`, `SESSION_UPDATE.md`, and `IMPLEMENTATION_PLAN.md`: reconcile final state after execution.
+
+### Acceptance result
+
+- Selecting Sauces immediately shows Stir-fry / Balanced and its parts.
+- No Sauce Builder, universal formula, Builder link, or standalone adjustment guide is rendered.
+- Stir-fry, Glaze, Dipping, Dressing, and Classics remain in the approved order.
+- Balanced, Umami, Bright, Nutty, Sweet Glaze, Spicy, and all four named classics remain available.
+- Sesame (Goma) wraps cleanly at 320 px without a leading or stranded separator.
+- Sauce pages visually match the existing category → controls → two-card result rhythm.
+- All candidate ratios, sources, and review metadata remain unchanged.
+
+### Verification gate
+
+Run focused navigation tests, then `node --test`; run `node --check` for every changed JavaScript file; run `git diff --check` and review the complete diff. Verify the real page at desktop, `390 x 844`, and `320 x 568`, including the default sauce route, one profile, and Sesame (Goma), with no console errors or horizontal overflow. Do not commit, publish, or deploy unless explicitly requested.
 
 ## Launch hardening status — 2026-07-23
 

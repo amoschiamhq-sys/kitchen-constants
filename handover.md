@@ -16,7 +16,8 @@ The tagline remains: **Measure twice. Season once.**
 - Dry-brine timing shows Minimum and Best together.
 - Ground meat remains under its parent meat and uses separate short timing guidance.
 - Pasta & Noodles shows flour weight, liquid or egg grams, and salt grams.
-- Bread, Marinades, and Sauces are visible as Coming soon but are not interactive.
+- Bread and Marinades are visible as Coming soon and are not interactive; Marinades remain separate from the active Sauces section.
+- Sauces are active and task-first, with Stir-fry, Glaze, Dipping, Dressing, and named classics including Vinaigrette.
 - Salt type, teaspoons, tablespoons, breadcrumbs, and preparation screens remain absent.
 - Chef temperature targets remain primary, with food-safety baselines shown as separate context.
 - Pasta ratios now use a clear separator with ingredient subtitles, such as `48% | 2%` with `Water` and `Salt` beneath.
@@ -36,7 +37,7 @@ The tagline remains: **Measure twice. Season once.**
 
 - Updated homepage, Guides, and About metadata for natural dry-brining, meat-temperature, pasta-dough, and cooking-reference searches.
 - Updated the approved personal About copy, Guides introduction and selected headings, calculator helper text, and support note.
-- No culinary values, source metadata, calculator behavior, or deployment settings changed.
+- No existing culinary values, source metadata, calculator behavior, or deployment settings changed; the new Vinaigrette entry is recorded internally as owner-tested with reference material.
 - Rendered culinary reference links were removed; source URLs and review metadata remain internal. The compact support link is present in the calculator, Guides, and About footers.
 - Automated checks pass: 43 tests, JavaScript syntax, and `git diff --check`.
 - The changes were merged into `main` and are live on <https://kitchenconstants.com/>. HTTP verification confirmed the updated homepage, Guides, and About titles and copy. In-app browser visual verification remains pending because it could not reach the local preview server.
@@ -60,6 +61,15 @@ All dough inputs default to `100 g` flour. Pasta cooking-water salt is deliberat
 ## Content status
 
 Meat salt ratios remain candidate values and should be independently audited and home-tested before being described as reviewed. Beef ribs, Pork ribs, and Lamb shoulder still have pending internal-temperature guidance because their tender endpoint depends on preparation method.
+
+## Sauce guidance update — 2026-07-25
+
+- Added Guide 05, “Build a sauce,” before the dough guides.
+- The guide covers salty, sweet, acid, umami, fat, heat, and aromatics in a compact task-first format.
+- Mixing guidance distinguishes watery ingredients, oil, dried spices or chilli, and delicate fresh herbs without adding chemistry terminology or storage advice.
+- Pure salt is described as a separate pinch-to-taste adjustment, not as an equal ratio part.
+- Added Vinaigrette after the existing named classics with a `3 Fat : 1 Acid` balance.
+- Global role examples now include Worcestershire and Western-style ingredients; user-facing pages do not show culinary sources or citations.
 
 ## Verification
 

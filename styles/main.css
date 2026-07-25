@@ -269,6 +269,12 @@ input {
   font-family: var(--display);
 }
 
+.guide-inline-link {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+}
+
 .content-back {
   margin: 1.5rem 0 0;
   color: var(--deep-pandan);
@@ -348,6 +354,15 @@ h2 {
 
 .choice-list--style {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.choice-list--sauce-direction {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.choice-list--sauce-profile,
+.choice-list--sauce-classic {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .selection-controls--secondary {
@@ -521,6 +536,127 @@ h2 {
   margin: 0.25rem 0 0;
   color: var(--muted-ink);
   font-size: 0.75rem;
+}
+
+.sauce-card-heading {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 0.65fr) minmax(0, 1.65fr);
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--warm-stone);
+}
+
+.sauce-ratio {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+  column-gap: 0.18rem;
+  justify-self: end;
+}
+
+.sauce-card-heading--long .sauce-ratio {
+  margin-top: 0;
+}
+
+.sauce-ratio-group {
+  display: grid;
+  min-width: 0;
+  align-items: flex-start;
+  justify-items: center;
+}
+
+.sauce-ratio-group:not(:first-child) {
+  padding-left: 0.2rem;
+  border-left: 1px solid var(--warm-stone);
+}
+
+.sauce-ratio-part {
+  display: grid;
+  width: 100%;
+  gap: 0.08rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.sauce-ratio-value {
+  color: var(--sesame);
+  font-family: var(--display);
+  font-size: clamp(1.65rem, 3.4vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+.sauce-ratio-label {
+  display: block;
+  min-height: 2.2em;
+  color: var(--muted-ink);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sauce-purpose {
+  margin: 0.7rem 0 0;
+  color: var(--muted-ink);
+}
+
+.sauce-roles {
+  margin-top: 0.7rem;
+}
+
+.sauce-role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 0.75rem;
+}
+
+.sauce-role {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.sauce-role strong {
+  color: var(--deep-pandan);
+  font-family: var(--display);
+  font-size: 0.8rem;
+}
+
+.sauce-role span {
+  color: var(--muted-ink);
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.sauce-use-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0.85rem;
+  padding: 0;
+  list-style: none;
+}
+
+.sauce-use-list li {
+  padding: 0.28rem 0.48rem;
+  border: 1px solid var(--warm-stone);
+  border-radius: 999px;
+  color: var(--muted-ink);
+  background: var(--flour-paper);
+  font-size: 0.72rem;
+}
+
+.sauce-subheading {
+  margin-top: 0.75rem;
 }
 
 .calculation-row {
@@ -815,8 +951,14 @@ h2 {
   }
 
   .choice-list--category,
-  .choice-list--style {
+  .choice-list--style,
+  .choice-list--sauce-direction {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .choice-list--sauce-profile,
+  .choice-list--sauce-classic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .choice-list--cut {
@@ -853,11 +995,58 @@ h2 {
   .ratio-separator {
     padding: 0 0.35rem;
   }
+
+  .sauce-card-heading {
+    grid-template-columns: minmax(5.75rem, 0.58fr) minmax(0, 1.65fr);
+    gap: 0.4rem;
+  }
+
+  .sauce-ratio-group:not(:first-child) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
 }
 
 @media (max-width: 21.5rem) {
+  .header-inner {
+    width: min(100% - 2rem, 72rem);
+    gap: 0.35rem;
+  }
+
+  .brand {
+    gap: 0.45rem;
+  }
+
+  .brand-name {
+    font-size: 0.94rem;
+  }
+
+  .site-nav {
+    gap: 0.3rem;
+    font-size: 0.72rem;
+  }
+
   .choice-list--category {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .choice-list--sauce-direction {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sauce-card-heading {
+    grid-template-columns: minmax(5rem, 0.5fr) minmax(0, 1.75fr);
+    gap: 0.3rem;
+  }
+
+  .sauce-ratio {
+    column-gap: 0.12rem;
+  }
+
+  .sauce-ratio-label {
+    font-size: 0.52rem;
+    letter-spacing: 0.025em;
   }
 
   .choice-list--meat {

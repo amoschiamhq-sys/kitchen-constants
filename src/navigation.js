@@ -17,6 +17,22 @@ function findPastaStyle(category, slug) {
     : undefined;
 }
 
+function findSauceDirection(category, slug) {
+  return category?.kind === 'sauce'
+    ? category.directions.find((direction) => direction.slug === slug)
+    : undefined;
+}
+
+function findSauceProfile(direction, slug) {
+  return direction?.profiles.find((profile) => profile.slug === slug);
+}
+
+function findSauceClassic(category, slug) {
+  return category?.kind === 'sauce'
+    ? category.classics.find((classic) => classic.slug === slug)
+    : undefined;
+}
+
 function findType(meat, slug) {
   return meat?.types.find((type) => type.slug === slug);
 }
@@ -46,9 +62,15 @@ function route(kind, fields = {}) {
   return { kind, ...fields };
 }
 
-export function routeToHash({ category, style, meat, type, detail, variant, doneness } = {}) {
+export function routeToHash({ category, style, direction, profile, classic, meat, type, detail, variant, doneness } = {}) {
   if (category?.kind === 'pasta') {
     return `#/${category.slug}/${(style ?? category.styles[0]).slug}`;
+  }
+  if (category?.kind === 'sauce') {
+    if (classic) return `#/${category.slug}/classics/${classic.slug}`;
+    const resolvedDirection = direction ?? category.directions[0];
+    const resolvedProfile = profile ?? resolvedDirection.profiles[0];
+    return `#/${category.slug}/${resolvedDirection.slug}/${resolvedProfile.slug}`;
   }
   if (!meat) return '#/';
   const segments = [meat.slug];
@@ -74,6 +96,29 @@ export function parseRoute(hash = '#/') {
     if (segments.length !== 2) return route('not-found');
     const style = findPastaStyle(category, segments[1]);
     return style ? route('pasta-style', { category, style, legacyPreparation }) : route('not-found');
+  }
+
+  if (category?.kind === 'sauce') {
+    if (segments.length === 1) return route('sauce-category', { category, legacyPreparation });
+    if (segments[1] === 'builder') {
+      return segments.length === 2 ? route('sauce-legacy', { category, legacyPreparation }) : route('not-found');
+    }
+    if (segments[1] === 'classics') {
+      if (segments.length === 2) return route('sauce-classics', { category, legacyPreparation });
+      if (segments.length !== 3) return route('not-found');
+      const classic = findSauceClassic(category, segments[2]);
+      return classic ? route('sauce-classic', { category, classic, legacyPreparation }) : route('not-found');
+    }
+    if (segments.length === 2) {
+      const direction = findSauceDirection(category, segments[1]);
+      return direction ? route('sauce-direction', { category, direction, legacyPreparation }) : route('not-found');
+    }
+    if (segments.length !== 3) return route('not-found');
+    const direction = findSauceDirection(category, segments[1]);
+    const profile = findSauceProfile(direction, segments[2]);
+    return direction && profile
+      ? route('sauce-profile', { category, direction, profile, legacyPreparation })
+      : route('not-found');
   }
 
   const [meatSlug, typeSlug, thirdSlug, fourthSlug] = segments;
@@ -105,6 +150,11 @@ export function selectionKey(selection) {
   if (selection?.category?.kind === 'pasta') {
     return [selection.category.slug, selection.style?.slug].filter(Boolean).join('/');
   }
+  if (selection?.category?.kind === 'sauce') {
+    return selection.classic
+      ? [selection.category.slug, 'classics', selection.classic.slug].join('/')
+      : [selection.category.slug, selection.direction?.slug, selection.profile?.slug].filter(Boolean).join('/');
+  }
   if (!selection?.meat || !selection?.type) return null;
   return [
     selection.meat.slug,
@@ -116,6 +166,9 @@ export function selectionKey(selection) {
 
 export function canonicalSelectionHash(selection) {
   if (selection?.category?.kind === 'pasta' && selection.style) {
+    return routeToHash(selection);
+  }
+  if (selection?.category?.kind === 'sauce' && (selection.profile || selection.classic)) {
     return routeToHash(selection);
   }
   if (!selection?.meat || !selection?.type || !selection?.detail || !selection?.doneness) {
@@ -134,6 +187,55 @@ export function resolveSelection(currentRoute) {
       kind: 'pasta-resolved',
       category,
       style,
+      selectionComplete: true,
+      legacyPreparation: Boolean(currentRoute.legacyPreparation),
+    };
+    return { ...resolved, hash: canonicalSelectionHash(resolved) };
+  }
+
+  if (currentRoute.category?.kind === 'sauce') {
+    const category = currentRoute.category;
+    if (currentRoute.kind === 'sauce-classics') {
+      const classic = category.classics[0];
+      const resolved = {
+        kind: 'sauce-resolved',
+        category,
+        classic,
+        selectionComplete: true,
+        legacyPreparation: Boolean(currentRoute.legacyPreparation),
+      };
+      return { ...resolved, hash: canonicalSelectionHash(resolved) };
+    }
+    if (currentRoute.kind === 'sauce-category' || currentRoute.kind === 'sauce-legacy'
+      || (!currentRoute.direction && !currentRoute.profile && !currentRoute.classic)) {
+      const resolved = {
+        kind: 'sauce-resolved',
+        category,
+        direction: category.directions[0],
+        profile: category.directions[0].profiles[0],
+        selectionComplete: true,
+        legacyPreparation: Boolean(currentRoute.legacyPreparation),
+      };
+      return { ...resolved, hash: canonicalSelectionHash(resolved) };
+    }
+    if (currentRoute.classic) {
+      const classic = currentRoute.classic;
+      const resolved = {
+        kind: 'sauce-resolved',
+        category,
+        classic,
+        selectionComplete: true,
+        legacyPreparation: Boolean(currentRoute.legacyPreparation),
+      };
+      return { ...resolved, hash: canonicalSelectionHash(resolved) };
+    }
+    const direction = currentRoute.direction ?? category.directions[0];
+    const profile = currentRoute.profile ?? direction.profiles[0];
+    const resolved = {
+      kind: 'sauce-resolved',
+      category,
+      direction,
+      profile,
       selectionComplete: true,
       legacyPreparation: Boolean(currentRoute.legacyPreparation),
     };
@@ -178,6 +280,63 @@ export function getRouteChoices(currentRoute) {
     }));
   }
 
+  if (currentRoute.kind === 'sauce-category' || currentRoute.kind === 'sauce-legacy' || currentRoute.kind === 'sauce-classics') {
+    const category = currentRoute.category;
+    if (currentRoute.kind === 'sauce-category' || currentRoute.kind === 'sauce-legacy') {
+      return [
+        ...category.directions.map((direction) => ({
+          kind: 'active',
+          label: direction.label,
+          href: resolveSelection(route('sauce-profile', {
+            category,
+            direction,
+            profile: direction.profiles[0],
+          })).hash,
+        })),
+      ];
+    }
+    if (currentRoute.kind === 'sauce-classics') {
+      return category.classics.map((classic) => ({
+        kind: 'active',
+        label: classic.label,
+        href: resolveSelection(route('sauce-classic', { category, classic })).hash,
+      }));
+    }
+    return category.directions.map((direction) => ({
+      kind: 'active',
+      label: direction.label,
+      href: resolveSelection(route('sauce-profile', {
+        category,
+        direction,
+        profile: direction.profiles[0],
+      })).hash,
+    }));
+  }
+
+  if (currentRoute.kind === 'sauce-direction') {
+    return currentRoute.direction.profiles.map((profile) => ({
+      kind: 'active',
+      label: profile.label,
+      href: resolveSelection(route('sauce-profile', {
+        category: currentRoute.category,
+        direction: currentRoute.direction,
+        profile,
+      })).hash,
+    }));
+  }
+
+  if (currentRoute.kind === 'sauce-profile') {
+    return currentRoute.direction.profiles.map((profile) => ({
+      kind: 'active',
+      label: profile.label,
+      href: resolveSelection(route('sauce-profile', {
+        category: currentRoute.category,
+        direction: currentRoute.direction,
+        profile,
+      })).hash,
+    }));
+  }
+
   if (currentRoute.kind === 'meat') {
     return currentRoute.meat.types.map((type) => ({
       kind: 'active',
@@ -218,6 +377,8 @@ export function getRouteTitle(currentRoute) {
   if (!currentRoute || currentRoute.kind === 'home') return 'Kitchen Constants';
   if (currentRoute.kind === 'not-found') return 'That page is not in the pantry';
   if (currentRoute.style?.label) return currentRoute.style.label;
+  if (currentRoute.classic?.label) return currentRoute.classic.label;
+  if (currentRoute.profile?.label) return currentRoute.profile.label;
   if (currentRoute.category?.label) return currentRoute.category.label;
   return currentRoute.doneness?.label
     ?? currentRoute.detail?.label
@@ -244,6 +405,22 @@ export function getSinglePageViewModel(selection, rawWeight = '') {
       weight,
       dough,
       result: dough,
+      dryBrine: null,
+      internalTemperature: null,
+    };
+  }
+
+  if (resolved?.category?.kind === 'sauce') {
+    const sauce = resolved.classic ?? resolved.profile;
+    return {
+      selectionComplete: Boolean(resolved),
+      module: 'sauce',
+      direction: resolved.direction ?? null,
+      profile: resolved.profile ?? null,
+      classic: resolved.classic ?? null,
+      sauce,
+      weight,
+      result: null,
       dryBrine: null,
       internalTemperature: null,
     };

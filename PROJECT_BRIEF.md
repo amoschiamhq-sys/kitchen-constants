@@ -6,14 +6,19 @@ Kitchen Constants is a fast cooking reference for home cooks who want less guess
 
 Tagline: **Measure twice. Season once.**
 
-The MVP focuses on practical meat dry-brining ratios, chef-oriented internal temperatures, and simple flour-based dough formulas.
+The MVP focuses on practical meat dry-brining ratios, chef-oriented internal temperatures, simple flour-based dough formulas, and reusable sauce balances.
 
 ## Approved experience
 
 - One compact page with button-style controls.
 - Meat is the default category.
 - Pasta & Noodles is the first additional category.
-- Bread, Marinades, and Sauces are visible as Coming soon and are not interactive.
+- Bread and Marinades remain visible as Coming soon; Sauces are an active, compact flavour-balance reference.
+- Sauces are organised by task first (Stir-fry, Glaze, Dipping, Dressing), with flavour profiles before a small set of named classics.
+- Sauces open directly to the first task and flavour profile; there is no separate Sauce Builder page.
+- Guides include a short sauce-building guide before the dough guides, including practical mixing notes for watery ingredients, oil, dried spices, and fresh aromatics.
+- Marinades remain a separate deferred category; do not fold them into Sauces.
+- Each sauce screen follows the same compact two-card rhythm as Meat and Pasta: the selected sauce parts and purpose first, then uses and substitutions. Do not add a universal formula, glossary, or standalone troubleshooting panel.
 - Selecting a category, cut, or style immediately resolves the first valid downstream choices.
 - Meat always shows Meat, Cut, Detail, and Doneness.
 - Detail and Doneness remain visible even when there is only one choice.
@@ -35,7 +40,7 @@ Ground meat stays under its parent meat because its salt ratio and temperature g
 
 ## Content integrity
 
-Ratios are practical candidate values, not universal laws. Keep them separate from safety-sensitive guidance and preserve source metadata for temperature content. Culinary references, recipe conversions, community experience, and Amos's own tests can inform taste-oriented ratios. Values should be independently checked before being described as reviewed.
+Ratios are practical starting points, not universal laws. Keep them separate from safety-sensitive guidance and preserve source metadata internally. Culinary references, recipe conversions, community experience, and Amos's own tests can inform taste-oriented ratios. Do not render source links or citations in the public cooking flow.
 
 ## Visual identity
 

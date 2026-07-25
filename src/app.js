@@ -81,7 +81,52 @@ function renderPastaSelectionControls(selection) {
   });
 }
 
+function renderSauceSelectionControls(selection) {
+  const category = selection.category;
+  const isClassic = Boolean(selection.classic);
+  const activeDirection = selection.direction ?? category.directions[0];
+  const startChoices = [
+    ...category.directions.map((direction) => selectionLink({
+      href: resolvedHash({ category, direction }),
+      label: direction.label,
+      isSelected: !isClassic && direction.slug === activeDirection.slug,
+      key: `sauce-direction:${direction.slug}`,
+    })),
+    selectionLink({
+      href: resolvedHash({ category, classic: category.classics[0] }),
+      label: 'Classic',
+      isSelected: isClassic,
+      key: 'sauce-direction:classics',
+    }),
+  ];
+
+  const secondaryChoices = isClassic
+    ? category.classics.map((classic) => selectionLink({
+      href: resolvedHash({ category, classic }),
+      label: classic.label,
+      isSelected: classic.slug === selection.classic.slug,
+      key: `sauce-classic:${classic.slug}`,
+    }))
+    : activeDirection.profiles.map((profile) => selectionLink({
+      href: resolvedHash({ category, direction: selection.direction, profile }),
+      label: profile.label,
+      isSelected: profile.slug === selection.profile.slug,
+      key: `sauce-profile:${profile.slug}`,
+    }));
+
+  return `
+    <div class="selection-controls selection-controls--sauce" aria-label="Sauce choices">
+      ${renderChoiceGroup({ id: 'sauce-direction-heading', label: 'Start with', kind: 'sauce-direction', choices: startChoices })}
+      ${secondaryChoices.length > 0
+        ? renderChoiceGroup({ id: 'sauce-secondary-heading', label: isClassic ? 'Named sauce' : 'Flavour', kind: isClassic ? 'sauce-classic' : 'sauce-profile', choices: secondaryChoices })
+        : ''}
+    </div>`;
+}
+
 function renderSelectionControls(selection) {
+  if (selection.category?.kind === 'sauce') {
+    return renderSauceSelectionControls(selection);
+  }
   if (selection.category?.kind === 'pasta') {
     return `
       <div class="selection-controls selection-controls--secondary" aria-label="Pasta and noodle choices">
@@ -280,6 +325,86 @@ function renderPastaFinishCard(model) {
     </article>`;
 }
 
+function renderSauceRatioDisplay(sauce) {
+  const ariaLabel = sauce.ratioParts.map(({ value, label }) => value === '+'
+    ? `plus ${label.toLowerCase()}`
+    : `${value} parts ${label.toLowerCase()}`).join(', ');
+  return `
+    <div class="sauce-ratio" aria-label="${escapeHtml(ariaLabel)}">
+      ${sauce.ratioParts.map(({ value, label }) => `
+        <span class="sauce-ratio-group${value === '+' ? ' sauce-ratio-group--optional' : ''}">
+          <span class="sauce-ratio-part">
+            <span class="sauce-ratio-value">${escapeHtml(value)}</span>
+            <span class="sauce-ratio-label">${escapeHtml(label)}</span>
+          </span>
+        </span>`).join('')}
+    </div>`;
+}
+
+
+
+function roleKey(label) {
+  const normalized = label.toLowerCase();
+  if (normalized.includes('salty') || normalized.includes('soy')) return 'salty';
+  if (normalized.includes('umami')) return 'umami';
+  if (normalized.includes('sweet')) return 'sweet';
+  if (normalized.includes('acid') || normalized.includes('vinegar')) return 'acid';
+  if (normalized.includes('fat') || normalized.includes('nutty') || normalized.includes('sesame') || normalized.includes('peanut')) return 'fat';
+  if (normalized.includes('heat')) return 'heat';
+  return 'aromatics';
+}
+
+function renderSauceRoleChoices(sauce) {
+  if (!sauce.ingredientsByRole) return '';
+  const roles = [...new Map(sauce.ratioParts
+    .map(({ label }) => [roleKey(label), label])).entries()];
+  return `
+    <div class="sauce-roles">
+      <p class="result-label">Choose from</p>
+      <div class="sauce-role-grid">
+        ${roles.map(([key, label]) => `
+          <div class="sauce-role">
+            <strong>${escapeHtml(label)}</strong>
+            <span>${escapeHtml((sauce.ingredientsByRole[key] ?? []).join(' · '))}</span>
+          </div>`).join('')}
+      </div>
+      <p class="method-note">One ingredient can fill more than one role. Start with the balance, then adjust.</p>
+    </div>`;
+}
+
+function renderSauceBalanceCard(model) {
+  const sauce = model.sauce;
+  return `
+    <article class="result-card result-card--sauce" aria-labelledby="sauce-balance-heading">
+      <p class="card-kicker">Ratio</p>
+      <div class="sauce-card-heading${sauce.ratioParts.length > 3 ? ' sauce-card-heading--long' : ''}">
+        <div>
+          <h2 id="sauce-balance-heading">${escapeHtml(sauce.label)}</h2>
+        </div>
+        ${renderSauceRatioDisplay(sauce)}
+      </div>
+      <p class="method-note sauce-ratio-help">Use the same spoon or cup for every part.</p>
+      <p class="sauce-purpose">${escapeHtml(sauce.purpose)}</p>
+      ${renderSauceRoleChoices(sauce)}
+    </article>`;
+}
+
+function renderSauceUseCard(model) {
+  const sauce = model.sauce;
+  return `
+    <article class="result-card result-card--sauce" aria-labelledby="sauce-use-heading">
+      <p class="card-kicker">Use</p>
+      <h2 id="sauce-use-heading">Where it fits</h2>
+      <p class="result-label">Typical uses</p>
+      <ul class="sauce-use-list">${sauce.uses.map((use) => `<li>${escapeHtml(use)}</li>`).join('')}</ul>
+      <p class="result-label sauce-subheading">Optional additions</p>
+      <p class="guidance">${escapeHtml(sauce.optionalAdditions.join(' · '))}</p>
+      <p class="result-label sauce-subheading">Common substitutions</p>
+      <p class="guidance">${escapeHtml(sauce.substitutions.join(' · '))}</p>
+      <p class="method-note">A practical starting balance, open to adjustment in your own kitchen.</p>
+    </article>`;
+}
+
 function renderFinishCard(model) {
   const guidance = model.internalTemperature?.targetInternalTemperature;
   if (!guidance) {
@@ -360,6 +485,7 @@ function renderNotFound() {
 function renderPage(selection) {
   const model = getSinglePageViewModel(selection, state.rawWeight);
   const isPasta = selection.category?.kind === 'pasta';
+  const isSauce = selection.category?.kind === 'sauce';
   return `
     ${renderHeader()}
     <main id="main-content">
@@ -369,9 +495,9 @@ function renderPage(selection) {
         ${renderSelectionControls(selection)}
       </div>
       <section class="results-grid" aria-label="Cooking guidance">
-        ${isPasta ? renderPastaPrepareCard(model) : renderPrepareCard(model)}
-        ${isPasta ? renderPastaFinishCard(model) : renderFinishCard(model)}
-      </section>
+          ${isSauce ? renderSauceBalanceCard(model) : isPasta ? renderPastaPrepareCard(model) : renderPrepareCard(model)}
+          ${isSauce ? renderSauceUseCard(model) : isPasta ? renderPastaFinishCard(model) : renderFinishCard(model)}
+        </section>
       ${renderSupportNote()}
     </main>
     ${renderFooter()}`;

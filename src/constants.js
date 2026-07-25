@@ -338,10 +338,307 @@ export const PASTA_CATALOG = Object.freeze([
   }),
 ]);
 
+const SAUCE_SOURCES = Object.freeze({
+  stirFry: 'https://thewoksoflife.com/stir-fry-sauce-recipe/',
+  yum: 'https://hot-thai-kitchen.com/thai-yum-dressing/',
+  wafu: 'https://www.justonecookbook.com/wafu-dressing-japanese-salad-dressing/comment-page-2/',
+  teriyaki: 'https://www.justonecookbook.com/teriyaki-sauce/',
+  goma: 'https://www.justonecookbook.com/how-to-make-sesame-sauce-goma-dare/',
+  peanut: 'https://hot-thai-kitchen.com/satay-and-peanut-sauce/',
+  sweetSour: 'https://thewoksoflife.com/sweet-sour-sauce/',
+  gochujang: 'https://www.koreanbapsang.com/asparagus-with-gochujang-sauce/',
+  vinaigrette: 'https://www.escoffier.edu/blog/recipes/how-to-properly-zest-and-make-a-citrus-vinaigrette/',
+});
+
+const SAUCE_REVIEW = Object.freeze({
+  contentStatus: 'candidate',
+  reviewedOn: '2026-07-24',
+  methodology: 'source-backed-candidate-and-home-testing',
+});
+
+function sauceRatioParts(parts) {
+  return Object.freeze(parts.map(([value, label]) => Object.freeze({ value, label })));
+}
+
+function sauceProfile({
+  slug,
+  label,
+  ratioParts,
+  purpose,
+  uses,
+  ingredientsByRole,
+  optionalAdditions,
+  substitutions,
+  sources,
+}) {
+  return Object.freeze({
+    ...SAUCE_REVIEW,
+    slug,
+    label,
+    ratioParts: sauceRatioParts(ratioParts),
+    ratioLabel: 'parts',
+    purpose,
+    uses: Object.freeze(uses),
+    ingredientsByRole: Object.freeze(Object.fromEntries(
+      Object.entries(ingredientsByRole).map(([role, choices]) => [role, Object.freeze(choices)]),
+    )),
+    optionalAdditions: Object.freeze(optionalAdditions),
+    substitutions: Object.freeze(substitutions),
+    sources: Object.freeze(sources),
+  });
+}
+
+function sauceClassic({ slug, label, ratioParts, purpose, uses, optionalAdditions, substitutions, sources, review = {} }) {
+  return Object.freeze({
+    ...SAUCE_REVIEW,
+    ...review,
+    slug,
+    label,
+    ratioParts: sauceRatioParts(ratioParts),
+    ratioLabel: 'parts',
+    purpose,
+    uses: Object.freeze(uses),
+    optionalAdditions: Object.freeze(optionalAdditions),
+    substitutions: Object.freeze(substitutions),
+    sources: Object.freeze(sources),
+  });
+}
+
+const SAUCE_INGREDIENTS = Object.freeze({
+  salty: Object.freeze(['Soy sauce', 'Fish sauce']),
+  umami: Object.freeze(['Oyster sauce', 'Miso', 'Gochujang', 'Worcestershire']),
+  sweet: Object.freeze(['Sugar', 'Honey', 'Mirin', 'Maple syrup']),
+  acid: Object.freeze(['Rice vinegar', 'Black vinegar', 'Lime juice', 'Wine or cider vinegar', 'Mustard']),
+  fat: Object.freeze(['Sesame oil', 'Chili oil', 'Sesame paste', 'Peanut butter', 'Olive oil', 'Butter']),
+  heat: Object.freeze(['Fresh chili', 'Sambal', 'Gochugaru', 'Black pepper', 'Horseradish']),
+  aromatics: Object.freeze(['Garlic', 'Ginger', 'Scallions', 'Shallot', 'Herbs']),
+});
+
+export const SAUCE_CATALOG = Object.freeze({
+  slug: 'sauces',
+  label: 'Sauces',
+  kind: 'sauce',
+  directions: Object.freeze([
+    Object.freeze({
+      slug: 'stir-fry',
+      label: 'Stir-fry',
+      profiles: Object.freeze([
+        sauceProfile({
+          slug: 'balanced',
+          label: 'Balanced',
+          ratioParts: [['3', 'Salty'], ['1', 'Umami'], ['½', 'Sweet']],
+          purpose: 'An everyday pan sauce that seasons without taking over.',
+          uses: ['Vegetables', 'Chicken', 'Pork', 'Tofu'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['A splash of water or stock to loosen', 'Garlic, ginger, or scallions'],
+          substitutions: ['Tamari can replace soy sauce; mushroom sauce can replace oyster sauce.'],
+          sources: [SAUCE_SOURCES.stirFry],
+        }),
+        sauceProfile({
+          slug: 'umami',
+          label: 'Umami',
+          ratioParts: [['2', 'Umami'], ['1', 'Salty'], ['½', 'Sweet']],
+          purpose: 'A deeper savoury base for mild ingredients.',
+          uses: ['Beef', 'Mushrooms', 'Tofu', 'Leafy greens'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Sesame oil', 'White pepper or chili oil'],
+          substitutions: ['Miso or mushroom sauce can stand in for oyster sauce.'],
+          sources: [SAUCE_SOURCES.stirFry],
+        }),
+        sauceProfile({
+          slug: 'spicy',
+          label: 'Spicy',
+          ratioParts: [['2', 'Salty'], ['1', 'Umami'], ['½', 'Sweet'], ['+', 'Heat']],
+          purpose: 'A savoury sauce with heat that clings to the food.',
+          uses: ['Chicken', 'Aubergine', 'Tofu', 'Stir-fried noodles'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Garlic, ginger, or scallions'],
+          substitutions: ['Sambal, chili oil, or gochugaru can supply the heat.'],
+          sources: [SAUCE_SOURCES.stirFry, SAUCE_SOURCES.gochujang],
+        }),
+      ]),
+    }),
+    Object.freeze({
+      slug: 'glaze',
+      label: 'Glaze',
+      profiles: Object.freeze([
+        sauceProfile({
+          slug: 'sweet-glaze',
+          label: 'Sweet Glaze',
+          ratioParts: [['2', 'Sweet'], ['1', 'Salty'], ['1', 'Umami']],
+          purpose: 'A glossy sweet-savoury coating for foods that can take colour.',
+          uses: ['Grilled meat', 'Tofu', 'Salmon', 'Roast vegetables'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Ginger or garlic', 'A little acid for lift'],
+          substitutions: ['Honey or mirin can replace sugar; soy or tamari can replace fish sauce.'],
+          sources: [SAUCE_SOURCES.teriyaki, SAUCE_SOURCES.sweetSour],
+        }),
+        sauceProfile({
+          slug: 'umami',
+          label: 'Umami',
+          ratioParts: [['2', 'Umami'], ['1', 'Salty'], ['1', 'Sweet']],
+          purpose: 'A savoury glaze with restrained sweetness.',
+          uses: ['Aubergine', 'Mushrooms', 'Tofu', 'Fish'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Sesame oil', 'Fresh ginger'],
+          substitutions: ['Miso or mushroom sauce can replace oyster sauce.'],
+          sources: [SAUCE_SOURCES.stirFry, SAUCE_SOURCES.teriyaki],
+        }),
+        sauceProfile({
+          slug: 'spicy',
+          label: 'Spicy',
+          ratioParts: [['2', 'Sweet'], ['1', 'Umami'], ['1', 'Salty'], ['+', 'Heat']],
+          purpose: 'Sticky sweet heat for strong-flavoured foods.',
+          uses: ['Chicken', 'Tofu', 'Mushrooms', 'Skewers'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Rice vinegar', 'Garlic or sesame seeds'],
+          substitutions: ['Gochujang can cover umami, sweetness, and heat at once; reduce the other roles.'],
+          sources: [SAUCE_SOURCES.gochujang],
+        }),
+      ]),
+    }),
+    Object.freeze({
+      slug: 'dipping',
+      label: 'Dipping',
+      profiles: Object.freeze([
+        sauceProfile({
+          slug: 'balanced',
+          label: 'Balanced',
+          ratioParts: [['4', 'Salty'], ['2', 'Acid'], ['1', 'Sweet']],
+          purpose: 'A flexible savoury dip that works with almost anything.',
+          uses: ['Dumplings', 'Spring rolls', 'Wontons', 'Steamed chicken', 'Grilled meat'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Sesame oil', 'Garlic, ginger, or scallions'],
+          substitutions: ['Black vinegar or lime can replace rice vinegar; honey can replace sugar.'],
+          sources: [SAUCE_SOURCES.yum],
+        }),
+        sauceProfile({
+          slug: 'bright',
+          label: 'Bright',
+          ratioParts: [['3', 'Acid'], ['2', 'Salty'], ['1', 'Sweet']],
+          purpose: 'A sharp, fresh dip that cuts through rich or fried food.',
+          uses: ['Seafood', 'Hot pot', 'Fried food', 'Steamed vegetables'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Fresh chili', 'Cilantro or scallions'],
+          substitutions: ['Lime, rice vinegar, or ponzu can fill the acid role.'],
+          sources: [SAUCE_SOURCES.yum],
+        }),
+        sauceProfile({
+          slug: 'spicy',
+          label: 'Spicy',
+          ratioParts: [['3', 'Acid'], ['2', 'Salty'], ['1', 'Sweet'], ['+', 'Heat']],
+          purpose: 'Tangy heat that stays balanced instead of simply hot.',
+          uses: ['Dumplings', 'Pancakes', 'Grilled meat', 'Seafood'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Sesame oil', 'Garlic or ginger'],
+          substitutions: ['Sambal, fresh chili, or gochugaru can supply the heat.'],
+          sources: [SAUCE_SOURCES.yum, SAUCE_SOURCES.gochujang],
+        }),
+      ]),
+    }),
+    Object.freeze({
+      slug: 'dressing',
+      label: 'Dressing',
+      profiles: Object.freeze([
+        sauceProfile({
+          slug: 'bright',
+          label: 'Bright',
+          ratioParts: [['3', 'Acid'], ['2', 'Fat'], ['1', 'Salty'], ['1', 'Sweet']],
+          purpose: 'A fresh, sharp dressing for plain vegetables and noodles.',
+          uses: ['Salads', 'Cold noodles', 'Cucumbers', 'Tofu'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Ginger', 'Scallions or sesame seeds'],
+          substitutions: ['Neutral oil can replace sesame oil; lime can replace rice vinegar.'],
+          sources: [SAUCE_SOURCES.wafu],
+        }),
+        sauceProfile({
+          slug: 'nutty',
+          label: 'Nutty',
+          ratioParts: [['3', 'Nutty / Fat'], ['2', 'Acid'], ['1', 'Salty'], ['½', 'Sweet']],
+          purpose: 'A creamy, rounded dressing with toasted depth.',
+          uses: ['Salads', 'Noodles', 'Steamed vegetables', 'Chicken'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Miso', 'Sesame seeds or ginger'],
+          substitutions: ['Tahini can replace sesame paste; peanut butter makes it fuller and sweeter.'],
+          sources: [SAUCE_SOURCES.goma],
+        }),
+        sauceProfile({
+          slug: 'spicy',
+          label: 'Spicy',
+          ratioParts: [['3', 'Acid'], ['2', 'Salty'], ['1', 'Sweet'], ['1', 'Fat'], ['+', 'Heat']],
+          purpose: 'A lively dressing for cold foods and crunchy vegetables.',
+          uses: ['Cold noodles', 'Slaws', 'Cucumbers', 'Seafood'],
+          ingredientsByRole: SAUCE_INGREDIENTS,
+          optionalAdditions: ['Garlic, ginger, or scallions'],
+          substitutions: ['Chili oil can supply both fat and heat; reduce the separate heat addition.'],
+          sources: [SAUCE_SOURCES.yum, SAUCE_SOURCES.wafu],
+        }),
+      ]),
+    }),
+  ]),
+  classics: Object.freeze([
+    sauceClassic({
+      slug: 'teriyaki',
+      label: 'Teriyaki',
+      ratioParts: [['2', 'Soy'], ['2', 'Sake'], ['2', 'Mirin'], ['1', 'Sugar']],
+      purpose: 'A glossy sweet-savoury glaze with a clean pantry balance.',
+      uses: ['Chicken', 'Salmon', 'Tofu', 'Meatballs'],
+      optionalAdditions: ['Ginger or garlic'],
+      substitutions: ['Dry sherry or water can replace sake; mirin needs extra sugar when replaced with water.'],
+      sources: [SAUCE_SOURCES.teriyaki],
+    }),
+    sauceClassic({
+      slug: 'sesame-goma',
+      label: 'Sesame (Goma)',
+      ratioParts: [['3', 'Sesame paste'], ['2', 'Dashi / water'], ['1', 'Soy'], ['1', 'Vinegar'], ['1', 'Sugar']],
+      purpose: 'A creamy nutty sauce for dipping or dressing.',
+      uses: ['Hot pot', 'Steamed vegetables', 'Tofu', 'Noodles'],
+      optionalAdditions: ['Sesame oil', 'Miso or ginger'],
+      substitutions: ['Tahini can replace sesame paste; water can replace dashi.'],
+      sources: [SAUCE_SOURCES.goma],
+    }),
+    sauceClassic({
+      slug: 'peanut',
+      label: 'Peanut',
+      ratioParts: [['4', 'Peanut'], ['1', 'Acid'], ['1', 'Sweet'], ['¼', 'Salty']],
+      purpose: 'A rich, rounded dip that can be loosened to dress noodles.',
+      uses: ['Satay', 'Spring rolls', 'Vegetables', 'Noodles'],
+      optionalAdditions: ['Coconut milk', 'Chili or curry paste'],
+      substitutions: ['Peanut butter can replace ground peanuts; tamarind can replace lime or vinegar.'],
+      sources: [SAUCE_SOURCES.peanut],
+    }),
+    sauceClassic({
+      slug: 'sweet-sour',
+      label: 'Sweet & Sour',
+      ratioParts: [['3', 'Acid'], ['3', 'Sweet'], ['1', 'Tomato'], ['¼', 'Salty']],
+      purpose: 'A bright, glossy balance for dipping or coating food.',
+      uses: ['Fried food', 'Pork', 'Chicken', 'Tofu', 'Vegetables'],
+      optionalAdditions: ['Ginger', 'Pineapple or chili'],
+      substitutions: ['Ketchup can replace tomato paste; honey can replace sugar.'],
+      sources: [SAUCE_SOURCES.sweetSour],
+    }),
+    sauceClassic({
+      slug: 'vinaigrette',
+      label: 'Vinaigrette',
+      ratioParts: [['3', 'Fat'], ['1', 'Acid']],
+      purpose: 'A classic dressing balance for fresh or roasted foods.',
+      uses: ['Salads', 'Vegetables', 'Beans', 'Grains'],
+      optionalAdditions: ['Mustard', 'Shallot or herbs', 'Honey, salt, and pepper'],
+      substitutions: ['Olive or neutral oil; wine or cider vinegar, or lemon.'],
+      sources: [SAUCE_SOURCES.vinaigrette],
+      review: {
+        contentStatus: 'reviewed',
+        reviewedOn: '2026-07-25',
+        methodology: 'owner-tested-with-reference',
+      },
+    }),
+  ]),
+});
+
 export const CATEGORY_CATALOG = Object.freeze([
   Object.freeze({ slug: 'meat', label: 'Meat', kind: 'meat' }),
   Object.freeze({ slug: 'pasta', label: 'Pasta & Noodles', kind: 'pasta', styles: PASTA_CATALOG[0].styles }),
+  SAUCE_CATALOG,
   Object.freeze({ slug: 'bread', label: 'Bread', kind: 'coming-soon', status: 'coming-soon' }),
   Object.freeze({ slug: 'marinades', label: 'Marinades', kind: 'coming-soon', status: 'coming-soon' }),
-  Object.freeze({ slug: 'sauces', label: 'Sauces', kind: 'coming-soon', status: 'coming-soon' }),
 ]);
