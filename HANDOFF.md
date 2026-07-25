@@ -2,11 +2,13 @@
 
 Updated: 2026-07-25
 
-Execution status: Sauce simplification completed locally on 2026-07-25; no deployment performed.
+Execution status: Pre-live URL and sauce-review cleanup completed locally on 2026-07-25; no deployment performed.
 
 ## Current state
 
 The MVP now includes the independently named meat catalogue, two dry-brine timing bands, dough formulas with separate liquid and salt calculations, reusable sauce-balance cards, labelled ratio displays, and the approved personal support note.
+
+Public page URLs use Cloudflare's clean routes: `/`, `/guides`, and `/about`. Sauce ratios are recorded internally as owner-tested with reference material; meat ratios remain candidate values by design.
 
 Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-constants.pages.dev/>. Amos confirmed that the live page is the current version. The custom domain `kitchenconstants.com` is active through Cloudflare Registrar and SSL is enabled.
 
@@ -44,7 +46,7 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 - `https://kitchenconstants.com` was verified over HTTPS at the default desktop viewport, `390 x 844`, and `320 x 568`; the live calculator had no horizontal overflow or console errors.
 - The live Pasta & Noodles styles, reviewed Lamb Chops targets, and pending Lamb Shoulder state were confirmed on the custom domain.
 - Google Search Console DNS ownership verification succeeded on 2026-07-23, and `https://kitchenconstants.com/sitemap.xml` now reports `Success` with 3 discovered pages.
-- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. Sauce ratios remain candidate content with source URLs and review metadata retained internally. Automated checks and local in-app browser verification pass; no deployment was performed for this redesign.
+- Content polish updated page metadata, the About copy, Guides introduction and headings, calculator helper text, and the support note. Sauce ratios are owner-tested with source URLs and review metadata retained internally. Automated checks and local in-app browser verification pass; no deployment was performed for this redesign.
 - Sauce simplification removed the Builder route state, universal formula, Builder link, and standalone adjustment guide; ratios now use `parts`, a same-measure helper, and wrap-safe visual dividers. No deployment was performed.
 - Rendered culinary reference links were removed from calculator results; source URLs and review metadata remain stored internally. A compact `Leave a tip` link is available in the calculator, Guides, and About footers.
 - Guide 05 now contains the compact sauce-building and mixing guidance; Guides do not render culinary source links or citations.
@@ -56,7 +58,7 @@ Cloudflare Pages is now deployed from the `main` branch at <https://kitchen-cons
 
 ## Remaining product work
 
-1. Source-audit and home-test candidate meat salt ratios before calling them reviewed. The source audit is recorded in `SESSION_UPDATE.md`; home-test results are still required.
+1. Keep meat salt ratios labelled as candidate values; no additional meat review is required for this release.
 2. Keep Bread and Marinades deferred until a later product decision.
 
 ## Sauce guidance execution — 2026-07-25
@@ -133,3 +135,11 @@ Run focused navigation tests, then `node --test`; run `node --check` for every c
 - The live apex currently returns `200` without `Strict-Transport-Security`; `www.kitchenconstants.com` still does not resolve.
 - Cloudflare access is the only remaining blocker. The connected account showed no Kitchen Constants Pages project or DNS zone.
 - On resume: sign into the Cloudflare account that owns the site, configure the proxied `www` record and permanent path/query-preserving redirect, merge/deploy PR #5, enable HSTS at `max-age=2592000` with subdomains/preload off, then verify live headers, redirects, assets, and metadata.
+
+## Pre-live URL and sauce review update — 2026-07-25
+
+- Changed public Guides and About canonicals, Open Graph URLs, and sitemap entries from `.html` paths to `/guides` and `/about`, matching Cloudflare's existing clean-URL behavior. Internal `.html` links remain so local file and static previews continue to work; Cloudflare redirects them once in production.
+- Recorded all sauce profiles and classics as `reviewed` using `owner-tested-with-reference`; ratio values and internal source URLs were unchanged.
+- Meat ratios remain candidate values without an additional review checklist or launch blocker.
+- Cloudflare account changes remain manual. The live apex currently returns `200` with HSTS active; wait for `www` certificate provisioning before checking the final redirect.
+- No push, merge, or deployment was performed for this update.

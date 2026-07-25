@@ -815,3 +815,26 @@ Status: implemented locally on 2026-07-25; no deployment performed.
 ### Gate
 
 Run focused sauce and Guides tests, the complete `node --test` suite, `node --check` for every changed JavaScript file, and `git diff --check`. Verify the default sauce route, Spicy, Sesame (Goma), Vinaigrette, Guides, and the category order at desktop, `390 x 844`, and `320 x 568`. Confirm no horizontal overflow, readable ratio groups, visible `+ Heat`, no rendered culinary citations, and no console errors. Do not commit, publish, or deploy.
+
+## Pre-live URL and sauce review milestone 13
+
+Status: implemented locally on 2026-07-25; Cloudflare work remains manual and no deployment was performed.
+
+### Approved decisions
+
+- Use Cloudflare's clean public URLs: `/`, `/guides`, and `/about`.
+- Treat the user's self-testing confirmation as sufficient owner testing for the existing sauce ratios.
+- Keep meat ratios as candidate values without adding a review checklist or making them a launch blocker.
+- Keep Cloudflare certificate, DNS, redirect, push, merge, and deployment actions outside the agent's scope unless separately authorized.
+
+### Implementation contract
+
+1. Update Guides and About canonical and Open Graph URLs to their clean paths.
+2. Update `sitemap.xml` to the same clean paths; keep physical `.html` links for local file/static-preview compatibility.
+3. Change sauce review metadata to `reviewed`, `2026-07-25`, and `owner-tested-with-reference`; preserve all ratios and hidden source URLs.
+4. Update metadata and sauce tests for clean URLs and owner-tested sauce records.
+5. Reconcile current handoff and session notes without changing historical execution records.
+
+### Gate
+
+Run focused metadata and sauce tests, the complete `node --test` suite, `node --check` for all JavaScript files, `git diff --check`, local-reference and asset smoke checks, and browser verification at desktop, `390 x 844`, and `320 x 568`. Confirm clean local routes, no overflow, no console errors, reviewed sauce metadata, unchanged meat candidate values, and no deployment activity.

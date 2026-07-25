@@ -437,7 +437,7 @@ function renderHeader() {
           <span class="brand-name">Kitchen Constants</span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
-          <a href="./index.html">Calculator</a>
+          <a href="./">Calculator</a>
           <a href="./guides.html">Guides</a>
           <a href="./about.html">About</a>
         </nav>

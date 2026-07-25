@@ -12,11 +12,11 @@ const pages = [
   },
   {
     file: 'guides.html',
-    canonical: 'https://kitchenconstants.com/guides.html',
+    canonical: 'https://kitchenconstants.com/guides',
   },
   {
     file: 'about.html',
-    canonical: 'https://kitchenconstants.com/about.html',
+    canonical: 'https://kitchenconstants.com/about',
   },
 ];
 
@@ -110,4 +110,21 @@ test('Guides keeps sauce guidance short, ordered, and citation-free', () => {
   assert.match(html, /Add delicate fresh herbs last/);
   assert.match(html, /Pure salt sits outside the parts/);
   assert.doesNotMatch(html, /thewoksoflife|escoffier|justonecookbook|hot-thai-kitchen/i);
+});
+
+test('public navigation and sitemap use clean page URLs', () => {
+  for (const file of ['guides.html', 'about.html']) {
+    const html = readPage(file);
+    assert.match(html, /href="\.\/guides\.html"/);
+    assert.match(html, /href="\.\/about\.html"/);
+  }
+
+  const app = fs.readFileSync(path.join(root, 'src/app.js'), 'utf8');
+  assert.match(app, /href="\.\/guides\.html"/);
+  assert.match(app, /href="\.\/about\.html"/);
+
+  const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
+  assert.match(sitemap, /https:\/\/kitchenconstants\.com\/guides/);
+  assert.match(sitemap, /https:\/\/kitchenconstants\.com\/about/);
+  assert.doesNotMatch(sitemap, /(?:guides|about)\.html/);
 });

@@ -127,3 +127,10 @@ Date: 2026-07-23
 - Added Guide 05, “Build a sauce,” before dough hydration and dough salt. It includes concise guidance for dissolving salt and sugar in watery ingredients, mixing dried spices or chilli into oil, and adding delicate fresh herbs last.
 - Pure salt remains outside the equal-parts ratio and is presented as a pinch, dissolve, taste, and repeat adjustment.
 - Public pages render no culinary source links or citations; internal sauce source metadata remains preserved.
+
+## Pre-live URL and sauce review cleanup - 2026-07-25
+
+- Updated Guides and About canonical URLs, Open Graph URLs, and sitemap entries to `/guides` and `/about`, matching the clean URLs already served by Cloudflare. Kept internal `.html` links for local file and static-preview compatibility.
+- Recorded every sauce profile and classic as `reviewed` with `owner-tested-with-reference` metadata, based on Amos's self-testing confirmation; numeric ratios and internal source URLs were preserved.
+- Left meat ratio statuses unchanged as candidate values; no extra internal checklist was added.
+- Cloudflare certificate and redirect work remains manual. No push, merge, or deployment was performed.

@@ -210,7 +210,7 @@ test('sauce routes default and canonicalize every downstream choice', () => {
   assert.equal(classicIndex.hash, '#/sauces/classics/teriyaki');
 });
 
-test('sauce view models expose ratios, uses, substitutions, and candidate sources', () => {
+test('sauce view models expose reviewed ratios, uses, substitutions, and sources', () => {
   const profile = getSinglePageViewModel(resolveSelection(parseRoute('#/sauces/stir-fry/balanced')));
   assert.equal(profile.module, 'sauce');
   assert.deepEqual(profile.sauce.ratioParts.map((part) => `${part.value} ${part.label}`), [
@@ -218,13 +218,29 @@ test('sauce view models expose ratios, uses, substitutions, and candidate source
   ]);
   assert.ok(profile.sauce.uses.length > 0);
   assert.ok(profile.sauce.substitutions.length > 0);
-  assert.equal(profile.sauce.contentStatus, 'candidate');
-  assert.equal(profile.sauce.reviewedOn, '2026-07-24');
+  assert.equal(profile.sauce.contentStatus, 'reviewed');
+  assert.equal(profile.sauce.reviewedOn, '2026-07-25');
+  assert.equal(profile.sauce.methodology, 'owner-tested-with-reference');
   assert.ok(profile.sauce.sources.length > 0);
 
   const classic = getSinglePageViewModel(resolveSelection(parseRoute('#/sauces/classics/peanut')));
   assert.equal(classic.classic.label, 'Peanut');
   assert.equal(classic.sauce.ratioParts.at(-1).label, 'Salty');
+});
+
+test('all sauce ratios carry owner-tested review metadata', () => {
+  const sauces = [
+    ...SAUCE_CATALOG.directions.flatMap((direction) => direction.profiles),
+    ...SAUCE_CATALOG.classics,
+  ];
+
+  assert.ok(sauces.length > 0);
+  for (const sauce of sauces) {
+    assert.equal(sauce.contentStatus, 'reviewed', sauce.slug);
+    assert.equal(sauce.reviewedOn, '2026-07-25', sauce.slug);
+    assert.equal(sauce.methodology, 'owner-tested-with-reference', sauce.slug);
+    assert.ok(sauce.sources.length > 0, sauce.slug);
+  }
 });
 
 test('vinaigrette is a reviewed classic with a chef-style balance', () => {

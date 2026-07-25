@@ -60,7 +60,13 @@ All dough inputs default to `100 g` flour. Pasta cooking-water salt is deliberat
 
 ## Content status
 
-Meat salt ratios remain candidate values and should be independently audited and home-tested before being described as reviewed. Beef ribs, Pork ribs, and Lamb shoulder still have pending internal-temperature guidance because their tender endpoint depends on preparation method.
+Meat salt ratios remain candidate values by design. Beef ribs, Pork ribs, and Lamb shoulder still have pending internal-temperature guidance because their tender endpoint depends on preparation method.
+
+Sauce ratios are recorded internally as owner-tested with reference material. Their numeric values and hidden source metadata are unchanged.
+
+## Pre-live URL update
+
+Public canonical page URLs are `/`, `/guides`, and `/about`. The repository metadata and sitemap use these clean URLs; internal `.html` links remain for local file and static-preview compatibility and redirect once on Cloudflare.
 
 ## Sauce guidance update — 2026-07-25
 

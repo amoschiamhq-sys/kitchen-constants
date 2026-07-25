@@ -351,9 +351,9 @@ const SAUCE_SOURCES = Object.freeze({
 });
 
 const SAUCE_REVIEW = Object.freeze({
-  contentStatus: 'candidate',
-  reviewedOn: '2026-07-24',
-  methodology: 'source-backed-candidate-and-home-testing',
+  contentStatus: 'reviewed',
+  reviewedOn: '2026-07-25',
+  methodology: 'owner-tested-with-reference',
 });
 
 function sauceRatioParts(parts) {
