@@ -2,6 +2,15 @@
 
 Date: 2026-07-25
 
+## Milestone 21 release verification
+
+- Published the approved M15–M20 scope through launch branch `agent/m21-seo-reference-pages` and PR #8. Commit `167f0e6` merged into `main` as `2bb8cf7`.
+- Local release gates pass: 10 focused metadata tests, 65 total tests, JavaScript syntax checks, and `git diff --check`.
+- Production apex verification passes for all seven clean URLs, matching canonicals, one H1 per page, structured data, public `robots.txt`, the seven-URL sitemap, HSTS on HTML responses, and calculator/reference-page links.
+- Production browser checks pass at desktop, 390×844, and 320×568. The desktop ratio number/subtitle overlap is corrected; mobile remains clean and console-free.
+- `www.kitchenconstants.com` has a working HTTP 301 to the apex but currently fails the HTTPS handshake. PageSpeed returned HTTP 429, so no score is claimed. Search Console was not changed.
+- M21 is published but remains open for those two external verification exceptions.
+
 ## MVP execution
 
 - Replaced the inherited visible meat taxonomy with independently named choices.
