@@ -1,7 +1,12 @@
-import { CATEGORY_CATALOG, MEAT_CATALOG } from './constants.js';
-import { calculateDoughRatio, calculateDryBrine, parseWeight } from './calculator.js';
+import { CATEGORY_CATALOG, MEAT_CATALOG } from './constants.js?v=20260725-bread';
+import { calculateDoughRatio, calculateDryBrine, parseWeight } from './calculator.js?v=20260725-bread';
 
 const LEGACY_PREPARATION_SLUGS = new Set(['dry-brine', 'internal-temperature']);
+const DOUGH_CATEGORY_KINDS = new Set(['pasta', 'bread']);
+
+function isDoughCategory(category) {
+  return DOUGH_CATEGORY_KINDS.has(category?.kind);
+}
 
 function findMeat(slug) {
   return MEAT_CATALOG.find((meat) => meat.slug === slug);
@@ -11,8 +16,8 @@ function findCategory(slug) {
   return CATEGORY_CATALOG.find((category) => category.slug === slug);
 }
 
-function findPastaStyle(category, slug) {
-  return category?.kind === 'pasta'
+function findDoughStyle(category, slug) {
+  return isDoughCategory(category)
     ? category.styles.find((style) => style.slug === slug)
     : undefined;
 }
@@ -63,7 +68,7 @@ function route(kind, fields = {}) {
 }
 
 export function routeToHash({ category, style, direction, profile, classic, meat, type, detail, variant, doneness } = {}) {
-  if (category?.kind === 'pasta') {
+  if (isDoughCategory(category)) {
     return `#/${category.slug}/${(style ?? category.styles[0]).slug}`;
   }
   if (category?.kind === 'sauce') {
@@ -91,11 +96,11 @@ export function parseRoute(hash = '#/') {
   if (segments.length === 0) return route('home', { legacyPreparation });
 
   const category = findCategory(segments[0]);
-  if (category?.kind === 'pasta') {
+  if (isDoughCategory(category)) {
     if (segments.length === 1) return route('category', { category, legacyPreparation });
     if (segments.length !== 2) return route('not-found');
-    const style = findPastaStyle(category, segments[1]);
-    return style ? route('pasta-style', { category, style, legacyPreparation }) : route('not-found');
+    const style = findDoughStyle(category, segments[1]);
+    return style ? route(`${category.kind}-style`, { category, style, legacyPreparation }) : route('not-found');
   }
 
   if (category?.kind === 'sauce') {
@@ -147,7 +152,7 @@ export function parseRoute(hash = '#/') {
 }
 
 export function selectionKey(selection) {
-  if (selection?.category?.kind === 'pasta') {
+  if (isDoughCategory(selection?.category)) {
     return [selection.category.slug, selection.style?.slug].filter(Boolean).join('/');
   }
   if (selection?.category?.kind === 'sauce') {
@@ -165,7 +170,7 @@ export function selectionKey(selection) {
 }
 
 export function canonicalSelectionHash(selection) {
-  if (selection?.category?.kind === 'pasta' && selection.style) {
+  if (isDoughCategory(selection?.category) && selection.style) {
     return routeToHash(selection);
   }
   if (selection?.category?.kind === 'sauce' && (selection.profile || selection.classic)) {
@@ -180,11 +185,11 @@ export function canonicalSelectionHash(selection) {
 export function resolveSelection(currentRoute) {
   if (!currentRoute || currentRoute.kind === 'not-found') return null;
 
-  if (currentRoute.category?.kind === 'pasta') {
+  if (isDoughCategory(currentRoute.category)) {
     const category = currentRoute.category;
     const style = currentRoute.style ?? category.styles[0];
     const resolved = {
-      kind: 'pasta-resolved',
+      kind: `${currentRoute.category.kind}-resolved`,
       category,
       style,
       selectionComplete: true,
@@ -269,11 +274,11 @@ export function getRouteChoices(currentRoute) {
     }));
   }
 
-  if (currentRoute.kind === 'category' && currentRoute.category?.kind === 'pasta') {
+  if (currentRoute.kind === 'category' && isDoughCategory(currentRoute.category)) {
     return currentRoute.category.styles.map((style) => ({
       kind: 'active',
       label: style.label,
-      href: resolveSelection(route('pasta-style', {
+      href: resolveSelection(route(`${currentRoute.category.kind}-style`, {
         category: currentRoute.category,
         style,
       })).hash,
@@ -391,16 +396,22 @@ export function getSinglePageViewModel(selection, rawWeight = '') {
   const resolved = selection?.selectionComplete ? selection : resolveSelection(selection);
   const weight = parseWeight(rawWeight);
 
-  if (resolved?.category?.kind === 'pasta') {
+  if (isDoughCategory(resolved?.category)) {
     const dough = resolved.style && weight.status === 'valid'
       ? calculateDoughRatio(weight.grams, {
         hydration: resolved.style.hydration,
         salt: resolved.style.saltPercent,
+        leaven: resolved.style.leavenPercent,
+        extras: resolved.style.extraParts?.map((part) => ({
+          slug: part.slug,
+          label: part.label,
+          percentage: part.percentage,
+        })),
       })
       : null;
     return {
       selectionComplete: Boolean(resolved),
-      module: 'pasta',
+      module: resolved.category.kind,
       style: resolved.style,
       weight,
       dough,

@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, dough hydration and sauce balance.">
+    <meta name="description" content="Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, bread ratios, dough hydration and sauce balance.">
     <link rel="canonical" href="https://kitchenconstants.com/guides">
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="./assets/favicon-32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
-    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/main.css?v=20260725-bread">
     <meta property="og:title" content="Cooking Guides | Kitchen Constants">
-    <meta property="og:description" content="Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, dough hydration and sauce balance.">
+    <meta property="og:description" content="Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, bread ratios, dough hydration and sauce balance.">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Kitchen Constants">
     <meta property="og:url" content="https://kitchenconstants.com/guides">
@@ -21,11 +21,25 @@
     <meta property="og:image:alt" content="Kitchen Constants — Measure twice. Season once.">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Cooking Guides | Kitchen Constants">
-    <meta name="twitter:description" content="Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, dough hydration and sauce balance.">
+    <meta name="twitter:description" content="Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, bread ratios, dough hydration and sauce balance.">
     <meta name="twitter:image" content="https://kitchenconstants.com/assets/kitchen-constants-social.png">
     <meta name="twitter:image:alt" content="Kitchen Constants — Measure twice. Season once.">
     <meta name="theme-color" content="#F1EEE6">
     <title>Cooking Guides | Kitchen Constants</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Cooking Guides | Kitchen Constants",
+        "url": "https://kitchenconstants.com/guides",
+        "description": "Short, practical guides to dry brining, meat temperatures, salt percentages, pasta dough, bread ratios, dough hydration and sauce balance.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Kitchen Constants",
+          "url": "https://kitchenconstants.com/"
+        }
+      }
+    </script>
   </head>
   <body class="content-page">
     <header class="site-header">
@@ -48,55 +62,89 @@
       <h1>Good cooking, with fewer guesses</h1>
       <p class="content-lede">A few useful principles sit behind the numbers in Kitchen Constants. They are here to make cooking clearer, not to turn dinner into homework.</p>
 
-      <div class="guide-list">
-        <article class="guide-card" id="methodology">
-          <p class="card-kicker">01</p>
-          <h2>How we choose the numbers</h2>
-          <p>Kitchen Constants treats a ratio as a useful starting point, not a law of nature. Values are compared across culinary references, recipe practice and home testing. Community discussions are useful for spotting common failures, but they are not the only evidence.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> keep the scale nearby, adjust for salty ingredients already in the dish, and treat the first batch as feedback.</p>
-        </article>
+      <nav class="guide-jump" aria-label="Guide topics">
+        <a href="#foundations">Foundations</a>
+        <a href="#meat-guides">Meat</a>
+        <a href="#sauce-guides">Sauces</a>
+        <a href="#dough-guides">Dough &amp; bread</a>
+      </nav>
 
-        <article class="guide-card" id="dry-brining">
-          <p class="card-kicker">02</p>
-          <h2>What is dry brining?</h2>
-          <p>Dry brining means salting meat ahead of cooking, without adding water. Salt first draws moisture to the surface, then the seasoned liquid is gradually reabsorbed. The result is more even seasoning, better browning and meat that holds onto its juices more effectively.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> use the minimum time when dinner is close and the best time when you can plan ahead. Leave the meat uncovered in the refrigerator so the surface dries.</p>
-        </article>
+      <section class="guide-card" aria-labelledby="reference-pages-heading">
+        <p class="card-kicker">Reference pages</p>
+        <h2 id="reference-pages-heading">Go deeper when you need the principle</h2>
+        <p>These short pages explain the ideas behind the calculator and link back to a useful starting state.</p>
+        <nav class="guide-jump" aria-label="Reference pages">
+          <a href="./dry-brining.html">Dry-brining by weight</a>
+          <a href="./meat-temperatures.html">Meat temperatures</a>
+          <a href="./dough-ratios.html">Dough &amp; bread ratios</a>
+          <a href="./sauce-ratios.html">Sauce ratios</a>
+        </nav>
+      </section>
 
-        <article class="guide-card" id="salt-percentages">
-          <p class="card-kicker">03</p>
-          <h2>Why salt percentages work</h2>
-          <p>A percentage scales with the size of the piece. That is more reliable than a teaspoon because the same spoonful can be far too much for a small chop and barely enough for a large roast.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> weigh the meat, multiply by the salt percentage, and measure the result in grams.</p>
-        </article>
+      <div class="guide-groups">
+        <section class="guide-group" id="foundations" aria-labelledby="foundations-heading">
+          <h2 id="foundations-heading">Foundations</h2>
+          <article class="guide-card" id="methodology">
+            <p class="card-kicker">01</p>
+            <h3>How we choose the numbers</h3>
+            <p>Kitchen Constants treats a ratio as a useful starting point, not a law of nature. Values are compared across culinary references, recipe practice and home testing. Community discussions are useful for spotting common failures, but they are not the only evidence.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> keep the scale nearby, adjust for salty ingredients already in the dish, and treat the first batch as feedback.</p>
+          </article>
+          <article class="guide-card" id="salt-percentages">
+            <p class="card-kicker">02</p>
+            <h3>Why salt percentages work</h3>
+            <p>A percentage scales with the size of the piece. That is more reliable than a teaspoon because the same spoonful can be far too much for a small chop and barely enough for a large roast.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> weigh the meat, multiply by the salt percentage, and measure the result in grams.</p>
+          </article>
+        </section>
 
-        <article class="guide-card" id="temperature">
-          <p class="card-kicker">04</p>
-          <h2>Why temperature beats the clock</h2>
-          <p>Ovens, pans, cuts and starting temperatures vary. Internal temperature tells you what the meat is actually doing, while time is only an estimate.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> use the chef target for the texture you want, then keep the food-safety baseline visible as separate context.</p>
-        </article>
+        <section class="guide-group" id="meat-guides" aria-labelledby="meat-guides-heading">
+          <h2 id="meat-guides-heading">Meat</h2>
+          <article class="guide-card" id="dry-brining">
+            <p class="card-kicker">03</p>
+            <h3>What is dry brining?</h3>
+            <p>Dry brining means salting meat ahead of cooking, without adding water. Salt first draws moisture to the surface, then the seasoned liquid is gradually reabsorbed. The result is more even seasoning, better browning and meat that holds onto its juices more effectively.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> use the minimum time when dinner is close and the best time when you can plan ahead. Leave the meat uncovered in the refrigerator so the surface dries.</p>
+          </article>
+          <article class="guide-card" id="temperature">
+            <p class="card-kicker">04</p>
+            <h3>Why temperature beats the clock</h3>
+            <p>Ovens, pans, cuts and starting temperatures vary. Internal temperature tells you what the meat is actually doing, while time is only an estimate.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> use the chef target for the texture you want, then keep the food-safety baseline visible as separate context.</p>
+          </article>
+        </section>
 
-        <article class="guide-card" id="sauce-builder">
-          <p class="card-kicker">05</p>
-          <h2>Build a sauce</h2>
-          <p>Start with a balance of salty, sweet, acid and umami. Add fat for body, then use heat and aromatics to move the flavour where you want it. Ratios are starting points: taste, then adjust. Pure salt sits outside the parts: add a pinch, dissolve, taste, and repeat.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> dissolve salt and sugar in the watery ingredients first. Mix dried spices or chilli into the oil. Add delicate fresh herbs last, then whisk or shake everything together. <span class="guide-inline-link"><a href="./index.html#/sauces">Open the sauce reference</a></span></p>
-        </article>
+        <section class="guide-group" id="sauce-guides" aria-labelledby="sauce-guides-heading">
+          <h2 id="sauce-guides-heading">Sauces</h2>
+          <article class="guide-card" id="sauce-builder">
+            <p class="card-kicker">05</p>
+            <h3>Build a sauce</h3>
+            <p>Start with a balance of salty, sweet, acid and umami. Add fat for body, then use heat and aromatics to move the flavour where you want it. Ratios are starting points: taste, then adjust. Pure salt sits outside the parts: add a pinch, dissolve, taste, and repeat.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> dissolve salt and sugar in the watery ingredients first. Mix dried spices or chilli into the oil. Add delicate fresh herbs last, then whisk or shake everything together. <span class="guide-inline-link"><a href="./index.html#/sauces">Open the sauce reference</a></span></p>
+          </article>
+        </section>
 
-        <article class="guide-card" id="dough-ratios">
-          <p class="card-kicker">06</p>
-          <h2>How dough hydration works</h2>
-          <p>Hydration is the liquid weight expressed as a percentage of flour weight. It lets a dough scale without turning a recipe into a list of cups. Lower hydration usually gives a firmer, chewier dough; higher hydration makes a softer dough that may need more handling care.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> weigh the flour first, add the calculated liquid gradually, and hold back a little if your flour is already behaving softly.</p>
-        </article>
-
-        <article class="guide-card" id="dough-salt">
-          <p class="card-kicker">07</p>
-          <h2>Why dough has its own salt ratio</h2>
-          <p>Salt in a dough is separate from hydration. Flour stays at 100%, while water, egg and salt are each scaled from the flour weight. The salt is part of the dough's texture and flavour, not pasta cooking water.</p>
-          <p class="guide-takeaway"><strong>In practice:</strong> weigh the flour, then add the calculated liquid and salt. Treat the displayed values as a useful starting point for the specific dough style.</p>
-        </article>
+        <section class="guide-group" id="dough-guides" aria-labelledby="dough-guides-heading">
+          <h2 id="dough-guides-heading">Dough &amp; bread</h2>
+          <article class="guide-card" id="dough-ratios">
+            <p class="card-kicker">06</p>
+            <h3>How dough hydration works</h3>
+            <p>Hydration is the liquid weight expressed as a percentage of flour weight. It lets a dough scale without turning a recipe into a list of cups. Lower hydration usually gives a firmer, chewier dough; higher hydration makes a softer dough that may need more handling care.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> weigh the flour first, add the calculated liquid gradually, and hold back a little if your flour is already behaving softly.</p>
+          </article>
+          <article class="guide-card" id="dough-salt">
+            <p class="card-kicker">07</p>
+            <h3>Why dough has its own salt ratio</h3>
+            <p>Salt in a dough is separate from hydration. Flour stays at 100%, while water, egg, salt and leavening are each scaled from the flour weight. The salt is part of the dough's texture and flavour, not pasta cooking water.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> weigh the flour, then add the calculated liquid and salt. Treat the displayed values as a useful starting point for the specific dough style.</p>
+          </article>
+          <article class="guide-card" id="bread-ratios">
+            <p class="card-kicker">08</p>
+            <h3>How bread ratios stay useful</h3>
+            <p>Bread uses flour as 100% and describes water, salt and leavening against that weight. Hydration changes how soft and extensible the dough feels; salt usually sits near 2%; yeast or starter changes with fermentation time, temperature and the strength of the flour.</p>
+            <p class="guide-takeaway"><strong>In practice:</strong> use the selected bread style as a starting point, then adjust water in small steps when the dough feels too stiff or slack. A ratio is a map for the dough, not a promise of an identical loaf.</p>
+          </article>
+        </section>
       </div>
 
       <p class="content-back"><a href="./index.html">Back to the calculator</a></p>

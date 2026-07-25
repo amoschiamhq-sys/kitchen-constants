@@ -63,20 +63,47 @@ export function calculateDoughRatio(flourWeightGrams, formula) {
 
   const hydrationPercent = typeof formula === 'number' ? formula : formula?.hydration;
   const saltPercent = typeof formula === 'number' ? 0 : formula?.salt ?? 0;
+  const leavenPercent = typeof formula === 'number' ? undefined : formula?.leaven;
+  const extraParts = typeof formula === 'number' ? undefined : formula?.extras;
   if (!Number.isFinite(hydrationPercent) || hydrationPercent < 0) {
     throw new CalculationInputError('Hydration must be a finite non-negative number.');
   }
   if (!Number.isFinite(saltPercent) || saltPercent < 0) {
     throw new CalculationInputError('Salt percentage must be a finite non-negative number.');
   }
+  if (leavenPercent !== undefined && (!Number.isFinite(leavenPercent) || leavenPercent < 0)) {
+    throw new CalculationInputError('Leaven percentage must be a finite non-negative number.');
+  }
+  if (extraParts !== undefined && !Array.isArray(extraParts)) {
+    throw new CalculationInputError('Extra parts must be an array.');
+  }
+  const extras = extraParts?.map((part) => {
+    if (!part || typeof part.slug !== 'string' || part.slug.trim() === ''
+      || typeof part.label !== 'string' || part.label.trim() === ''
+      || !Number.isFinite(part.percentage) || part.percentage < 0) {
+      throw new CalculationInputError('Extra parts require a label and finite non-negative percentage.');
+    }
+    return {
+      slug: part.slug,
+      label: part.label,
+      percentage: part.percentage,
+      grams: normalizeCalculation(flourWeightGrams * part.percentage / 100),
+    };
+  });
 
-  return {
+  const result = {
     flour: normalizeCalculation(flourWeightGrams),
     liquid: normalizeCalculation(flourWeightGrams * hydrationPercent / 100),
     salt: normalizeCalculation(flourWeightGrams * saltPercent / 100),
     hydration: hydrationPercent,
     saltPercent,
   };
+  if (leavenPercent !== undefined) {
+    result.leaven = normalizeCalculation(flourWeightGrams * leavenPercent / 100);
+    result.leavenPercent = leavenPercent;
+  }
+  if (extras !== undefined) result.extras = extras;
+  return result;
 }
 
 function normalizeCalculation(value) {

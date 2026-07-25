@@ -93,9 +93,53 @@ test('calculateDoughRatio scales liquid and salt from flour weight', () => {
   });
 });
 
+test('calculateDoughRatio scales an optional leaven percentage', () => {
+  assert.deepEqual(calculateDoughRatio(500, { hydration: 66, salt: 2, leaven: 1.2 }), {
+    flour: 500,
+    liquid: 330,
+    salt: 10,
+    hydration: 66,
+    saltPercent: 2,
+    leaven: 6,
+    leavenPercent: 1.2,
+  });
+});
+
+test('calculateDoughRatio scales ordered optional extras', () => {
+  assert.deepEqual(calculateDoughRatio(500, {
+    hydration: 75,
+    salt: 2,
+    leaven: 1,
+    extras: [
+      { slug: 'olive-oil', label: 'Olive oil', percentage: 5 },
+      { slug: 'sugar', label: 'Sugar', percentage: 3 },
+    ],
+  }), {
+    flour: 500,
+    liquid: 375,
+    salt: 10,
+    hydration: 75,
+    saltPercent: 2,
+    leaven: 5,
+    leavenPercent: 1,
+    extras: [
+      { slug: 'olive-oil', label: 'Olive oil', percentage: 5, grams: 25 },
+      { slug: 'sugar', label: 'Sugar', percentage: 3, grams: 15 },
+    ],
+  });
+});
+
 test('calculateDoughRatio rejects invalid programmer preconditions', () => {
   assert.throws(() => calculateDoughRatio(0, 50), CalculationInputError);
   assert.throws(() => calculateDoughRatio(100, -1), CalculationInputError);
+  assert.throws(() => calculateDoughRatio(100, {
+    hydration: 50,
+    extras: [{ slug: 'oil', label: 'Oil', percentage: -1 }],
+  }), CalculationInputError);
+  assert.throws(() => calculateDoughRatio(100, {
+    hydration: 50,
+    extras: [{ slug: 'oil', label: 'Oil' }],
+  }), CalculationInputError);
 });
 
 test('formatGrams always emits one decimal place', () => {
