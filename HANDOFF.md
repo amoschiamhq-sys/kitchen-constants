@@ -2,6 +2,12 @@
 
 Updated: 2026-07-25
 
+## Current M21 release status
+
+Milestones 15–20 are complete. Milestone 21 is published to production with two external verification exceptions recorded below.
+
+Production release: PR #8 merged into `main` at `2bb8cf7` on 2026-07-25. The apex domain serves the release and all seven clean URLs return `200`. The `www` hostname still fails its HTTPS handshake even though plain HTTP redirects to the apex; PageSpeed returned `429 Too Many Requests`; Search Console was not changed.
+
 Execution status: Milestones 15–20 completed locally on 2026-07-25; no deployment performed.
 
 ## Current state
@@ -251,4 +257,13 @@ Run focused navigation tests, then `node --test`; run `node --check` for every c
 - Browser verification passed for all four pages at desktop, `390 × 844`, and `320 × 568`; each has one H1, no actual body overflow, and no console errors. All four calculator CTAs opened the intended canonical hash states.
 - Guides discovery links are present and both `.guide-jump` groups remain `position: static`; keyboard-visible page structure and existing focus contracts were preserved.
 - No commit, publish, deployment, sitemap submission, or Search Console mutation was performed.
+
+## Milestone 21 release execution - 2026-07-25
+
+- Re-ran the release gates before publishing: focused metadata tests pass (10), the full suite passes (65), all `src/` and `tests/` JavaScript files pass `node --check`, and `git diff --check` passes.
+- Created launch branch `agent/m21-seo-reference-pages`, committed the approved scope as `167f0e6`, pushed it, opened PR #8, passed the Cloudflare Pages check, and merged it into `main` as `2bb8cf7`.
+- Verified production at `https://kitchenconstants.com`: `/`, `/guides`, `/about`, `/dry-brining`, `/meat-temperatures`, `/dough-ratios`, and `/sauce-ratios` all return `200`; the seven pages have matching clean canonicals, one H1, and structured data. `robots.txt` and the seven-URL sitemap are publicly fetchable, and HTML responses include HSTS.
+- Production browser checks passed at desktop, `390 x 844`, and `320 x 568`. The desktop ratio number/subtitle rows do not overlap; the calculator has no horizontal overflow, the reference page has one H1 and a visible `By Amos Chiam` byline, and console logs are clean.
+- External exceptions: `https://www.kitchenconstants.com/` could not complete a TLS handshake; `http://www.kitchenconstants.com/` returns the expected `301` to the apex. The public PageSpeed API returned `429 Too Many Requests`, so no lab score is recorded. Search Console was not inspected or mutated in this execution.
+- M21 remains open only for the `www` certificate/redirect verification and a repeatable PageSpeed/Lighthouse run.
 - Milestone 21 is next and requires explicit authorization because it changes external state.
