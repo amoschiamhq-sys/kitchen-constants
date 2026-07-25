@@ -20,9 +20,6 @@ const SOURCE_RATIOS = Object.freeze({
   porkGround: sourceRatio(1.25),
   lambBoneless: sourceRatio(1),
   lambBoneIn: sourceRatio(0.9),
-  scallops: sourceRatio(0.9),
-  shrimp: sourceRatio(0.65),
-  fish: sourceRatio(0.75),
 });
 
 const CHEF_TEMPERATURE_SOURCE = 'https://blog.thermoworks.com/chef-recommended-tw-approved/';
@@ -30,63 +27,57 @@ const USDA_TEMPERATURE_SOURCE = 'https://www.fsis.usda.gov/food-safety/safe-food
 
 const CHEF_TEMPERATURES = Object.freeze({
   chickenWhole: Object.freeze({
-    target: '165\u00b0F / 74\u00b0C',
-    note: 'Check the thickest part of the breast and thigh. Dark meat is often more tender at 170\u2013175\u00b0F / 77\u201379\u00b0C.',
-    safety: 'USDA minimum: 165\u00b0F / 74\u00b0C for all poultry.',
+    target: '74\u00b0C / 165\u00b0F',
+    note: 'Check the thickest part of the breast and thigh. Dark meat is often more tender at 77\u201379\u00b0C / 170\u2013175\u00b0F.',
+    safety: 'USDA minimum: 74\u00b0C / 165\u00b0F for all poultry.',
   }),
   chickenBreast: Object.freeze({
-    target: '165\u00b0F / 74\u00b0C',
+    target: '74\u00b0C / 165\u00b0F',
     note: 'Check the thickest part of the breast with the probe centered in the meat.',
-    safety: 'USDA minimum: 165\u00b0F / 74\u00b0C for all poultry.',
+    safety: 'USDA minimum: 74\u00b0C / 165\u00b0F for all poultry.',
   }),
   chickenThigh: Object.freeze({
-    target: '170\u2013175\u00b0F / 77\u201379\u00b0C',
+    target: '77\u201379\u00b0C / 170\u2013175\u00b0F',
     note: 'Dark meat is more tender in this range as connective tissue softens.',
-    safety: 'USDA minimum: 165\u00b0F / 74\u00b0C for all poultry.',
+    safety: 'USDA minimum: 74\u00b0C / 165\u00b0F for all poultry.',
   }),
   beefMediumRare: Object.freeze({
-    target: '130\u2013135\u00b0F / 54\u201357\u00b0C',
-    note: 'Pull about 5\u201310\u00b0F / 2\u20135\u00b0C early and let the meat rise while resting.',
-    safety: 'USDA whole-cut baseline: 145\u00b0F / 63\u00b0C with at least 3 minutes of rest.',
+    target: '54\u201357\u00b0C / 130\u2013135\u00b0F',
+    note: 'Pull about 2\u20135\u00b0C / 5\u201310\u00b0F early and let the meat rise while resting.',
+    safety: 'USDA whole-cut baseline: 63\u00b0C / 145\u00b0F with at least 3 minutes of rest.',
   }),
   beefMedium: Object.freeze({
-    target: '135\u2013145\u00b0F / 57\u201363\u00b0C',
-    note: 'Pull about 5\u201310\u00b0F / 2\u20135\u00b0C early and let the meat rise while resting.',
-    safety: 'USDA whole-cut baseline: 145\u00b0F / 63\u00b0C with at least 3 minutes of rest.',
+    target: '57\u201363\u00b0C / 135\u2013145\u00b0F',
+    note: 'Pull about 2\u20135\u00b0C / 5\u201310\u00b0F early and let the meat rise while resting.',
+    safety: 'USDA whole-cut baseline: 63\u00b0C / 145\u00b0F with at least 3 minutes of rest.',
   }),
   lambMediumRare: Object.freeze({
-    target: '130\u2013135\u00b0F / 54\u201357\u00b0C',
-    note: 'Pull about 5\u00b0F / 2\u00b0C early for chops and 10\u201312\u00b0F / 5\u20136\u00b0C early for larger roasts, then rest to the target.',
-    safety: 'USDA whole-cut baseline: 145\u00b0F / 63\u00b0C with at least 3 minutes of rest.',
+    target: '54\u201357\u00b0C / 130\u2013135\u00b0F',
+    note: 'Pull about 2\u00b0C / 5\u00b0F early for chops and 5\u20136\u00b0C / 10\u201312\u00b0F early for larger roasts, then rest to the target.',
+    safety: 'USDA whole-cut baseline: 63\u00b0C / 145\u00b0F with at least 3 minutes of rest.',
     reviewedOn: '2026-07-23',
   }),
   lambMedium: Object.freeze({
-    target: '135\u2013145\u00b0F / 57\u201363\u00b0C',
-    note: 'Pull about 5\u00b0F / 2\u00b0C early for chops and 10\u201312\u00b0F / 5\u20136\u00b0C early for larger roasts, then rest to the target.',
-    safety: 'USDA whole-cut baseline: 145\u00b0F / 63\u00b0C with at least 3 minutes of rest.',
+    target: '57\u201363\u00b0C / 135\u2013145\u00b0F',
+    note: 'Pull about 2\u00b0C / 5\u00b0F early for chops and 5\u20136\u00b0C / 10\u201312\u00b0F early for larger roasts, then rest to the target.',
+    safety: 'USDA whole-cut baseline: 63\u00b0C / 145\u00b0F with at least 3 minutes of rest.',
     reviewedOn: '2026-07-23',
   }),
   pork: Object.freeze({
-    target: '145\u00b0F / 63\u00b0C',
+    target: '63\u00b0C / 145\u00b0F',
     note: 'Rest for at least 3 minutes before slicing.',
-    safety: 'USDA minimum: 145\u00b0F / 63\u00b0C with at least 3 minutes of rest.',
+    safety: 'USDA minimum: 63\u00b0C / 145\u00b0F with at least 3 minutes of rest.',
   }),
   groundPoultry: Object.freeze({
-    target: '165\u00b0F / 74\u00b0C',
+    target: '74\u00b0C / 165\u00b0F',
     note: 'Check the center of the thickest part with a food thermometer.',
-    safety: 'USDA minimum: 165\u00b0F / 74\u00b0C for ground poultry.',
+    safety: 'USDA minimum: 74\u00b0C / 165\u00b0F for ground poultry.',
     source: USDA_TEMPERATURE_SOURCE,
   }),
   groundMeat: Object.freeze({
-    target: '160\u00b0F / 71\u00b0C',
+    target: '71\u00b0C / 160\u00b0F',
     note: 'Check the center of the thickest part with a food thermometer.',
-    safety: 'USDA minimum: 160\u00b0F / 71\u00b0C for ground beef and pork.',
-    source: USDA_TEMPERATURE_SOURCE,
-  }),
-  seafood: Object.freeze({
-    target: '145\u00b0F / 63\u00b0C',
-    note: 'Check the thickest part with a food thermometer.',
-    safety: 'USDA minimum: 145\u00b0F / 63\u00b0C for fish and shellfish.',
+    safety: 'USDA minimum: 71\u00b0C / 160\u00b0F for ground beef and pork.',
     source: USDA_TEMPERATURE_SOURCE,
   }),
 });
@@ -98,7 +89,6 @@ function timingRange(minimum, best) {
 const TIMING = Object.freeze({
   short: timingRange('At least 1 hour', '4 hours or overnight'),
   long: timingRange('At least 4 hours', 'Overnight'),
-  seafood: timingRange('30 minutes', '1 hour'),
   ground: timingRange('Immediately before shaping', 'Up to 30 minutes for a firmer, better-bound texture'),
 });
 
@@ -148,15 +138,18 @@ export const WHOLE_CHICKEN_DRY_BRINE = Object.freeze({
   timing: TIMING.long,
 });
 
-function dryBrineContent(id, ratios, timing = TIMING.short) {
+function dryBrineContent(id, ratios, timing = TIMING.short, metadata = {}) {
+  const provenance = metadata.source
+    ? { source: metadata.source, sourceLabel: metadata.sourceLabel }
+    : { source: null };
   return Object.freeze({
     ...placeholderContent(id, 'Dry brine'),
     percentageBasis: 'protein-weight',
     ratios,
     contentStatus: 'candidate',
-    source: null,
-    methodology: 'culinary-references-and-home-testing',
-    reviewedOn: '2026-07-20',
+    ...provenance,
+    methodology: metadata.methodology ?? 'culinary-references-and-home-testing',
+    reviewedOn: metadata.reviewedOn ?? '2026-07-20',
     timing,
   });
 }
@@ -172,12 +165,13 @@ function typeRecord({
   temperature,
   temperaturesByDoneness = {},
   timing = TIMING.short,
+  dryBrineMetadata = {},
 }) {
   const temperatureId = `${dryBrineId}-temperature`;
   const baseDryBrine = dryBrineId === WHOLE_CHICKEN_DRY_BRINE.id
     ? WHOLE_CHICKEN_DRY_BRINE
     : ratios
-      ? dryBrineContent(dryBrineId, ratios, timing)
+      ? dryBrineContent(dryBrineId, ratios, timing, dryBrineMetadata)
       : placeholderContent(dryBrineId, 'Dry brine');
 
   return Object.freeze({
@@ -189,7 +183,7 @@ function typeRecord({
     dryBrineByDetail: Object.freeze(Object.fromEntries(
       Object.entries(ratiosByDetail).map(([detailSlug, detailRatios]) => [
         detailSlug,
-        dryBrineContent(`${dryBrineId}-${detailSlug}`, detailRatios, timing),
+        dryBrineContent(`${dryBrineId}-${detailSlug}`, detailRatios, timing, dryBrineMetadata),
       ]),
     )),
     internalTemperature: temperatureContent(temperatureId, temperature),
@@ -210,6 +204,8 @@ const DETAIL = {
   shucked: { slug: 'shucked', label: 'Shucked' },
   peeled: { slug: 'peeled', label: 'Peeled' },
   fillet: { slug: 'fillet', label: 'Fillet' },
+  steak: { slug: 'steak', label: 'Steak' },
+  cleaned: { slug: 'cleaned', label: 'Cleaned' },
 };
 
 const DONENESS = {
@@ -259,15 +255,6 @@ export const MEAT_CATALOG = Object.freeze([
       typeRecord({ slug: 'leg', label: 'Leg', details: [DETAIL.boneIn, DETAIL.boneless], doneness: [DONENESS.mediumRare, DONENESS.medium], dryBrineId: 'lamb-leg-dry-brine', ratios: SOURCE_RATIOS.lambBoneless, ratiosByDetail: { 'bone-in': SOURCE_RATIOS.lambBoneIn, boneless: SOURCE_RATIOS.lambBoneless }, temperaturesByDoneness: { 'medium-rare': CHEF_TEMPERATURES.lambMediumRare, medium: CHEF_TEMPERATURES.lambMedium }, timing: TIMING.long }),
       typeRecord({ slug: 'rack', label: 'Rack', details: [DETAIL.boneIn], doneness: [DONENESS.mediumRare, DONENESS.medium], dryBrineId: 'lamb-rack-dry-brine', ratios: SOURCE_RATIOS.lambBoneIn, temperaturesByDoneness: { 'medium-rare': CHEF_TEMPERATURES.lambMediumRare, medium: CHEF_TEMPERATURES.lambMedium }, timing: TIMING.long }),
       typeRecord({ slug: 'shoulder', label: 'Shoulder', details: [DETAIL.boneIn, DETAIL.boneless], doneness: [DONENESS.tender], dryBrineId: 'lamb-shoulder-dry-brine', ratios: SOURCE_RATIOS.lambBoneless, ratiosByDetail: { 'bone-in': SOURCE_RATIOS.lambBoneIn, boneless: SOURCE_RATIOS.lambBoneless }, timing: TIMING.long }),
-    ]),
-  }),
-  Object.freeze({
-    slug: 'seafood',
-    label: 'Fish & shellfish',
-    types: Object.freeze([
-      typeRecord({ slug: 'scallops', label: 'Scallops', details: [DETAIL.shucked], doneness: [DONENESS.cookThrough], dryBrineId: 'seafood-scallops-dry-brine', ratios: SOURCE_RATIOS.scallops, temperature: CHEF_TEMPERATURES.seafood, timing: TIMING.seafood }),
-      typeRecord({ slug: 'shrimp', label: 'Prawns', details: [DETAIL.peeled], doneness: [DONENESS.cookThrough], dryBrineId: 'seafood-shrimp-dry-brine', ratios: SOURCE_RATIOS.shrimp, temperature: CHEF_TEMPERATURES.seafood, timing: TIMING.seafood }),
-      typeRecord({ slug: 'fish', label: 'Fish fillet', details: [DETAIL.fillet], doneness: [DONENESS.cookThrough], dryBrineId: 'seafood-fish-dry-brine', ratios: SOURCE_RATIOS.fish, temperature: CHEF_TEMPERATURES.seafood, timing: TIMING.seafood }),
     ]),
   }),
 ]);
@@ -333,6 +320,113 @@ export const PASTA_CATALOG = Object.freeze([
         note: 'This is a cold-water wrapper dough for jiaozi. Flour protein changes how much water the dough needs.',
         source: 'https://redhousespice.com/homemade-dumpling-wrappers/',
         sourceLabel: 'Dumpling wrapper ratio reference',
+      }),
+    ]),
+  }),
+]);
+
+export const BREAD_CATALOG = Object.freeze([
+  Object.freeze({
+    slug: 'bread',
+    label: 'Bread',
+    styles: Object.freeze([
+      Object.freeze({
+        slug: 'everyday-loaf',
+        label: 'Everyday loaf',
+        inputLabel: 'Flour weight',
+        liquidLabel: 'Water',
+        hydration: 66,
+        saltPercent: 2,
+        leavenLabel: 'Yeast',
+        leavenPercent: 1.2,
+        extraParts: Object.freeze([]),
+        ratioParts: Object.freeze([
+          Object.freeze({ value: 66, label: 'Water' }),
+          Object.freeze({ value: 2, label: 'Salt' }),
+          Object.freeze({ value: 1.2, label: 'Yeast' }),
+        ]),
+        ratioLabel: 'by flour weight',
+        rest: 'Let the dough ferment until expanded and airy, then give it a final proof after shaping.',
+        finishGuidance: Object.freeze({
+          method: 'Bake',
+          temperature: '90°C / 194°F',
+          cue: 'The crust is browned and the crumb feels set.',
+          after: 'Cool before slicing so the crumb can finish setting.',
+        }),
+        note: 'A balanced starting point for a soft, sliceable loaf. Flour strength and room temperature can shift the water and yeast needs.',
+        source: 'https://www.kingarthurbaking.com/pro/reference/bakers-percentage',
+        contentStatus: 'candidate',
+        methodology: 'culinary-reference-and-home-testing',
+        reviewedOn: '2026-07-25',
+        sourceLabel: 'Baker’s percentage reference',
+      }),
+      Object.freeze({
+        slug: 'olive-oil-focaccia',
+        label: 'Olive-oil focaccia',
+        inputLabel: 'Flour weight',
+        liquidLabel: 'Water',
+        hydration: 75,
+        saltPercent: 2,
+        leavenLabel: 'Yeast',
+        leavenPercent: 1,
+        extraParts: Object.freeze([
+          Object.freeze({ slug: 'olive-oil', label: 'Olive oil', percentage: 5 }),
+        ]),
+        ratioParts: Object.freeze([
+          Object.freeze({ value: 75, label: 'Water' }),
+          Object.freeze({ value: 2, label: 'Salt' }),
+          Object.freeze({ value: 1, label: 'Yeast' }),
+          Object.freeze({ value: 5, label: 'Olive oil' }),
+        ]),
+        ratioLabel: 'by flour weight',
+        rest: 'Let the dough ferment until airy, then ease it into a well-oiled pan without pressing out all the gas.',
+        finishGuidance: Object.freeze({
+          method: 'Bake',
+          temperature: '96°C / 205°F',
+          cue: 'The top is deeply coloured and the underside is crisp.',
+          after: 'Keep the pan and finishing oil outside the dough ratio; rest briefly before cutting.',
+        }),
+        note: 'A wet, oil-rich starting point. Flour strength changes how much water the dough can hold.',
+        source: 'https://www.kingarthurbaking.com/recipes/focaccia-recipe',
+        contentStatus: 'candidate',
+        methodology: 'culinary-reference-and-home-testing',
+        reviewedOn: '2026-07-25',
+        sourceLabel: 'Focaccia formula reference',
+      }),
+      Object.freeze({
+        slug: 'chinese-steamed-buns',
+        label: 'Chinese steamed buns',
+        inputLabel: 'Flour weight',
+        liquidLabel: 'Water',
+        hydration: 55,
+        saltPercent: 0.5,
+        leavenLabel: 'Yeast',
+        leavenPercent: 1,
+        extraParts: Object.freeze([
+          Object.freeze({ slug: 'sugar', label: 'Sugar', percentage: 3 }),
+          Object.freeze({ slug: 'oil', label: 'Oil', percentage: 2 }),
+        ]),
+        ratioParts: Object.freeze([
+          Object.freeze({ value: 55, label: 'Water' }),
+          Object.freeze({ value: 0.5, label: 'Salt' }),
+          Object.freeze({ value: 1, label: 'Yeast' }),
+          Object.freeze({ value: 3, label: 'Sugar' }),
+          Object.freeze({ value: 2, label: 'Oil' }),
+        ]),
+        ratioLabel: 'by flour weight',
+        rest: 'Let the dough become smooth and lively before shaping; give the shaped buns a final rest until slightly puffy.',
+        finishGuidance: Object.freeze({
+          method: 'Steam',
+          temperature: '88°C / 190°F',
+          cue: 'Temperature is secondary to a set, springy crumb with no wet dough.',
+          after: 'Stand briefly before serving so the crumb settles without drying out.',
+        }),
+        note: 'A soft, lightly sweet starting point for plain mantou-style buns. Flour and humidity can shift the water needed.',
+        source: 'https://thewoksoflife.com/purpose-chinese-bun-dough-man-tou/',
+        contentStatus: 'candidate',
+        methodology: 'culinary-reference-and-home-testing',
+        reviewedOn: '2026-07-25',
+        sourceLabel: 'Chinese steamed bun reference',
       }),
     ]),
   }),
@@ -620,7 +714,7 @@ export const SAUCE_CATALOG = Object.freeze({
     sauceClassic({
       slug: 'vinaigrette',
       label: 'Vinaigrette',
-      ratioParts: [['3', 'Fat'], ['1', 'Acid']],
+      ratioParts: [['3', 'Oil'], ['1', 'Acid']],
       purpose: 'A classic dressing balance for fresh or roasted foods.',
       uses: ['Salads', 'Vegetables', 'Beans', 'Grains'],
       optionalAdditions: ['Mustard', 'Shallot or herbs', 'Honey, salt, and pepper'],
@@ -639,6 +733,6 @@ export const CATEGORY_CATALOG = Object.freeze([
   Object.freeze({ slug: 'meat', label: 'Meat', kind: 'meat' }),
   Object.freeze({ slug: 'pasta', label: 'Pasta & Noodles', kind: 'pasta', styles: PASTA_CATALOG[0].styles }),
   SAUCE_CATALOG,
-  Object.freeze({ slug: 'bread', label: 'Bread', kind: 'coming-soon', status: 'coming-soon' }),
+  Object.freeze({ slug: 'bread', label: 'Bread', kind: 'bread', styles: BREAD_CATALOG[0].styles }),
   Object.freeze({ slug: 'marinades', label: 'Marinades', kind: 'coming-soon', status: 'coming-soon' }),
 ]);

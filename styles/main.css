@@ -222,9 +222,46 @@ input {
   font-size: 1.08rem;
 }
 
-.guide-list {
+.guide-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 1.4rem 0 1.25rem;
+  padding: 0.65rem 0;
+  border-top: 1px solid var(--warm-stone);
+  border-bottom: 1px solid var(--warm-stone);
+}
+
+.guide-jump a {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--warm-stone);
+  background: var(--recipe-paper);
+  color: var(--deep-pandan);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.guide-jump a:hover {
+  border-color: var(--deep-pandan);
+  color: var(--soft-ink);
+}
+
+.guide-groups {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.guide-group {
   display: grid;
   gap: 1rem;
+  scroll-margin-top: 1rem;
+}
+
+.guide-group > h2 {
+  margin: 0;
+  color: var(--deep-pandan);
+  font-size: 1.2rem;
 }
 
 .guide-card,
@@ -235,7 +272,7 @@ input {
   background: var(--recipe-paper);
 }
 
-.guide-card h2 {
+.guide-card h3 {
   margin-bottom: 0.55rem;
   font-size: 1.45rem;
 }
@@ -490,9 +527,12 @@ h2 {
 }
 
 .ratio-display {
-  display: inline-grid;
-  grid-template-columns: auto auto auto;
+  display: inline-flex;
+  flex-wrap: wrap;
   align-items: start;
+  justify-content: flex-end;
+  column-gap: 0;
+  row-gap: 0.35rem;
   max-width: 12rem;
   margin: 0;
   text-align: right;
@@ -500,7 +540,8 @@ h2 {
 
 .ratio-part {
   display: grid;
-  gap: 0.1rem;
+  flex: 0 0 auto;
+  gap: 0.25rem;
   justify-items: end;
 }
 
@@ -510,7 +551,7 @@ h2 {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.05em;
-  line-height: 0.9;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
@@ -525,6 +566,7 @@ h2 {
 }
 
 .ratio-separator {
+  flex: 0 0 auto;
   padding: 0 0.55rem;
   color: var(--warm-stone);
   font-family: var(--display);
@@ -577,7 +619,7 @@ h2 {
 .sauce-ratio-part {
   display: grid;
   width: 100%;
-  gap: 0.08rem;
+  gap: 0.2rem;
   justify-items: center;
   text-align: center;
 }
@@ -588,7 +630,7 @@ h2 {
   font-size: clamp(1.65rem, 3.4vw, 2.4rem);
   font-weight: 700;
   letter-spacing: -0.05em;
-  line-height: 0.9;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
@@ -739,7 +781,7 @@ h2 {
 
 .dough-output-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
   gap: 0.8rem;
 }
 
@@ -886,6 +928,18 @@ h2 {
 @media (max-width: 47.99rem) {
   .results-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 37.51rem) {
+  .ratio-part {
+    grid-template-rows: minmax(3rem, auto) minmax(1.6rem, auto);
+    row-gap: 0.25rem;
+  }
+
+  .sauce-ratio-part {
+    grid-template-rows: minmax(2.4rem, auto) minmax(1.2rem, auto);
+    row-gap: 0.2rem;
   }
 }
 

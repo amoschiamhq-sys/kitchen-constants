@@ -1,10 +1,10 @@
-import { CATEGORY_CATALOG, MEAT_CATALOG } from './constants.js';
+import { CATEGORY_CATALOG, MEAT_CATALOG } from './constants.js?v=20260725-bread';
 import {
   getSinglePageViewModel,
   parseRoute,
   resolveSelection,
-} from './navigation.js';
-import { formatGrams } from './calculator.js';
+} from './navigation.js?v=20260725-bread';
+import { formatGrams } from './calculator.js?v=20260725-bread';
 
 const appRoot = document.querySelector('#app');
 const state = {
@@ -31,10 +31,12 @@ function selectionLink({ href, label, isSelected, key }) {
   return `<li><a class="choice${isSelected ? ' choice--selected' : ''}" href="${escapeHtml(href)}" data-choice-key="${escapeHtml(key)}"${isSelected ? ' aria-current="true"' : ''}>${escapeHtml(label)}</a></li>`;
 }
 
-function renderChoiceGroup({ id, label, kind, choices }) {
+function renderChoiceGroup({ id, label, kind, choices, description = '' }) {
+  const describedBy = description ? ` aria-describedby="${id}-description"` : '';
   return `
-    <section class="selection-group selection-group--${kind}" aria-labelledby="${id}">
+    <section class="selection-group selection-group--${kind}" aria-labelledby="${id}"${describedBy}>
       <h2 id="${id}">${escapeHtml(label)}</h2>
+      ${description ? `<p id="${id}-description" class="selection-group__description">${escapeHtml(description)}</p>` : ''}
       <ul class="choice-list choice-list--${kind}">
         ${choices.join('')}
       </ul>
@@ -61,20 +63,21 @@ function renderCategoryControls(selection) {
     id: 'category-heading',
     label: 'What are you making?',
     kind: 'category',
+    description: 'Rough ratios and temperatures that scale to what you’re cooking.',
     choices: categoryChoices,
   });
 }
 
-function renderPastaSelectionControls(selection) {
+function renderDoughSelectionControls(selection) {
   const styleChoices = selection.category.styles.map((style) => selectionLink({
     href: resolvedHash({ category: selection.category, style }),
     label: style.label,
     isSelected: style.slug === selection.style.slug,
-    key: `pasta:${style.slug}`,
+    key: `${selection.category.kind}:${style.slug}`,
   }));
 
   return renderChoiceGroup({
-    id: 'pasta-style-heading',
+    id: `${selection.category.kind}-style-heading`,
     label: 'Style',
     kind: 'style',
     choices: styleChoices,
@@ -127,10 +130,10 @@ function renderSelectionControls(selection) {
   if (selection.category?.kind === 'sauce') {
     return renderSauceSelectionControls(selection);
   }
-  if (selection.category?.kind === 'pasta') {
+  if (['pasta', 'bread'].includes(selection.category?.kind)) {
     return `
-      <div class="selection-controls selection-controls--secondary" aria-label="Pasta and noodle choices">
-        ${renderPastaSelectionControls(selection)}
+      <div class="selection-controls selection-controls--secondary" aria-label="Dough choices">
+        ${renderDoughSelectionControls(selection)}
       </div>`;
   }
 
@@ -159,15 +162,19 @@ function renderSelectionControls(selection) {
     isSelected: option.slug === doneness.slug,
     key: `doneness:${option.slug}`,
   }));
+  const detailGroup = type.details.length > 1
+    ? renderChoiceGroup({ id: 'detail-heading', label: 'Detail', kind: 'detail', choices: detailChoices })
+    : '';
+  const donenessGroup = type.doneness.length > 1
+    ? renderChoiceGroup({ id: 'doneness-heading', label: 'Doneness', kind: 'doneness', choices: donenessChoices })
+    : '';
+  const secondaryGroups = [detailGroup, donenessGroup].filter(Boolean);
 
   return `
     <div class="selection-controls" aria-label="Cooking choices">
       ${renderChoiceGroup({ id: 'meat-heading', label: 'Meat', kind: 'meat', choices: meatChoices })}
       ${renderChoiceGroup({ id: 'cut-heading', label: 'Cut', kind: 'cut', choices: typeChoices })}
-      <div class="selection-pair">
-        ${renderChoiceGroup({ id: 'detail-heading', label: 'Detail', kind: 'detail', choices: detailChoices })}
-        ${renderChoiceGroup({ id: 'doneness-heading', label: 'Doneness', kind: 'doneness', choices: donenessChoices })}
-      </div>
+      ${secondaryGroups.length > 0 ? `<div class="selection-pair">${secondaryGroups.join('')}</div>` : ''}
     </div>`;
 }
 
@@ -244,6 +251,18 @@ function renderPrepareCard(model) {
 
 function renderDoughCalculation(model) {
   if (model.weight.status === 'valid' && model.dough) {
+    const leavenOutput = model.dough.leaven === undefined
+      ? ''
+      : `
+        <div class="dough-output-item">
+          <p class="dough-output-label">${escapeHtml(model.style.leavenLabel)}</p>
+          <p class="result-value">${formatGrams(model.dough.leaven)} <span>g</span></p>
+        </div>`;
+    const extraOutputs = (model.dough.extras ?? []).map((extra) => `
+        <div class="dough-output-item">
+          <p class="dough-output-label">${escapeHtml(extra.label)}</p>
+          <p class="result-value">${formatGrams(extra.grams)} <span>g</span></p>
+        </div>`).join('');
     return `
       <div class="dough-output-grid">
         <div class="dough-output-item">
@@ -254,6 +273,8 @@ function renderDoughCalculation(model) {
           <p class="dough-output-label">Salt</p>
           <p class="result-value">${formatGrams(model.dough.salt)} <span>g</span></p>
         </div>
+        ${leavenOutput}
+        ${extraOutputs}
       </div>`;
   }
   if (model.weight.status === 'empty') {
@@ -280,7 +301,7 @@ function renderRatioDisplay(style) {
     </div>`;
 }
 
-function renderPastaPrepareCard(model) {
+function renderDoughPrepareCard(model) {
   const { style } = model;
   const error = weightError(model.weight.status);
   const validationAttributes = error
@@ -313,7 +334,23 @@ function renderPastaPrepareCard(model) {
     </article>`;
 }
 
-function renderPastaFinishCard(model) {
+function renderDoughFinishCard(model) {
+  if (model.style.finishGuidance) {
+    const finish = model.style.finishGuidance;
+    return `
+      <article class="result-card result-card--finish" aria-labelledby="finish-heading">
+        <p class="card-kicker">Finish</p>
+        <h2 id="finish-heading">${escapeHtml(finish.method)}</h2>
+        <p class="result-label">Rest</p>
+        <p class="guidance">${escapeHtml(model.style.rest)}</p>
+        <p class="result-label">Internal temperature</p>
+        <p class="temperature-value">${escapeHtml(finish.temperature)}</p>
+        <p class="result-label">Look and feel</p>
+        <p class="guidance">${escapeHtml(finish.cue)}</p>
+        <p class="result-label safety-label">After cooking</p>
+        <p class="safety-note">${escapeHtml(finish.after)}</p>
+      </article>`;
+  }
   return `
     <article class="result-card result-card--finish" aria-labelledby="finish-heading">
       <p class="card-kicker">Finish</p>
@@ -354,6 +391,20 @@ function roleKey(label) {
   return 'aromatics';
 }
 
+const CONCENTRATED_INGREDIENTS = new Set([
+  'Fish sauce',
+  'Miso',
+  'Gochujang',
+  'Mirin',
+  'Worcestershire',
+]);
+
+function renderRoleIngredients(ingredients) {
+  return ingredients.map((ingredient) => CONCENTRATED_INGREDIENTS.has(ingredient)
+    ? `${ingredient} (concentrated)`
+    : ingredient).join(' · ');
+}
+
 function renderSauceRoleChoices(sauce) {
   if (!sauce.ingredientsByRole) return '';
   const roles = [...new Map(sauce.ratioParts
@@ -365,10 +416,10 @@ function renderSauceRoleChoices(sauce) {
         ${roles.map(([key, label]) => `
           <div class="sauce-role">
             <strong>${escapeHtml(label)}</strong>
-            <span>${escapeHtml((sauce.ingredientsByRole[key] ?? []).join(' · '))}</span>
+            <span>${escapeHtml(renderRoleIngredients(sauce.ingredientsByRole[key] ?? []))}</span>
           </div>`).join('')}
       </div>
-      <p class="method-note">One ingredient can fill more than one role. Start with the balance, then adjust.</p>
+      <p class="method-note">One ingredient can fill more than one role, and strengths vary. Start with the balance, then adjust gradually.</p>
     </div>`;
 }
 
@@ -383,6 +434,7 @@ function renderSauceBalanceCard(model) {
         </div>
         ${renderSauceRatioDisplay(sauce)}
       </div>
+      <p class="method-note sauce-strength-note">Parts show balance, not equal strength. Start with half a part when using concentrated ingredients, then taste.</p>
       <p class="method-note sauce-ratio-help">Use the same spoon or cup for every part.</p>
       <p class="sauce-purpose">${escapeHtml(sauce.purpose)}</p>
       ${renderSauceRoleChoices(sauce)}
@@ -484,7 +536,7 @@ function renderNotFound() {
 
 function renderPage(selection) {
   const model = getSinglePageViewModel(selection, state.rawWeight);
-  const isPasta = selection.category?.kind === 'pasta';
+  const isDough = ['pasta', 'bread'].includes(selection.category?.kind);
   const isSauce = selection.category?.kind === 'sauce';
   return `
     ${renderHeader()}
@@ -495,8 +547,8 @@ function renderPage(selection) {
         ${renderSelectionControls(selection)}
       </div>
       <section class="results-grid" aria-label="Cooking guidance">
-          ${isSauce ? renderSauceBalanceCard(model) : isPasta ? renderPastaPrepareCard(model) : renderPrepareCard(model)}
-          ${isSauce ? renderSauceUseCard(model) : isPasta ? renderPastaFinishCard(model) : renderFinishCard(model)}
+          ${isSauce ? renderSauceBalanceCard(model) : isDough ? renderDoughPrepareCard(model) : renderPrepareCard(model)}
+          ${isSauce ? renderSauceUseCard(model) : isDough ? renderDoughFinishCard(model) : renderFinishCard(model)}
         </section>
       ${renderSupportNote()}
     </main>
@@ -543,11 +595,11 @@ function updateWeightResult() {
   else input?.removeAttribute('aria-errormessage');
   const errorNode = appRoot.querySelector('#weight-error');
   if (errorNode) errorNode.textContent = error;
-  const output = appRoot.querySelector(state.selection.category?.kind === 'pasta'
+  const output = appRoot.querySelector(['pasta', 'bread'].includes(state.selection.category?.kind)
     ? '[data-dough-output]'
     : '[data-salt-output]');
   if (output) {
-    output.innerHTML = state.selection.category?.kind === 'pasta'
+    output.innerHTML = ['pasta', 'bread'].includes(state.selection.category?.kind)
       ? renderDoughCalculation(model)
       : renderSaltCalculation(model);
   }

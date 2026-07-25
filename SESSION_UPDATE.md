@@ -1,6 +1,6 @@
 # Session update
 
-Date: 2026-07-23
+Date: 2026-07-25
 
 ## MVP execution
 
@@ -134,3 +134,91 @@ Date: 2026-07-23
 - Recorded every sauce profile and classic as `reviewed` with `owner-tested-with-reference` metadata, based on Amos's self-testing confirmation; numeric ratios and internal source URLs were preserved.
 - Left meat ratio statuses unchanged as candidate values; no extra internal checklist was added.
 - Cloudflare certificate and redirect work remains manual. No push, merge, or deployment was performed.
+
+## Seafood and bread expansion - 2026-07-25
+
+- Expanded Fish & shellfish with Salmon, White fish, Tuna, and Trout while preserving Scallops, Prawns, and Fish fillet.
+- Added lighter candidate dry-brine starting points: 0.5% for delicate fish and 0.75% for fattier fish, with the existing short seafood timing and hidden fish-brining source metadata.
+- Activated Bread with Everyday loaf at 66% water / 2% salt / 1.2% yeast, Ciabatta-style at 76% / 2% / 1.2%, and Sourdough fougasse at 73% water / 1.9% salt / 18% starter.
+- Generalized the flour-based dough calculator to show an optional leaven output in grams while preserving Pasta & Noodles behavior.
+- Added Guide 08, “How bread ratios stay useful.” It explains baker's percentage as a scaling language, not a recipe or a promise of identical results.
+- New seafood and bread values remain candidate starting points pending representative home testing. Marinades remain deferred and no deployment was performed.
+
+## Whole-site correction plan - 2026-07-25
+
+- Reviewed the current site as a first-time home cook and approved a narrower next direction: remove seafood, retain Marinades only as Coming soon, and keep the product focused on scalable ratios rather than recipes.
+- Approved the next Bread set as Everyday loaf, Olive-oil focaccia, and Chinese steamed buns. Each Bread Finish card should include a Celsius-first internal temperature plus method, sensory cue, and cooling/rest guidance; all new values remain candidate content pending source reconciliation and home testing.
+- Approved hiding singleton Detail and Doneness rows while preserving complete canonical route state.
+- Approved clearer first-use positioning, a grouped Guides jump menu, sauce-strength qualification, Celsius-first temperature strings, and the homepage title `Kitchen Constants | Cooking Ratios & Temperatures`.
+- Deferred all marinade ratios and guide content. Marinades remain separate from Sauces.
+- Recorded the slight desktop-only number/subtitle overlap as a required visual correction. Mobile is currently acceptable and must be regression-tested, not redesigned.
+- Sol Planner converted these decisions into milestones 15–17 in `IMPLEMENTATION_PLAN.md`. No product code was changed during planning.
+- Planning baseline: all 56 tests pass; all 7 JavaScript files pass `node --check`; `git diff --check` reports only line-ending notices.
+
+## Milestone 17 execution - 2026-07-25
+
+- Fixed the desktop-only number/subtitle collision in dough and sauce ratio groups with explicit desktop grid rows for the number and subtitle treatments.
+- Preserved the existing mobile CSS path and verified every listed ratio-heavy page at `390 × 844` and `320 × 568` without horizontal overflow.
+- Added a focused metadata/CSS regression test; no data, route, calculation, content value, source, or review metadata changed.
+- Completed the outsider walkthrough across category navigation, canonical history, invalid-weight recovery, keyboard focus, Guides jumps, About, support links, and all six ratio-heavy states.
+- Verification: 62 tests pass; all changed JavaScript files pass `node --check`; `git diff --check` passes with only line-ending notices; desktop screenshots show distinct number/subtitle boundaries; browser console logs are clean.
+- No further implementation milestone is approved. Marinades remains deferred, and no deployment or commit was performed.
+
+## Milestone 16 execution - 2026-07-25
+
+- Added the rough-ratios first-use helper under the category prompt and clarified the About page that Kitchen Constants is not a recipe book.
+- Hid only singleton Detail and Doneness groups in the rendered controls while retaining complete arrays and canonical route hashes.
+- Changed existing meat temperature pairs to Celsius-first presentation without changing reviewed values or pending temperature states.
+- Added the sauce unequal-strength caveat, concentrated ingredient labels, and retained the same-measure instruction.
+- Grouped Guides into Foundations, Meat, Sauces, and Dough & bread with jump links; Marinades remains deferred and has no guide.
+- Updated the homepage and social title to `Kitchen Constants | Cooking Ratios & Temperatures`.
+- Verification: focused and full tests pass (61 tests); all changed JavaScript files pass `node --check`; browser checks pass at desktop, `390 × 844`, and `320 × 568` with no horizontal overflow or console errors. Canonical click, Back, and Forward behavior also pass.
+- Remaining: Milestone 17 desktop-only number/subtitle overlap correction. No deployment or commit performed.
+
+## Milestone 15 execution - 2026-07-25
+
+- Removed Fish & shellfish from the active catalogue and deleted seafood-only runtime data. Former seafood hashes now render the existing not-found recovery.
+- Replaced Ciabatta-style and Sourdough fougasse with Everyday loaf, Olive-oil focaccia, and Chinese steamed buns.
+- Added candidate bread finish guidance with Bake/Steam method, Celsius-first internal temperature, sensory cue, and after-cooking guidance.
+- Extended flour calculations with ordered optional extras while preserving the existing Pasta & Noodles output contract.
+- Added focused regression tests for the four-meat catalogue, removed routes, Bread styles, candidate Finish data, and oil/sugar calculations.
+- Verification: focused tests pass; `node --test` passes 58 tests; `node --check` passes for all 7 JavaScript files; `git diff --check` passes with only line-ending notices; browser checks pass at desktop, `390 × 844`, and `320 × 568` with no actual horizontal overflow or console errors.
+- Remaining: singleton controls, Celsius-first meat temperatures, first-use copy, sauce-strength copy, Guides regrouping, metadata title, and the desktop number/subtitle overlap remain for milestones 16–17. No deployment or commit performed.
+
+## Terminology and SEO planning - 2026-07-25
+
+- Approved a label-only change from `Fat` to `Oil` for Vinaigrette. All other sauce labels and the generic `fat` ingredient role remain unchanged.
+- Explicitly rejected sticky or floating Guides topic buttons on both desktop and mobile.
+- Approved a technical SEO foundation consisting of meaningful homepage source content and accurate `WebSite`, `CollectionPage`, and `AboutPage`/`Person` structured data. `Recipe` schema is excluded.
+- Approved four clean-URL reference pages covering dry-brining by weight, meat internal temperatures, dough and bread ratios, and sauce ratios. They will teach reusable principles, reuse approved content, and link to calculator states without duplicating every hash route.
+- Publishing, sitemap submission, Search Console actions, and live measurement remain a conditional final milestone requiring the appropriate explicit authorization.
+- Sol Planner converted the decisions into milestones 18-21 in `IMPLEMENTATION_PLAN.md`. Planning changed documentation only.
+- Planning baseline: `node --test` passes all 62 tests.
+
+## Milestone 18 execution - 2026-07-25
+
+- Changed Vinaigrette's visible balance label to `Oil` while leaving every other `Fat` label, the generic `fat` role, ratio values, and source/review metadata unchanged.
+- Updated the focused navigation assertion and passed 38 focused navigation tests plus all 62 tests.
+- `node --check` passed for both changed JavaScript files; `git diff --check` passed with only existing line-ending notices.
+- Verified the Vinaigrette card in the real browser at desktop, `390 × 844`, and `320 × 568`; the Oil label is clear, the body has no actual horizontal overflow, and console logs are clean. Dressing / Bright still shows Fat.
+- Restored the Vinaigrette route in the local browser for review. No SEO, deployment, commit, or Milestone 19 work was performed.
+
+## Milestone 19 execution - 2026-07-25
+
+- Added the homepage semantic fallback inside `#app`, reusing the existing header, choice buttons, card treatment, and footer. It contains one H1, rough-ratio positioning, active category links, and Guides/About links; no new CSS was needed.
+- Added one accurate JSON-LD block to each public static page: `WebSite` on the homepage, `CollectionPage` on Guides, and `AboutPage` with Amos Chiam as the existing public `Person` entity on About.
+- Added metadata regression coverage for JSON parsing, schema types/URLs, no Recipe schema, and the source fallback contract.
+- Focused metadata tests pass: 9. Full suite passes: 64. `node --check` passes for the changed test file; `git diff --check` passes with existing line-ending notices.
+- Browser verification passed for JavaScript-enabled rendering at desktop, `390 × 844`, and `320 × 568`; one H1 remains, the fallback is replaced, body width stays within the viewport, and console logs are clean.
+- Source-only homepage verification passed over the local HTTP response. Guides and About schema were parsed in-browser at 320 px; Guides jump navigation remains static (`position: static`, `top: auto`).
+- No reference pages, sitemap expansion, sticky navigation, SEO account actions, commit, publish, or deployment were performed. Milestone 20 is next.
+
+## Milestone 20 execution - 2026-07-25
+
+- Added four clean-URL principle pages: `dry-brining.html`, `meat-temperatures.html`, `dough-ratios.html`, and `sauce-ratios.html`.
+- Reused the existing static-page visual system: warm paper, Georgia display type, compact content width, sesame card rule, existing header/footer, and ordinary in-flow links.
+- Added visible `By Amos Chiam` bylines and Article author markup with `url: https://kitchenconstants.com/about`, matching Google’s author-disambiguation guidance.
+- Added Guides discovery links and seven clean sitemap URLs. No Recipe schema, new culinary values, recipe steps, Marinades content, or sticky navigation was added.
+- Focused metadata tests pass: 10. Full suite passes: 65. `node --check` passes for the changed test file; `git diff --check` passes with existing line-ending notices.
+- Browser verification passed for all four pages at desktop, `390 × 844`, and `320 × 568`; all calculator CTAs opened the intended hash routes, with no actual overflow or console errors. Guides discovery links and static jump navigation were verified at 320 px.
+- No commit, deployment, sitemap submission, or Search Console action was performed. Milestone 21 is now the next approved action and requires explicit publishing authorization.

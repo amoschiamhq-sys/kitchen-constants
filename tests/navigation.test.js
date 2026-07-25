@@ -11,18 +11,17 @@ import {
   routeToHash,
   selectionKey,
 } from '../src/navigation.js';
-import { CATEGORY_CATALOG, MEAT_CATALOG, PASTA_CATALOG, SAUCE_CATALOG } from '../src/constants.js';
+import { BREAD_CATALOG, CATEGORY_CATALOG, MEAT_CATALOG, PASTA_CATALOG, SAUCE_CATALOG } from '../src/constants.js';
 
-test('approved catalogue exposes the compact five-meat matrix', () => {
+test('approved catalogue exposes the compact four-meat matrix', () => {
   assert.deepEqual(MEAT_CATALOG.map((meat) => meat.label), [
-    'Chicken', 'Beef', 'Pork', 'Lamb', 'Fish & shellfish',
+    'Chicken', 'Beef', 'Pork', 'Lamb',
   ]);
   assert.deepEqual(MEAT_CATALOG.map((meat) => meat.types.map((type) => type.label)), [
     ['Whole bird', 'Breast', 'Thigh', 'Ground meat'],
     ['Steak', 'Ribeye', 'Beef ribs', 'Ground meat'],
     ['Chop', 'Tenderloin', 'Ribs', 'Ground meat'],
     ['Chops', 'Leg', 'Rack', 'Shoulder'],
-    ['Scallops', 'Prawns', 'Fish fillet'],
   ]);
 });
 
@@ -66,6 +65,9 @@ test('parseRoute maps unknown and malformed hashes to not-found', () => {
   for (const hash of ['#/fish', '#/chicken/wing', '#/chicken/whole/bone-in', '#/beef/steak/bone-in/rare']) {
     assert.equal(parseRoute(hash).kind, 'not-found', hash);
   }
+  for (const hash of ['#/seafood', '#/seafood/salmon', '#/seafood/white-fish']) {
+    assert.equal(parseRoute(hash).kind, 'not-found', hash);
+  }
 });
 
 test('route parsing and hash generation are idempotent for selection paths', () => {
@@ -80,13 +82,13 @@ test('route choices expose the compact active catalogue', () => {
   const homeChoices = getRouteChoices(parseRoute('#/'));
   const beefChoices = getRouteChoices(parseRoute('#/beef'));
 
-  assert.deepEqual(homeChoices.slice(0, 5).map((choice) => choice.label), [
-    'Chicken', 'Beef', 'Pork', 'Lamb', 'Fish & shellfish',
+  assert.deepEqual(homeChoices.map((choice) => choice.label), [
+    'Chicken', 'Beef', 'Pork', 'Lamb',
   ]);
   assert.deepEqual(beefChoices.map((choice) => choice.label), [
     'Steak', 'Ribeye', 'Beef ribs', 'Ground meat',
   ]);
-  assert.equal(homeChoices.length, 5);
+  assert.equal(homeChoices.length, 4);
 });
 
 test('detail and doneness choices are exposed for every applicable step', () => {
@@ -108,6 +110,22 @@ test('detail and doneness choices are exposed for every applicable step', () => 
   );
 });
 
+test('known singleton choices retain canonical route state for conditional controls', () => {
+  const whole = resolveSelection(parseRoute('#/chicken/whole'));
+  const breast = resolveSelection(parseRoute('#/chicken/breast'));
+  const steak = resolveSelection(parseRoute('#/beef/steak'));
+
+  assert.equal(whole.hash, '#/chicken/whole/whole/cook-through');
+  assert.equal(breast.hash, '#/chicken/breast/bone-in/cook-through');
+  assert.equal(steak.hash, '#/beef/steak/bone-in/medium-rare');
+  assert.equal(whole.type.details.length, 1);
+  assert.equal(whole.type.doneness.length, 1);
+  assert.equal(breast.type.details.length, 2);
+  assert.equal(breast.type.doneness.length, 1);
+  assert.equal(steak.type.details.length, 2);
+  assert.equal(steak.type.doneness.length, 2);
+});
+
 test('single-page model resolves whole-chicken defaults before weight input', () => {
   const model = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/whole')));
 
@@ -123,10 +141,13 @@ test('category model exposes the active sauce section before coming-soon tools',
     'Meat', 'Pasta & Noodles', 'Sauces', 'Bread', 'Marinades',
   ]);
   assert.deepEqual(CATEGORY_CATALOG.slice(3).map((category) => category.status), [
-    'coming-soon', 'coming-soon',
+    undefined, 'coming-soon',
   ]);
   assert.deepEqual(PASTA_CATALOG[0].styles.map((style) => style.label), [
     'Fresh egg pasta', 'Chinese hand-cut noodles', 'Dumpling wrappers',
+  ]);
+  assert.deepEqual(BREAD_CATALOG[0].styles.map((style) => style.label), [
+    'Everyday loaf', 'Olive-oil focaccia', 'Chinese steamed buns',
   ]);
 });
 
@@ -248,7 +269,7 @@ test('vinaigrette is a reviewed classic with a chef-style balance', () => {
 
   assert.equal(selection.hash, '#/sauces/classics/vinaigrette');
   assert.deepEqual(selection.classic.ratioParts, [
-    { value: '3', label: 'Fat' },
+    { value: '3', label: 'Oil' },
     { value: '1', label: 'Acid' },
   ]);
   assert.equal(selection.classic.contentStatus, 'reviewed');
@@ -305,6 +326,78 @@ test('pasta styles expose labelled ratio parts for the visual ratio display', ()
   }
 });
 
+test('bread routes resolve the first style and expose baker percentages', () => {
+  const parsed = parseRoute('#/bread');
+  const resolved = resolveSelection(parsed);
+
+  assert.equal(parsed.kind, 'category');
+  assert.equal(resolved.style.slug, 'everyday-loaf');
+  assert.equal(resolved.hash, '#/bread/everyday-loaf');
+  assert.deepEqual(getRouteChoices(parsed).map((choice) => choice.label), [
+    'Everyday loaf', 'Olive-oil focaccia', 'Chinese steamed buns',
+  ]);
+
+  for (const style of BREAD_CATALOG[0].styles) {
+    const model = getSinglePageViewModel(
+      resolveSelection(parseRoute(`#/bread/${style.slug}`)),
+      '500',
+    );
+    assert.equal(model.module, 'bread', style.slug);
+    assert.equal(model.dough.liquid, 500 * style.hydration / 100, style.slug);
+    assert.equal(model.dough.salt, 500 * style.saltPercent / 100, style.slug);
+    assert.equal(model.dough.leaven, 500 * style.leavenPercent / 100, style.slug);
+  }
+});
+
+test('bread styles expose candidate finish guidance and ordered extras', () => {
+  const expected = {
+    'everyday-loaf': {
+      parts: ['66% Water', '2% Salt', '1.2% Yeast'],
+      temperature: '90°C / 194°F',
+      method: 'Bake',
+    },
+    'olive-oil-focaccia': {
+      parts: ['75% Water', '2% Salt', '1% Yeast', '5% Olive oil'],
+      temperature: '96°C / 205°F',
+      method: 'Bake',
+    },
+    'chinese-steamed-buns': {
+      parts: ['55% Water', '0.5% Salt', '1% Yeast', '3% Sugar', '2% Oil'],
+      temperature: '88°C / 190°F',
+      method: 'Steam',
+    },
+  };
+
+  for (const style of BREAD_CATALOG[0].styles) {
+    const model = getSinglePageViewModel(
+      resolveSelection(parseRoute(`#/bread/${style.slug}`)),
+      '500',
+    );
+    const finish = style.finishGuidance;
+
+    assert.deepEqual(style.ratioParts.map((part) => `${part.value}% ${part.label}`), expected[style.slug].parts, style.slug);
+    assert.equal(style.contentStatus, 'candidate', style.slug);
+    assert.equal(finish.temperature, expected[style.slug].temperature, style.slug);
+    assert.equal(finish.method, expected[style.slug].method, style.slug);
+    assert.ok(finish.cue.length > 0, style.slug);
+    assert.ok(finish.after.length > 0, style.slug);
+    assert.deepEqual(
+      model.dough.extras?.map((extra) => ({ slug: extra.slug, grams: extra.grams })),
+      (style.extraParts ?? []).map((extra) => ({
+        slug: extra.slug,
+        grams: 500 * extra.percentage / 100,
+      })),
+      style.slug,
+    );
+  }
+});
+
+test('former seafood routes use the not-found recovery state', () => {
+  for (const hash of ['#/seafood', '#/seafood/prawns', '#/seafood/salmon', '#/seafood/trout']) {
+    assert.equal(parseRoute(hash).kind, 'not-found', hash);
+  }
+});
+
 test('single-page whole-chicken model calculates without stale output', () => {
   const selection = resolveSelection(parseRoute('#/chicken/whole'));
   const valid = getSinglePageViewModel(selection, '1500');
@@ -323,29 +416,26 @@ test('single-page model exposes grams without salt-volume fields', () => {
   assert.equal('spoonResult' in model, false);
 });
 
-test('reviewed dry-brine timing remains tailored for ground meat and seafood', () => {
+test('reviewed dry-brine timing remains tailored for ground meat', () => {
   const ground = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ground-80-20')), '1000');
-  const seafood = getSinglePageViewModel(resolveSelection(parseRoute('#/seafood/shrimp')), '1000');
 
   assert.match(ground.dryBrine.timing.minimum, /Immediately before shaping/);
   assert.match(ground.dryBrine.timing.best, /30 minutes/);
-  assert.equal(seafood.dryBrine.timing.minimum, '30 minutes');
-  assert.equal(seafood.dryBrine.timing.best, '1 hour');
 });
 
 test('single-page chef temperatures follow selected beef doneness', () => {
   const mediumRare = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/steak/bone-in/medium-rare')));
   const medium = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/steak/bone-in/medium')));
 
-  assert.equal(mediumRare.internalTemperature.targetInternalTemperature, '130–135°F / 54–57°C');
-  assert.equal(medium.internalTemperature.targetInternalTemperature, '135–145°F / 57–63°C');
-  assert.match(mediumRare.internalTemperature.safety, /145°F/);
+  assert.equal(mediumRare.internalTemperature.targetInternalTemperature, '54–57°C / 130–135°F');
+  assert.equal(medium.internalTemperature.targetInternalTemperature, '57–63°C / 135–145°F');
+  assert.match(mediumRare.internalTemperature.safety, /63°C \/ 145°F/);
 });
 
 test('reviewed lamb temperatures cover each roast and chop doneness choice', () => {
   const expected = {
-    'medium-rare': '130–135°F / 54–57°C',
-    medium: '135–145°F / 57–63°C',
+    'medium-rare': '54–57°C / 130–135°F',
+    medium: '57–63°C / 135–145°F',
   };
 
   for (const cut of ['chops', 'leg', 'rack']) {
@@ -357,9 +447,9 @@ test('reviewed lamb temperatures cover each roast and chop doneness choice', () 
 
       assert.equal(temperature.contentStatus, 'reviewed', `${cut} ${doneness}`);
       assert.equal(temperature.targetInternalTemperature, target, `${cut} ${doneness}`);
-      assert.match(temperature.guidance, /5°F \/ 2°C early for chops/);
-      assert.match(temperature.guidance, /10–12°F \/ 5–6°C early for larger roasts/);
-      assert.match(temperature.safety, /145°F \/ 63°C with at least 3 minutes of rest/);
+      assert.match(temperature.guidance, /2°C \/ 5°F early for chops/);
+      assert.match(temperature.guidance, /5–6°C \/ 10–12°F early for larger roasts/);
+      assert.match(temperature.safety, /63°C \/ 145°F with at least 3 minutes of rest/);
       assert.equal(
         temperature.source,
         'https://blog.thermoworks.com/chef-recommended-tw-approved/',
@@ -373,18 +463,16 @@ test('reviewed lamb temperatures cover each roast and chop doneness choice', () 
   }
 });
 
-test('reviewed ground meat and seafood temperatures use safety baselines', () => {
+test('reviewed ground meat temperatures use safety baselines', () => {
   const groundPoultry = getSinglePageViewModel(resolveSelection(parseRoute('#/chicken/ground')));
   const groundBeef = getSinglePageViewModel(resolveSelection(parseRoute('#/beef/ground-80-20')));
   const groundPork = getSinglePageViewModel(resolveSelection(parseRoute('#/pork/ground')));
-  const seafood = getSinglePageViewModel(resolveSelection(parseRoute('#/seafood/fish')));
 
-  assert.equal(groundPoultry.internalTemperature.targetInternalTemperature, '165°F / 74°C');
+  assert.equal(groundPoultry.internalTemperature.targetInternalTemperature, '74°C / 165°F');
   assert.match(groundPoultry.internalTemperature.safety, /ground poultry/);
-  assert.equal(groundBeef.internalTemperature.targetInternalTemperature, '160°F / 71°C');
+  assert.equal(groundBeef.internalTemperature.targetInternalTemperature, '71°C / 160°F');
   assert.match(groundBeef.internalTemperature.safety, /ground beef and pork/);
-  assert.equal(groundPork.internalTemperature.targetInternalTemperature, '160°F / 71°C');
-  assert.equal(seafood.internalTemperature.targetInternalTemperature, '145°F / 63°C');
+  assert.equal(groundPork.internalTemperature.targetInternalTemperature, '71°C / 160°F');
 });
 
 test('compact catalogue keeps source ratios for active detail choices', () => {

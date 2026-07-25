@@ -8,7 +8,7 @@ const pages = [
   {
     file: 'index.html',
     canonical: 'https://kitchenconstants.com/',
-    titleIncludes: 'Pasta',
+    titleIncludes: 'Cooking Ratios',
   },
   {
     file: 'guides.html',
@@ -17,6 +17,26 @@ const pages = [
   {
     file: 'about.html',
     canonical: 'https://kitchenconstants.com/about',
+  },
+  {
+    file: 'dry-brining.html',
+    canonical: 'https://kitchenconstants.com/dry-brining',
+    titleIncludes: 'Dry-Brining Percentages',
+  },
+  {
+    file: 'meat-temperatures.html',
+    canonical: 'https://kitchenconstants.com/meat-temperatures',
+    titleIncludes: 'Meat Internal Temperatures',
+  },
+  {
+    file: 'dough-ratios.html',
+    canonical: 'https://kitchenconstants.com/dough-ratios',
+    titleIncludes: 'Dough &amp; Bread Ratios',
+  },
+  {
+    file: 'sauce-ratios.html',
+    canonical: 'https://kitchenconstants.com/sauce-ratios',
+    titleIncludes: 'Sauce Ratios',
   },
 ];
 
@@ -36,6 +56,11 @@ function getLink(html, rel) {
   const escapedRel = rel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const pattern = new RegExp(`<link\\s+rel="${escapedRel}"\\s+href="([^"]*)"`);
   return html.match(pattern)?.[1] ?? null;
+}
+
+function getJsonLd(html) {
+  return [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map(([, json]) => JSON.parse(json));
 }
 
 test('all public pages expose complete sharing metadata and matching canonicals', () => {
@@ -75,6 +100,57 @@ test('all public pages expose complete sharing metadata and matching canonicals'
   }
 });
 
+test('public pages expose accurate structured data without Recipe schema', () => {
+  const expected = {
+    'index.html': { type: 'WebSite', url: 'https://kitchenconstants.com/' },
+    'guides.html': { type: 'CollectionPage', url: 'https://kitchenconstants.com/guides' },
+    'about.html': { type: 'AboutPage', url: 'https://kitchenconstants.com/about' },
+    'dry-brining.html': { type: 'Article', url: 'https://kitchenconstants.com/dry-brining' },
+    'meat-temperatures.html': { type: 'Article', url: 'https://kitchenconstants.com/meat-temperatures' },
+    'dough-ratios.html': { type: 'Article', url: 'https://kitchenconstants.com/dough-ratios' },
+    'sauce-ratios.html': { type: 'Article', url: 'https://kitchenconstants.com/sauce-ratios' },
+  };
+
+  for (const [file, expectation] of Object.entries(expected)) {
+    const html = readPage(file);
+    const blocks = getJsonLd(html);
+
+    assert.equal(blocks.length, 1, `${file} JSON-LD block count`);
+    assert.equal(blocks[0]['@context'], 'https://schema.org', `${file} JSON-LD context`);
+    assert.equal(blocks[0]['@type'], expectation.type, `${file} JSON-LD type`);
+    assert.equal(blocks[0].url, expectation.url, `${file} JSON-LD URL`);
+    assert.doesNotMatch(html, /"@type"\s*:\s*"Recipe"/, `${file} Recipe schema`);
+  }
+
+  const about = getJsonLd(readPage('about.html'))[0];
+  assert.deepEqual(about.mainEntity, { '@type': 'Person', name: 'Amos Chiam', url: 'https://kitchenconstants.com/about' });
+
+  for (const file of ['dry-brining.html', 'meat-temperatures.html', 'dough-ratios.html', 'sauce-ratios.html']) {
+    assert.deepEqual(getJsonLd(readPage(file))[0].author, {
+      '@type': 'Person',
+      name: 'Amos Chiam',
+      url: 'https://kitchenconstants.com/about',
+    }, file);
+  }
+});
+
+test('reference pages have one H1, principle links, and no recipe-shaped content', () => {
+  const expected = {
+    'dry-brining.html': ['./index.html#/chicken/whole/whole/cook-through', './guides.html#salt-percentages'],
+    'meat-temperatures.html': ['./index.html#/chicken/whole/whole/cook-through', './guides.html#temperature'],
+    'dough-ratios.html': ['./index.html#/bread/everyday-loaf', './guides.html#dough-ratios'],
+    'sauce-ratios.html': ['./index.html#/sauces/stir-fry/balanced', './guides.html#sauce-builder'],
+  };
+
+  for (const [file, links] of Object.entries(expected)) {
+    const html = readPage(file);
+    assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${file} H1 count`);
+    for (const href of links) assert.match(html, new RegExp(`href="${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`), `${file} ${href}`);
+    assert.match(html, /By Amos Chiam/);
+    assert.doesNotMatch(html, /<ol|<ul[^>]*class="(ingredient|steps)/i, `${file} recipe-shaped content`);
+  }
+});
+
 test('brand assets and HSTS configuration are present and correctly sized', () => {
   for (const file of [
     'assets/favicon.svg',
@@ -98,18 +174,70 @@ test('Guides keeps sauce guidance short, ordered, and citation-free', () => {
 
   assert.deepEqual(cards.map(([, id, number]) => [id, number]), [
     ['methodology', '01'],
-    ['dry-brining', '02'],
-    ['salt-percentages', '03'],
+    ['salt-percentages', '02'],
+    ['dry-brining', '03'],
     ['temperature', '04'],
     ['sauce-builder', '05'],
     ['dough-ratios', '06'],
     ['dough-salt', '07'],
+    ['bread-ratios', '08'],
   ]);
   assert.match(html, /dissolve salt and sugar in the watery ingredients first\./);
   assert.match(html, /Mix dried spices or chilli into the oil\./);
   assert.match(html, /Add delicate fresh herbs last/);
   assert.match(html, /Pure salt sits outside the parts/);
   assert.doesNotMatch(html, /thewoksoflife|escoffier|justonecookbook|hot-thai-kitchen/i);
+});
+
+test('first-use copy, conditional controls, sauce caveat, and public title are present', () => {
+  const app = fs.readFileSync(path.join(root, 'src/app.js'), 'utf8');
+  const index = readPage('index.html');
+  const about = readPage('about.html');
+
+  assert.match(app, /Rough ratios and temperatures that scale to what you’re cooking\./);
+  assert.match(app, /type\.details\.length > 1/);
+  assert.match(app, /type\.doneness\.length > 1/);
+  assert.match(app, /Parts show balance, not equal strength\./);
+  assert.match(app, /Use the same spoon or cup for every part\./);
+  assert.match(app, /concentrated/);
+  assert.equal(index.match(/<title>([^<]+)<\/title>/)?.[1], 'Kitchen Constants | Cooking Ratios &amp; Temperatures');
+  assert.match(index, /<meta name="twitter:title" content="Kitchen Constants \| Cooking Ratios &amp; Temperatures">/);
+  assert.match(about, /Kitchen Constants is not a recipe book\. It offers scalable starting points/);
+});
+
+test('homepage source contains a useful semantic fallback for non-JavaScript visitors', () => {
+  const html = readPage('index.html');
+  const appStart = html.indexOf('<div id="app">');
+  const scriptStart = html.indexOf('<script type="module"', appStart);
+  const fallback = html.slice(appStart, scriptStart);
+
+  assert.ok(appStart >= 0, 'homepage app mount');
+  assert.ok(scriptStart > appStart, 'homepage script follows fallback');
+  assert.equal((fallback.match(/<h1\b/g) ?? []).length, 1, 'homepage fallback has one H1');
+  assert.match(fallback, /Kitchen Constants cooking reference/);
+  assert.match(fallback, /Rough ratios and temperatures that scale to what you’re cooking\./);
+  for (const label of ['Meat', 'Pasta &amp; Noodles', 'Sauces', 'Bread', 'Marinades']) {
+    assert.match(fallback, new RegExp(`>${label}<`), label);
+  }
+  assert.match(fallback, /href="\.\/guides\.html"/);
+  assert.match(fallback, /href="\.\/about\.html"/);
+  assert.match(fallback, /Kitchen Constants is a reference for adjusting your own cooking, not a recipe book\./);
+});
+
+test('Guides exposes the four approved topic jump targets', () => {
+  const html = readPage('guides.html');
+  for (const id of ['foundations', 'meat-guides', 'sauce-guides', 'dough-guides']) {
+    assert.match(html, new RegExp(`id="${id}"`), id);
+    assert.match(html, new RegExp(`href="#${id}"`), id);
+  }
+  assert.doesNotMatch(html, /id="marinades/);
+});
+
+test('desktop ratio labels reserve shared number and subtitle rows', () => {
+  const css = fs.readFileSync(path.join(root, 'styles/main.css'), 'utf8');
+
+  assert.match(css, /@media\s*\(min-width:\s*37\.51rem\)[\s\S]*?\.ratio-part\s*\{[\s\S]*?grid-template-rows:\s*minmax\(3rem, auto\)\s+minmax\(1\.6rem, auto\);/);
+  assert.match(css, /@media\s*\(min-width:\s*37\.51rem\)[\s\S]*?\.sauce-ratio-part\s*\{[\s\S]*?grid-template-rows:\s*minmax\(2\.4rem, auto\)\s+minmax\(1\.2rem, auto\);/);
 });
 
 test('public navigation and sitemap use clean page URLs', () => {
@@ -127,4 +255,15 @@ test('public navigation and sitemap use clean page URLs', () => {
   assert.match(sitemap, /https:\/\/kitchenconstants\.com\/guides/);
   assert.match(sitemap, /https:\/\/kitchenconstants\.com\/about/);
   assert.doesNotMatch(sitemap, /(?:guides|about)\.html/);
+
+  const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, url]) => url);
+  assert.deepEqual(sitemapUrls, [
+    'https://kitchenconstants.com/',
+    'https://kitchenconstants.com/guides',
+    'https://kitchenconstants.com/about',
+    'https://kitchenconstants.com/dry-brining',
+    'https://kitchenconstants.com/meat-temperatures',
+    'https://kitchenconstants.com/dough-ratios',
+    'https://kitchenconstants.com/sauce-ratios',
+  ]);
 });
