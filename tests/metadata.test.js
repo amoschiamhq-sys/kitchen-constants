@@ -19,24 +19,29 @@ const pages = [
     canonical: 'https://kitchenconstants.com/about',
   },
   {
+    file: 'amos-chiam.html',
+    canonical: 'https://kitchenconstants.com/amos-chiam',
+    titleIncludes: 'Amos Chiam',
+  },
+  {
     file: 'dry-brining.html',
     canonical: 'https://kitchenconstants.com/dry-brining',
-    titleIncludes: 'Dry-Brining Percentages',
+    titleIncludes: 'Dry-Brine Calculator',
   },
   {
     file: 'meat-temperatures.html',
     canonical: 'https://kitchenconstants.com/meat-temperatures',
-    titleIncludes: 'Meat Internal Temperatures',
+    titleIncludes: 'Meat Internal Temperature Chart',
   },
   {
     file: 'dough-ratios.html',
     canonical: 'https://kitchenconstants.com/dough-ratios',
-    titleIncludes: 'Dough &amp; Bread Ratios',
+    titleIncludes: 'Pasta Dough &amp; Bread Ratio Calculator',
   },
   {
     file: 'sauce-ratios.html',
     canonical: 'https://kitchenconstants.com/sauce-ratios',
-    titleIncludes: 'Sauce Ratios',
+    titleIncludes: 'Sauce Ratio Calculator',
   },
 ];
 
@@ -105,6 +110,7 @@ test('public pages expose accurate structured data without Recipe schema', () =>
     'index.html': { type: 'WebSite', url: 'https://kitchenconstants.com/' },
     'guides.html': { type: 'CollectionPage', url: 'https://kitchenconstants.com/guides' },
     'about.html': { type: 'AboutPage', url: 'https://kitchenconstants.com/about' },
+    'amos-chiam.html': { type: 'ProfilePage', url: 'https://kitchenconstants.com/amos-chiam' },
     'dry-brining.html': { type: 'Article', url: 'https://kitchenconstants.com/dry-brining' },
     'meat-temperatures.html': { type: 'Article', url: 'https://kitchenconstants.com/meat-temperatures' },
     'dough-ratios.html': { type: 'Article', url: 'https://kitchenconstants.com/dough-ratios' },
@@ -123,13 +129,31 @@ test('public pages expose accurate structured data without Recipe schema', () =>
   }
 
   const about = getJsonLd(readPage('about.html'))[0];
-  assert.deepEqual(about.mainEntity, { '@type': 'Person', name: 'Amos Chiam', url: 'https://kitchenconstants.com/about' });
+  assert.deepEqual(about.mainEntity, {
+    '@id': 'https://kitchenconstants.com/amos-chiam#amos-chiam',
+    '@type': 'Person',
+    name: 'Amos Chiam',
+    url: 'https://kitchenconstants.com/amos-chiam',
+    sameAs: ['https://de.linkedin.com/in/amoschiam'],
+  });
+
+  const authorPage = getJsonLd(readPage('amos-chiam.html'))[0];
+  assert.deepEqual(authorPage.mainEntity, {
+    '@id': 'https://kitchenconstants.com/amos-chiam#amos-chiam',
+    '@type': 'Person',
+    name: 'Amos Chiam',
+    url: 'https://kitchenconstants.com/amos-chiam',
+    description: 'Creator of Kitchen Constants.',
+    sameAs: ['https://de.linkedin.com/in/amoschiam'],
+  });
 
   for (const file of ['dry-brining.html', 'meat-temperatures.html', 'dough-ratios.html', 'sauce-ratios.html']) {
     assert.deepEqual(getJsonLd(readPage(file))[0].author, {
+      '@id': 'https://kitchenconstants.com/amos-chiam#amos-chiam',
       '@type': 'Person',
       name: 'Amos Chiam',
-      url: 'https://kitchenconstants.com/about',
+      url: 'https://kitchenconstants.com/amos-chiam',
+      sameAs: ['https://de.linkedin.com/in/amoschiam'],
     }, file);
   }
 });
@@ -146,7 +170,8 @@ test('reference pages have one H1, principle links, and no recipe-shaped content
     const html = readPage(file);
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${file} H1 count`);
     for (const href of links) assert.match(html, new RegExp(`href="${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`), `${file} ${href}`);
-    assert.match(html, /By Amos Chiam/);
+    assert.match(html, /By\s+(?:<[^>]+>\s*)?Amos Chiam/);
+    assert.match(html, /href="\.\/amos-chiam\.html"/);
     assert.doesNotMatch(html, /<ol|<ul[^>]*class="(ingredient|steps)/i, `${file} recipe-shaped content`);
   }
 });
@@ -203,6 +228,7 @@ test('first-use copy, conditional controls, sauce caveat, and public title are p
   assert.equal(index.match(/<title>([^<]+)<\/title>/)?.[1], 'Kitchen Constants | Cooking Ratios &amp; Temperatures');
   assert.match(index, /<meta name="twitter:title" content="Kitchen Constants \| Cooking Ratios &amp; Temperatures">/);
   assert.match(about, /Kitchen Constants is not a recipe book\. It offers scalable starting points/);
+  assert.match(index, /"creator":\s*\{[\s\S]*"name":\s*"Amos Chiam"[\s\S]*"url":\s*"https:\/\/kitchenconstants\.com\/amos-chiam"/);
 });
 
 test('homepage source contains a useful semantic fallback for non-JavaScript visitors', () => {
@@ -261,6 +287,7 @@ test('public navigation and sitemap use clean page URLs', () => {
     'https://kitchenconstants.com/',
     'https://kitchenconstants.com/guides',
     'https://kitchenconstants.com/about',
+    'https://kitchenconstants.com/amos-chiam',
     'https://kitchenconstants.com/dry-brining',
     'https://kitchenconstants.com/meat-temperatures',
     'https://kitchenconstants.com/dough-ratios',
